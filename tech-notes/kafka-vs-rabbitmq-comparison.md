@@ -36,7 +36,7 @@ RabbitMQ is a traditional message broker that implements the Advanced Message Qu
 - **Request-reply patterns**: Native support for RPC and synchronous communication patterns
 - **Priority queues**: Built-in support for message prioritization
 - **Message TTL and dead-letter queues**: Sophisticated message lifecycle management
-- **Low latency**: Optimized for low-latency message delivery between producers and consumers
+- **Low latency**: RabbitMQ is low latency for small, in-memory, transient messaging. Optimized for low-latency message delivery between producers and consumers.
 - **Flexible protocols**: Supports AMQP, MQTT, STOMP, and HTTP
 - **Ease of use**: Simpler conceptual model and easier to get started
 - **Transient messaging**: Efficient handling of short-lived messages that don't need persistence
