@@ -6,7 +6,7 @@ Apache Kafka is a distributed event streaming platform designed as a commit log.
 
 ## What Kafka is Good For
 
-- **High throughput streaming**: Handles millions of messages per second with low latency
+- **High throughput streaming**: Handles millions of messages per second with low latency. Typical p99 latency is 10-25ms for durable writes with acks=all and replication. Lower latency (1-2ms) possible with fsync disabled but not recommended for production.
 - **Event sourcing**: Perfect for maintaining event logs and building event-driven architectures
 - **Log aggregation**: Collecting and processing logs from multiple services
 - **Real-time analytics**: Processing and analyzing data streams in real-time
@@ -45,7 +45,7 @@ RabbitMQ is a traditional message broker that implements the Advanced Message Qu
 
 - **High throughput streaming**: Lower throughput compared to Kafka for massive data streams (Note: RabbitMQ Streams, introduced in 3.9, significantly closes this gap with throughput exceeding 1M msg/s)
 - **Event replay**: Messages are deleted after consumption in Classic queues, making replay difficult (Note: RabbitMQ Streams support offset tracking and replay like Kafka)
-- **Horizontal scaling**: More challenging to scale horizontally compared to Kafka. Classic queues do NOT shard; every queue lives on a single node. Quorum Queues (3.8+) provide better replication via Raft consensus but still don't shard like Kafka partitions.
+- **Horizontal scaling**: More challenging to scale horizontally compared to Kafka. Classic queues do NOT shard; every queue lives on a single node. Quorum Queues (3.8+) provide better replication via Raft consensus but still don't shard like Kafka partitions. RabbitMQ Streams support partitioning via Superstreams (3.11+), which work conceptually like Kafka topics with partitions, but lack consumer groups at partition granularity and remain more limited than Kafka's native partitioning model.
 - **Long-term storage**: Not designed for storing large volumes of historical data (Classic queues)
 - **Stream processing**: Limited native stream processing capabilities
 - **Partition tolerance**: Less resilient to network partitions than Kafka (Classic queues; Quorum Queues improve this)
