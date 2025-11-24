@@ -22,7 +22,7 @@ Apache Kafka is a distributed event streaming platform designed as a commit log.
 - **Low message volume**: Complex setup not justified for small-scale applications
 - **Message routing complexity**: Limited routing capabilities compared to traditional message brokers
 - **Operations overhead**: Requires ZooKeeper (or KRaft) and significant operational expertise
-- **Small messages**: Less efficient with very small message payloads due to overhead
+- **Small messages**: Less efficient with very small message payloads due to overhead. Kafka is not inherently bad with small messages; it's just less space efficient, not slower. Performance can still be very high.
 - **Message ordering across partitions**: Only guarantees order within a single partition
 - **Resource intensive**: Requires more memory and disk space than lightweight brokers
 
@@ -46,7 +46,7 @@ RabbitMQ is a traditional message broker that implements the Advanced Message Qu
 
 - **High throughput streaming**: Lower throughput compared to Kafka for massive data streams
 - **Event replay**: Messages are deleted after consumption, making replay difficult
-- **Horizontal scaling**: More challenging to scale horizontally compared to Kafka
+- **Horizontal scaling**: More challenging to scale horizontally compared to Kafka. RabbitMQ clustering does NOT shard queues; every queue lives on a single node (except mirrored queues), so scaling is limited.
 - **Long-term storage**: Not designed for storing large volumes of historical data
 - **Stream processing**: Limited native stream processing capabilities
 - **Partition tolerance**: Less resilient to network partitions than Kafka
