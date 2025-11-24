@@ -21,7 +21,7 @@ Apache Kafka is a distributed event streaming platform designed as a commit log.
 - **Simple pub-sub patterns**: Overkill for basic message queue requirements
 - **Low message volume**: Complex setup not justified for small-scale applications
 - **Message routing complexity**: Limited routing capabilities compared to traditional message brokers
-- **Operations overhead**: Requires ZooKeeper (or KRaft) and significant operational expertise
+- **Operations overhead**: Formerly required ZooKeeper; now uses KRaft mode (production-ready since 3.3, ZooKeeper deprecated in 3.5, removed in 4.0). Still requires significant operational expertise.
 - **Small messages**: Less efficient with very small message payloads due to overhead. Kafka is not inherently bad with small messages; it's just less space efficient, not slower. Performance can still be very high.
 - **Message ordering across partitions**: Only guarantees order within a single partition
 - **Resource intensive**: Requires more memory and disk space than lightweight brokers
@@ -38,20 +38,19 @@ RabbitMQ is a traditional message broker that implements the Advanced Message Qu
 - **Message TTL and dead-letter queues**: Sophisticated message lifecycle management
 - **Low latency**: RabbitMQ is low latency for small, in-memory, transient messaging. Optimized for low-latency message delivery between producers and consumers.
 - **Flexible protocols**: Supports AMQP, MQTT, STOMP, and HTTP
-- **Ease of use**: Simpler conceptual model and easier to get started
 - **Transient messaging**: Efficient handling of short-lived messages that don't need persistence
 - **Resource efficiency**: Lighter footprint for moderate message volumes
 
 ## What RabbitMQ Sucks For
 
-- **High throughput streaming**: Lower throughput compared to Kafka for massive data streams
-- **Event replay**: Messages are deleted after consumption, making replay difficult
-- **Horizontal scaling**: More challenging to scale horizontally compared to Kafka. RabbitMQ clustering does NOT shard queues; every queue lives on a single node (except mirrored queues), so scaling is limited.
-- **Long-term storage**: Not designed for storing large volumes of historical data
+- **High throughput streaming**: Lower throughput compared to Kafka for massive data streams (Note: RabbitMQ Streams, introduced in 3.9, significantly closes this gap with throughput exceeding 1M msg/s)
+- **Event replay**: Messages are deleted after consumption in Classic queues, making replay difficult (Note: RabbitMQ Streams support offset tracking and replay like Kafka)
+- **Horizontal scaling**: More challenging to scale horizontally compared to Kafka. Classic queues do NOT shard; every queue lives on a single node. Quorum Queues (3.8+) provide better replication via Raft consensus but still don't shard like Kafka partitions.
+- **Long-term storage**: Not designed for storing large volumes of historical data (Classic queues)
 - **Stream processing**: Limited native stream processing capabilities
-- **Partition tolerance**: Less resilient to network partitions than Kafka
-- **Large message backlogs**: Performance degrades with large queue backlogs
-- **Audit logs**: Not suitable for maintaining long-term audit trails
+- **Partition tolerance**: Less resilient to network partitions than Kafka (Classic queues; Quorum Queues improve this)
+- **Large message backlogs**: Performance degrades with large queue backlogs (Note: Classic Queues v2 in 3.12+ handle backlogs much better, 2-3.5x performance improvement)
+- **Audit logs**: Not suitable for maintaining long-term audit trails (Classic queues; use Streams for this)
 
 ## Checkpointing
 
@@ -98,6 +97,8 @@ Kafka exactly-once requires:
 - transactional.id set on producer
 - isolation.level=read_committed on consumer
 - Application must use transactions correctly
+
+**Critical Limitation**: Kafka's exactly-once semantics only apply within the Kafka ecosystem (Kafka → Application → Kafka). External side effects such as database writes, API calls, or file system operations are NOT covered by Kafka transactions. If your consumer reads a message, writes to an external database, then crashes before committing the Kafka offset, the database write persists but Kafka re-delivers the message, causing duplicate processing. To achieve true exactly-once semantics with external systems, you must implement idempotent consumer patterns or use application-level coordination mechanisms.
 
 ### Comparison with Flink
 
