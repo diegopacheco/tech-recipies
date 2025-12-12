@@ -5,6 +5,9 @@
 ## Shortcuts
 
 ```
-CMD + ENTER    : Fullscreen Toggle
-CMD + ,        : Preferences
+CMD + ENTER        : Fullscreen Toggle
+CMD + ,            : Preferences
+CMD + SHIFT + D    : New terminal vertical split
+CMD + D            : New terminal horizontal split
+CMD + W            : Close current terminal
 ```
