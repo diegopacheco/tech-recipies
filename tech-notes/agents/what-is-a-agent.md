@@ -17,3 +17,17 @@ Not all agents are create equals, they can be a simple markdown file or it could
 Agents are software and can be deployed in various environments, depending on their purpose and requirements. Some common deployment environments:
 
 <img src="agent-deploy.png" width="600" alt="Agent Deployment">
+
+A more taxonomy of agent deployment environments:
+
+```
+┌─────────────┬───────────────────┬────────────────┐
+│  Local/Dev  │    Self-Hosted    │ Managed Cloud  │
+├─────────────┼───────────────────┼────────────────┤
+│ Claude Code │ Spring AI/Boot    │ AWS Agent Core │
+├─────────────┼───────────────────┼────────────────┤
+│             │ FastAPI + Strands │ Vertex AI      │
+├─────────────┼───────────────────┼────────────────┤
+│             │ Docker/K8s        │ Azure AI       │
+└─────────────┴───────────────────┴────────────────┘
+```
