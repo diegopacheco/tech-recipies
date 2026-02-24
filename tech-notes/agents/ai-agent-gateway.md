@@ -124,3 +124,73 @@ Guardrail: FLAGGED - RFC 9421 not found in retrieved context. Response held for 
 
     These patterns are what tools like LiteLLM (failover + load balancing), Portkey (cost + latency routing), OpenRouter
     (capability-based model selection), and RouterLLM (learned routing based on query complexity) implement in practice.
+
+## Auditing
+
+1. Request/Response Logging
+    Every call through the gateway gets logged with full context - who called, what model, what was sent, what came back, how long it
+    took.
+    {
+    "timestamp": "2026-02-23T14:32:01Z",
+    "user": "agent-order-support",
+    "team": "customer-ops",
+    "model": "claude-sonnet-4-6",
+    "provider": "anthropic",
+    "input_tokens": 1250,
+    "output_tokens": 430,
+    "latency_ms": 1840,
+    "status": "success",
+    "guardrails_triggered": [],
+    "cost_usd": 0.0089
+    }
+
+2. Cost Attribution & Chargeback
+    Track spending per team, per agent, per project. Know exactly who is burning how much and on what.
+    Monthly Report:
+    team: customer-ops     -> $2,340  (80% GPT-4o-mini, 20% Claude Opus)
+    team: ml-research      -> $8,120  (95% Claude Opus)
+    team: marketing        -> $410    (100% GPT-4o-mini)
+    agent: order-support   -> $1,800  (12,400 calls)
+    agent: code-reviewer   -> $3,200  (890 calls, high token usage)
+
+3. Guardrail Violation Tracking
+    Log every time a guardrail fires. Detect patterns - is a specific user probing for prompt injections? Is an agent hallucinating
+    too often?
+    Violations last 7 days:
+    PII leak blocked:        14 events (agent: support-bot)
+    Prompt injection attempt: 3 events (user: user-8821)
+    Off-topic blocked:       47 events (agent: sales-assistant)
+    Budget exceeded:          2 events (team: ml-research)
+
+    Alert: user-8821 triggered 3 injection attempts in 24h -> flag for review
+
+4. Compliance & Regulatory Audit Trail
+    For regulated industries (finance, healthcare), keep immutable logs proving what data went to which model, that PII was redacted,
+    and that responses were grounded.
+    Audit record (HIPAA compliant):
+    request_id: "req-a1b2c3"
+    pii_detected: true
+    pii_redacted: true
+    redacted_fields: ["patient_name", "ssn", "dob"]
+    model_provider: "anthropic"
+    data_residency: "us-east-1"
+    retention_policy: "90_days"
+    immutable_hash: "sha256:9f3a..."
+
+5. Performance & Drift Monitoring
+    Track model quality over time. Detect when a provider degrades, latency spikes, or response quality drops.
+    Weekly quality dashboard:
+    claude-sonnet-4-6:
+        avg_latency:  1.2s (was 1.1s last week, +9%)
+        error_rate:   0.3% (stable)
+        avg_tokens:   580  (stable)
+
+    gpt-4o-mini:
+        avg_latency:  0.8s (was 0.4s last week, +100%) <- ALERT
+        error_rate:   2.1% (was 0.5%) <- ALERT
+        avg_tokens:   620  (stable)
+
+    Action: auto-routed 30% of gpt-4o-mini traffic to Claude as failover
+
+    Tools from the document that handle auditing: LangSmith and Arize for observability and tracing, Portkey for cost tracking and
+    logging, LiteLLM for request logging across providers, and Helicone for analytics and cost attribution.
