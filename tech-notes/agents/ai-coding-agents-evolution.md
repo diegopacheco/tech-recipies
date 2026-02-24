@@ -24,3 +24,9 @@ Cursor, Superset and Conductor.
 
 Claude Teams -> Multi-agents like Claude Flow, Gast Town, Superclaude
 Codex App -> Threads like Cursor, Superset and Conductor.
+
+## AI Evolution
+
+Here is a bigger picture of evolution of AI. No boddy knows the future but my guess (as 2026) it's robotics. Perhaps there will be a correction or slice rollback, I said that in 2025. 
+
+<img src="ai-evolution-2026.png" width="600">
