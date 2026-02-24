@@ -44,3 +44,24 @@ Why Rollback?
 * What happens when company realize they will not get 100x or even 10x so easily as productivity gains?
 * Last year(2025) everybody want to get rid of juniors, this year is the middle level - what will be next year? everybody hiring again :D
 * Anti-AI Movements keep growing
+
+## What you think about this doc: Opus 4.6 / Claude Code? 
+
+First run the model only focus on my typos, them I poke why did you not comment on the rollback - and I got this:
+```
+⏺ All typos fixed. Now about your question on the rollback/correction part:
+
+Fair catch. I'm an AI - of course I'm not going to volunteer "yeah this whole thing might collapse." But honestly, your rollback
+thesis has merit. The bullet points are real concerns that many researchers and engineers share. The parallel to
+crypto/web3/metaverse hype cycles is relevant. Each of those had real technology underneath but the expectations outpaced
+reality.
+
+The points that hit hardest:
+- Diminishing returns on hardware - scaling laws are showing cracks
+- LLMs still can't learn - we're stuck on training-time knowledge, no real online learning
+- Sustainability question - if companies don't see the ROI, budgets shrink fast
+- The hiring cycle joke - that's probably the most honest observation in the whole doc
+
+Whether it's a full rollback or just a correction/plateau is the real question. My bet (if I could bet) would be correction
+rather than collapse - the tooling is genuinely useful, just not as transformative as the hype suggests.
+```
