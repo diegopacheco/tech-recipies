@@ -12,6 +12,26 @@ Not all agents are create equals, they can be a simple markdown file or it could
 
 <img src="agent-anatomy.png" width="600" alt="Agent Anatomy">
 
+## Memory
+
+```
+┌───────────┬────────────────────────┬────────────────────────┬────────────────────────────────┐
+│  Aspect   │       Short-Term       │    Long-Term (File)    │        Long-Term (RAG)         │
+├───────────┼────────────────────────┼────────────────────────┼────────────────────────────────┤
+│ Lifespan  │ Single session         │ Persistent             │ Persistent                     │
+├───────────┼────────────────────────┼────────────────────────┼────────────────────────────────┤
+│ Capacity  │ Context window         │ File size limits       │ Practically unlimited          │
+├───────────┼────────────────────────┼────────────────────────┼────────────────────────────────┤
+│ Retrieval │ Already in context     │ Full file load         │ Semantic similarity search     │
+├───────────┼────────────────────────┼────────────────────────┼────────────────────────────────┤
+│ Precision │ Exact (it's all there) │ Exact (if you find it) │ Approximate (similarity-based) │
+├───────────┼────────────────────────┼────────────────────────┼────────────────────────────────┤
+│ Cost      │ Token usage per turn   │ Cheap reads            │ Embedding + search cost        │
+├───────────┼────────────────────────┼────────────────────────┼────────────────────────────────┤
+│ Best for  │ Active task context    │ Stable preferences     │ Large evolving knowledge       │
+└───────────┴────────────────────────┴────────────────────────┴────────────────────────────────┘
+```
+
 ## Where to Deploy agents?
 
 Agents are software and can be deployed in various environments, depending on their purpose and requirements. Some common deployment environments:
@@ -26,8 +46,8 @@ A more taxonomy of agent deployment environments:
 ├─────────────┼───────────────────┼────────────────┤
 │ Claude Code │ Spring AI/Boot    │ AWS Agent Core │
 ├─────────────┼───────────────────┼────────────────┤
-│             │ FastAPI + Strands │ Vertex AI      │
+│ Codex       │ FastAPI + Strands │ Vertex AI      │
 ├─────────────┼───────────────────┼────────────────┤
-│             │ Docker/K8s        │ Azure AI       │
+│ Gemini CLI  │ Docker/K8s        │ Azure AI       │
 └─────────────┴───────────────────┴────────────────┘
 ```
