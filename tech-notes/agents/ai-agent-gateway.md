@@ -67,3 +67,60 @@ Before returning a response, a guardrail validates that the agent's claims are g
 the agent fabricates data (fake URLs, invented statistics), the response gets flagged.
 Agent output: "According to RFC 9421, the timeout should be 30s"
 Guardrail: FLAGGED - RFC 9421 not found in retrieved context. Response held for review.
+
+## Routing
+
+1. Cost-Based Routing
+    Route simple queries to cheap models and complex ones to expensive models. Save money without sacrificing quality where it
+    matters.
+    User: "What time is it in Tokyo?"
+    Router: Simple query -> GPT-4o-mini ($0.15/1M tokens)
+
+    User: "Analyze this 200-line function for security vulnerabilities"
+    Router: Complex query -> Claude Opus ($15/1M tokens)
+
+2. Latency-Based Routing
+    For real-time applications, route to the fastest responding provider. The gateway measures response times and picks the lowest
+    latency endpoint.
+    Providers available:
+    - OpenAI us-east: 120ms avg
+    - Anthropic us-west: 85ms avg
+    - Google us-central: 200ms avg
+
+    Router: User in California -> Anthropic us-west (lowest latency)
+
+3. Capability-Based Routing
+    Different models have different strengths. Route based on what the task actually needs.
+    User uploads an image: "What's in this photo?"
+    Router: Needs vision -> GPT-4o or Claude Sonnet (multimodal)
+
+    User: "Generate a Python script"
+    Router: Needs code -> Claude Opus or Codex
+
+    User: "Translate this to Japanese"
+    Router: Needs translation -> Gemini or GPT-4o-mini (good enough, cheaper)
+
+4. Failover / Redundancy Routing
+    If the primary provider is down or rate-limited, automatically fall to the next one. No downtime for the end user.
+    Request -> OpenAI (primary)
+    OpenAI returns 429 (rate limited)
+    Router: Failover -> Anthropic (secondary)
+    Anthropic returns 200 OK -> serve response
+
+    Request -> Anthropic (primary)
+    Anthropic timeout after 30s
+    Router: Failover -> Google Gemini (tertiary) -> serve response
+
+5. Tenant / Team-Based Routing
+    In multi-tenant platforms, route different teams or customers to different models based on their plan, budget, or policies.
+    Team: "free-tier-user"
+    Router: -> GPT-4o-mini, max 1000 tokens, rate limit 10 req/min
+
+    Team: "enterprise-customer"
+    Router: -> Claude Opus, max 32K tokens, rate limit 500 req/min
+
+    Team: "internal-ml-team"
+    Router: -> Self-hosted Llama 3, no token limit, no rate limit
+
+    These patterns are what tools like LiteLLM (failover + load balancing), Portkey (cost + latency routing), OpenRouter
+    (capability-based model selection), and RouterLLM (learned routing based on query complexity) implement in practice.
