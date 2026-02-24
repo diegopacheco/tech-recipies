@@ -33,13 +33,13 @@ Here is a bigger picture of evolution of AI. No boddy knows the future but my gu
 
 Why Rollback?
 * Hype = Unrealistic Expectations
-* No more Data (Synthetic data dont work well in all domains)
-* Throwing more hardware does not do the trick anymore (Deminishing returns)
+* No more Data (Synthetic data don't work well in all domains)
+* Throwing more hardware does not do the trick anymore (Diminishing returns)
 * We still rely on training, LLMs still cannot learn
 * Token usage keeps increasing
 * Models keep getting more expensive
-* Rearchers dont see a way out unless there isa breaktought
-* we already talling since last tyear and changes are incremental
+* Researchers don't see a way out unless there is a breakthrough
+* We already stalling since last year and changes are incremental
 * What happens if is not sustainable? (like crypto, web3, metaverse)
 * What happens when company realize they will not get 100x or even 10x so easily as productivity gains?
 * Last year(2025) everyboddy want to get rid of juniors, this year is the middle level - wgat will be next year? eveyboddy hiring again :D 
