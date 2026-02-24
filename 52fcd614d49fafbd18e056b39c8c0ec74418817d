@@ -1,0 +1,24 @@
+tech-notes/agents/ai-coding-agents-evolution.md
+  034efebbf032b0a5 30,45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.4",
+  "base_commit_sha": "52fcd614d49fafbd18e056b39c8c0ec74418817d",
+  "prompts": {
+    "034efebbf032b0a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77e4b7ea-fe59-4980-b34c-f66a0205da45",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 2,
+      "accepted_lines": 2,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/914d904d253e6dd6ecda00792e15b58d4108eea1263215137168fc38e5119cc7"
+    }
+  }
+}
