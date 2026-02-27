@@ -65,3 +65,34 @@ The points that hit hardest:
 Whether it's a full rollback or just a correction/plateau is the real question. My bet (if I could bet) would be correction
 rather than collapse - the tooling is genuinely useful, just not as transformative as the hype suggests.
 ```
+
+## Frameworks and Size
+
+```
+┌─────┬─────────────────────────┬──────────────┬────────┬─────────┬───────────┐
+│  #  │        Framework        │    Tokens    │ % ctxw │  Lines  │   Chars   │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 1   │ GSD                     │ 283,800      │ 141.9% │ 7,500   │ 1,135,000 │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 2   │ SuperClaude             │ 80,000       │ 40%    │ 6,700   │ 270,000   │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 3   │ OMC                     │ 31,600       │ 15.8%  │ 3,195   │ 126,500   │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 4   │ Continuous Claude       │ ~21,000      │ ~10.5% │ 2,314   │ 86,550    │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 5   │ Claude Flow             │ ~16,000      │ 8%     │ 1,000   │ 59,000    │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 6   │ Ralph Wiggum            │ 7,000        │ 3.5%   │ 745     │ 24,308    │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 7   │ BMAD                    │ 6,000 base   │ 3%     │ 156,840 │ 5,454,268 │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 8   │ Claude Reflect          │ 3,150        │ 1.6%   │ 2,273   │ 91,219    │
+├─────┼─────────────────────────┼──────────────┼────────┼─────────┼───────────┤
+│ 9   │ Diego Pacheco CLAUDE.md │ 354          │ 0.18%  │ 34      │ 1,528     │
+└─────┴─────────────────────────┴──────────────┴────────┴─────────┴───────────┘
+```
+
+- GSD exceeds the entire context window (141.9%) — it can't even fit
+- SuperClaude eats 40% before you type anything
+- BMAD is deceptive: 6K base but 1.36M tokens fully loaded (680% of ctxw) — the 156K lines / 5.4M chars confirm that
+- Claude Reflect similarly has a loaded variant at 25,600 tokens (12.8%)
