@@ -96,3 +96,34 @@ rather than collapse - the tooling is genuinely useful, just not as transformati
 - SuperClaude eats 40% before you type anything
 - BMAD is deceptive: 6K base but 1.36M tokens fully loaded (680% of ctxw) — the 156K lines / 5.4M chars confirm that
 - Claude Reflect similarly has a loaded variant at 25,600 tokens (12.8%)
+
+## Links
+
+OMC: https://github.com/Yeachan-Heo/oh-my-claudecode
+
+The biggest culprits are the 32 agent definition files (~24,500 tokens alone) and the 40 MCP tool schemas (~6,250 tokens).
+
+SuperClaude: https://github.com/SuperClaude-Org/SuperClaude_Framework
+
+That's a significant chunk. Claude Opus has a 200K token context window, so SuperClaude is eating roughly 33-40% of your
+available context before you even send your first message
+
+GSD: https://github.com/gsd-build/get-shit-done
+
+BMAD: https://github.com/bmad-code-org/BMAD-METHOD
+
+OMC: https://github.com/Yeachan-Heo/oh-my-claudecode
+
+Continuous Claude: https://github.com/AnandChowdhary/continuous-claude
+
+Claude Flow: https://github.com/ruvnet/claude-flow
+
+The heaviest offenders:
+1. Task tool agent descriptions (~7K tokens) — 50+ agent type definitions
+2. Skills registry (~4K tokens) — 70+ skill listings
+3. MCP deferred tools (~3K tokens) — 200 tool names
+4. CLAUDE.md (~1.8K tokens) — project instructions
+
+Claude Reflect https://github.com/BayramAnnakov/claude-reflect
+
+Ralph Wiggin: https://github.com/anthropics/claude-code/tree/main/plugins/ralph-wiggum
