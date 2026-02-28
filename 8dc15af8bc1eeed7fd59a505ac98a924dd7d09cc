@@ -1,0 +1,26 @@
+tech-notes/memory-map.md
+  0604ccf4465305e3 1-186
+tech-notes/cell-based-architecture.md
+  0604ccf4465305e3 1-139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.6",
+  "base_commit_sha": "8dc15af8bc1eeed7fd59a505ac98a924dd7d09cc",
+  "prompts": {
+    "0604ccf4465305e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e5731300-8c97-46d4-ae66-a45a70c6e0e8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 325,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/9b2be31954a062560d50e09444b1adccf7fa140dae37730de9b4b9b73ab417b1"
+    }
+  }
+}
