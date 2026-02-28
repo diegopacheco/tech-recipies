@@ -1,75 +1,109 @@
 # Data Mesh
 
-## What is it?
+## 1. What is Data Mesh?
 
 Data Mesh is a decentralized sociotechnical approach to data architecture that shifts data ownership from centralized data teams to domain-oriented teams. It treats data as a product and applies principles from distributed systems and domain-driven design to data management. Instead of a monolithic data lake or warehouse owned by a central team, each business domain owns and publishes its data as a product.
 
+The concept was introduced by **Zhamak Dehghani** in **2019** while at ThoughtWorks, and later expanded in her book "Data Mesh: Delivering Data-Driven Value at Scale" (2022).
+
 The architecture is built on four core principles:
-- **Domain Ownership**: Each domain team owns their data end-to-end (ingestion, processing, serving)
-- **Data as a Product**: Domains treat their data outputs as products with clear SLAs, documentation, and quality guarantees
-- **Self-Serve Data Platform**: A shared infrastructure platform that enables domains to build and manage data products autonomously
-- **Federated Computational Governance**: Global policies and standards applied across all domains through automation
 
-## Who created it? When?
+- **Domain Ownership**: each domain team owns their data end-to-end (ingestion, processing, serving)
+- **Data as a Product**: domains treat their data outputs as products with clear SLAs, documentation, and quality guarantees
+- **Self-Serve Data Platform**: a shared infrastructure platform that enables domains to build and manage data products autonomously
+- **Federated Computational Governance**: global policies and standards applied across all domains through automation
 
-Data Mesh was introduced by **Zhamak Dehghani** in **2019**. She published her foundational article "How to Move Beyond a Monolithic Data Lake to a Distributed Data Mesh" while working as a Principal Technology Consultant at ThoughtWorks. She later expanded on the concept in her book "Data Mesh: Delivering Data-Driven Value at Scale" published in 2022.
+### How it works
 
-## How it works?
+1. **Domain Identification**: organization identifies business domains (orders, customers, inventory) and assigns teams responsible for their data
+2. **Data Product Creation**: domain teams build data products with discoverable APIs, documentation, and quality metrics
+3. **Self-Serve Platform**: central platform team provides infrastructure as a service, abstracting storage, compute, and pipelines
+4. **Federated Governance**: global standards for interoperability encoded as code and enforced automatically
+5. **Data Consumption**: consumers discover data products through a central catalog and subscribe via standardized interfaces
 
-1. **Domain Identification**:
-   - Organization identifies business domains (e.g., orders, customers, inventory)
-   - Each domain is assigned a team responsible for their data
+## 2. Pros
 
-2. **Data Product Creation**:
-   - Domain teams build data products from their operational systems
-   - Each data product has discoverable APIs, documentation, and quality metrics
-   - Products are designed for consumption by other domains
+- **Scalability**: distributes data work across multiple teams, avoiding central bottlenecks
+- **Domain Expertise**: data owned by teams who understand the business context
+- **Faster Time to Value**: domains can iterate independently without waiting for central teams
+- **Data Quality**: clear ownership improves accountability and data quality
+- **Agility**: teams can evolve their data products without affecting others
+- **Reduced Coupling**: domains are decoupled through well-defined interfaces
+- **Better Alignment**: data architecture mirrors organizational structure
 
-3. **Self-Serve Platform**:
-   - Central platform team provides infrastructure as a service
-   - Domains use platform tools to build, deploy, and monitor data products
-   - Abstracts complexity of storage, compute, and data pipelines
+## 3. Cons
 
-4. **Federated Governance**:
-   - Global standards for interoperability (schemas, naming, security)
-   - Policies encoded as code and enforced automatically
-   - Data product catalog for discovery across domains
+- **Organizational Change**: requires significant cultural and organizational transformation
+- **Coordination Overhead**: maintaining interoperability across domains is challenging
+- **Duplication Risk**: similar data may be duplicated across domains
+- **Skill Requirements**: each domain team needs data engineering expertise
+- **Governance Complexity**: balancing autonomy with global standards is difficult
+- **Initial Investment**: building self-serve platform requires upfront effort
+- **Not for Small Organizations**: overhead may not be justified for smaller companies
+- **Cross-Domain Queries**: joining data across domains can be complex and slow
 
-5. **Data Consumption**:
-   - Consumers discover data products through a central catalog
-   - Subscribe to data products via standardized interfaces
-   - Cross-domain analytics built by combining multiple data products
+## 4. Comparisons with Other Architectures
 
-## Pros
+### Data Mesh vs Data Lake
 
-- **Scalability**: Distributes data work across multiple teams, avoiding central bottlenecks
-- **Domain Expertise**: Data owned by teams who understand the business context
-- **Faster Time to Value**: Domains can iterate independently without waiting for central teams
-- **Data Quality**: Clear ownership improves accountability and data quality
-- **Agility**: Teams can evolve their data products without affecting others
-- **Reduced Coupling**: Domains are decoupled through well-defined interfaces
-- **Better Alignment**: Data architecture mirrors organizational structure
+| Aspect | Data Mesh | Data Lake |
+|---|---|---|
+| Ownership | Decentralized, domain teams | Centralized data team |
+| Data Model | Domain-specific schemas | Schema-on-read, raw storage |
+| Governance | Federated, automated policies | Centralized governance |
+| Scaling | Scales with number of domains | Scales with storage/compute |
+| Risk | Duplication across domains | Data swamp (ungoverned dumping) |
+| Best for | Large orgs with many domains | Exploratory analytics, ML pipelines |
 
-## Cons
+### Data Mesh vs Data Warehouse
 
-- **Organizational Change**: Requires significant cultural and organizational transformation
-- **Coordination Overhead**: Maintaining interoperability across domains is challenging
-- **Duplication Risk**: Similar data may be duplicated across domains
-- **Skill Requirements**: Each domain team needs data engineering expertise
-- **Governance Complexity**: Balancing autonomy with global standards is difficult
-- **Initial Investment**: Building self-serve platform requires upfront effort
-- **Not for Small Organizations**: Overhead may not be justified for smaller companies
-- **Cross-Domain Queries**: Joining data across domains can be complex and slow
+| Aspect | Data Mesh | Data Warehouse |
+|---|---|---|
+| Ownership | Domain teams | Central BI/DW team |
+| Data Model | Polyglot, domain-driven | Star/snowflake schema, normalized |
+| Flexibility | High, each domain evolves independently | Low, schema changes are costly |
+| Latency | Varies by domain product | Batch-oriented, higher latency |
+| Best for | Distributed organizations | Structured reporting and BI |
 
-## Use Cases
+### Data Mesh vs Data Lakehouse
 
-- **Large Enterprises**: Organizations with multiple business units and complex data needs
-- **E-commerce Platforms**: Separating order, inventory, customer, and shipping domains
-- **Financial Institutions**: Banks with distinct domains like retail, corporate, and trading
-- **Healthcare Organizations**: Patient data, clinical data, billing as separate domains
-- **Streaming Services**: Content, user engagement, recommendations as separate data products
-- **Logistics Companies**: Fleet, warehouse, delivery, and customer domains
-- **Insurance Companies**: Claims, underwriting, policy, and customer domains
-- **Telecommunications**: Network, billing, customer service, and marketing domains
-- **Organizations Scaling Data Teams**: When centralized data teams become bottlenecks
-- **Companies Adopting Microservices**: Natural extension of microservices to data
+| Aspect | Data Mesh | Data Lakehouse |
+|---|---|---|
+| Architecture | Decentralized, multiple data products | Unified platform (lake + warehouse) |
+| Ownership | Domain teams | Central or platform team |
+| Technology | Any stack per domain | Single stack (Delta Lake, Iceberg, Hudi) |
+| Query Engine | Per domain choice | Unified query engine |
+| Best for | Organizational scalability | Technical unification of analytics and ML |
+
+### Data Mesh vs ETL/ELT Pipelines
+
+| Aspect | Data Mesh | Traditional ETL/ELT |
+|---|---|---|
+| Pipeline Ownership | Domain teams build and own | Central data engineering team |
+| Coupling | Loose, via data product APIs | Tight, pipelines coupled to sources |
+| Bottleneck | Distributed, no single bottleneck | Central team becomes bottleneck |
+| Change Management | Domain-local changes | Cascading pipeline changes |
+| Best for | Many independent data producers | Simple, well-defined data flows |
+
+### Data Mesh vs Lambda/Kappa Architecture
+
+| Aspect | Data Mesh | Lambda/Kappa |
+|---|---|---|
+| Focus | Organizational and ownership model | Technical processing model |
+| Scope | End-to-end data management | Stream and batch processing |
+| Complexity | Organizational complexity | Technical complexity (dual pipelines in Lambda) |
+| Complementary | Yes, a domain can use Lambda/Kappa internally | Yes, can exist inside a Data Mesh domain |
+
+## 5. Who is Using it?
+
+- **Large Enterprises**: organizations with multiple business units and complex data needs
+- **E-commerce Platforms**: separating order, inventory, customer, and shipping domains
+- **Financial Institutions**: banks with distinct domains like retail, corporate, and trading
+- **Healthcare Organizations**: patient data, clinical data, billing as separate domains
+- **Streaming Services**: content, user engagement, recommendations as separate data products
+- **Logistics Companies**: fleet, warehouse, delivery, and customer domains
+- **Insurance Companies**: claims, underwriting, policy, and customer domains
+- **Telecommunications**: network, billing, customer service, and marketing domains
+- **Companies Adopting Microservices**: natural extension of microservices to data
+
+Notable adopters include **JPMorgan Chase**, **Zalando**, **Netflix**, **Intuit**, **PayPal**, and **Saxo Bank**.
