@@ -1,0 +1,46 @@
+tech-notes/agents/portkey.md
+  85520689e9ad019f 1-149
+tech-notes/agents/openrouter.md
+  85520689e9ad019f 1-148
+tech-notes/agents/litellm.md
+  85520689e9ad019f 1-141
+tech-notes/agents/DSPy.md
+  4f6e2b3f96b176d9 1-145
+tech-notes/agents/routerllm.md
+  85520689e9ad019f 1-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "f9e789ac8f9b12c86ace8acd4baf6e57539e3fd8",
+  "prompts": {
+    "4f6e2b3f96b176d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7bad9535-2e90-48ef-96eb-5df18eda91ec",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 145,
+      "total_deletions": 0,
+      "accepted_lines": 145,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/8214accaf2479d4ea1ccc4687a36ca5bd55b31b332373f365b4f98c4bab8f4e1"
+    },
+    "85520689e9ad019f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dd508668-2d8e-44ad-bd97-6d4c9bebaa80",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 559,
+      "total_deletions": 0,
+      "accepted_lines": 559,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/5923c43476fed24ff146b82582422b9d45829dab86195be2ddab9caab0750a7e"
+    }
+  }
+}
