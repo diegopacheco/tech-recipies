@@ -303,6 +303,52 @@ Review & Documentation Agents (6)
   - Quick start (backend, frontend, database)
 ```
 
+## The evolution in waves
+
+```
+V1 (97 lines, ~1,400 tokens) - "Fire and Pray"
+
+  Spawns 12 agents across 4 phases. Prose tutorial format explaining to the LLM how its own tools work. No design doc, no
+  verification, no progress tracking, no mistake tracking. Agents build without a shared plan. If the build breaks, nobody knows.
+  Insight: You don't need to teach the LLM how subagent_type: "general-purpose" works - it already knows. 20 lines of boilerplate
+  wasted.
+
+  V2 (101 lines, ~1,500 tokens) - "Plan Before You Build"
+
+  Killed the prose, switched to declarative Global Context + Rules format. Added design-doc.md before building, user checkboxes to
+  skip phases, todo.md progress tracking, and a Verify Components gate. Same 12 agents. Insight: Compression doesn't mean less
+  functionality. The skill does MORE in 4 extra lines than V1 did in 97 because every line is an instruction, not an explanation.
+
+  V3 (127 lines, ~1,900 tokens) - "Learn From Mistakes"
+
+  The architecture shift. Consolidated 12 agents down to 5 (1 Testing Agent replaces 4, 1 Reviewer Agent replaces 5). Added
+  mistakes.md cross-phase learning and Build and Test Enforcement rules. Insight: Fewer agents with full context outperform many
+  agents with fragmented context. A single testing agent that sees all code writes better tests than 4 isolated agents. The
+  mistakes file was the breakthrough - agents stop repeating the same failures.
+
+  V4 (134 lines, ~2,000 tokens) - "Zero Tolerance"
+
+  Added build.sh verification loop (zero errors AND zero warnings, re-run until clean). Added Verify Tests with dedicated scripts
+  (run-unit-tests.sh, etc.) that must exit 0. Made frontend unit tests mandatory. Merged Changelog/README into Phase 3. Insight:
+  "Verify it works" is vague. "Run build.sh in a loop until stdout has zero errors and zero warnings" is not. Explicit exit-code
+  checking and script-per-test-type made the difference between "tests exist" and "tests pass".
+
+  V5 (137 lines, ~2,100 tokens) - "Prove It Runs"
+
+  Added run.sh creation with credential logging and runtime verification (start DB + backend + frontend, verify all reachable).
+  Triple gate: build clean + run.sh succeeds + all components reachable. Insight: Code that compiles is not code that works. V4
+  proved the build was clean, V5 proved the app actually starts and connects end-to-end. Only 3 lines added but it closed the last
+  gap - you could run the app immediately after the workflow finishes.
+
+  ---
+  The Arc
+
+  V1 -> V2: Stop explaining, start instructing (format compression)
+  V2 -> V3: Fewer agents, shared memory (architecture change)
+  V3 -> V4: Demand proof, not promises (verification loops)
+  V4 -> V5: Compiles != Runs (runtime verification)
+```
+
 ## Result
 
 https://github.com/diegopacheco/ai-playground/tree/main/pocs/adwf-twitter-like-opus-4-6-v5-skill
