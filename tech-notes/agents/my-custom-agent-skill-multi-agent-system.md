@@ -1,5 +1,8 @@
 # My Custom Agent Skill Multi-Agent System
 
+I wrote a simple tool in Rust, capable of deploying agents into Claude code, I called it RAD (Rust Agent Deployer).
+https://github.com/diegopacheco/ai-playground/tree/main/pocs/claude-agents-deployer
+
 ## Agents
 
 ```
