@@ -1,5 +1,7 @@
 # Agent 2 Agent Protocol (A2A)
 
+https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/
+
 ## 1. What is A2A?
 
 A2A (Agent2Agent) is an open protocol created by Google in April 2025 that enables AI agents to communicate with each other, exchange information, and coordinate actions across different platforms and vendors. The protocol was contributed to the Linux Foundation in June 2025, making it a vendor-neutral open standard. A2A is built on top of established web standards like HTTP, JSON-RPC, and SSE (Server-Sent Events). It complements Anthropic's Model Context Protocol (MCP), where MCP provides tools and context to agents, A2A enables agent-to-agent collaboration. A2A treats agents as opaque entities, meaning they can collaborate without exposing their internal logic, memory, or proprietary implementations.
