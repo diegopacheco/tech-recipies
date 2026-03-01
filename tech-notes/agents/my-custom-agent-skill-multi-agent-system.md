@@ -28,3 +28,7 @@ Review & Documentation Agents (6)
 15. Changes Summarizer — Release notes, git diff analysis, changelog
 16. Reviewer Agent (meta-orchestrator) — Coordinates all review activities
 ```
+
+## Result
+
+https://github.com/diegopacheco/ai-playground/tree/main/pocs/adwf-twitter-like-opus-4-6-v5-skill
