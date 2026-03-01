@@ -381,6 +381,50 @@ V4 -> V5: Compiles != Runs (runtime verification)
 └──────────────────────┴─────────────────────────┴────────┴───────────────────────────┘
 ```
 
+## Summary of Leassons Learned
+
+```
+Prompt Engineering for Agent Skills
+
+- Don't teach the LLM its own tools - boilerplate explaining subagent_type: "general-purpose" is wasted tokens. The model already
+knows how to use its Agent tool
+- Declarative > Prose - "Global Context + Rules" format beats narrative "When this skill is invoked, follow this exact
+workflow..." Every line should be an instruction, not an explanation
+- Compression doesn't mean less functionality - V2 did MORE in 101 lines than V1 did in 97 because zero lines were wasted on
+explanations
+
+Agent Architecture
+
+- Fewer agents with full context > many agents with fragmented context - 1 Testing Agent that sees all code writes better tests
+than 4 isolated test agents that each see a slice
+- Meta-orchestrator agents work - consolidating 4 test agents into 1 "Testing Agent" and 5 review/doc agents into 1 "Reviewer
+Agent" reduced spawning overhead and improved coherence
+- 12 agents -> 5 agents = better results with less cost - 58% fewer agents, dramatically better output
+
+Cross-Phase Learning
+
+- mistakes.md is the breakthrough - a shared file where every agent reads past failures before starting and logs new failures
+when they happen. Agents stop repeating the same mistakes across phases
+- Every agent MUST read mistakes.md first - this single rule prevents cascading failures where Phase 2 hits the same issue Phase
+1 already solved
+
+Verification & Enforcement
+
+- "Verify it works" is useless - vague instructions get vague results. "Run build.sh in a loop until stdout has zero errors AND
+zero warnings" is not vague
+- Compiles != Runs - V4 proved the build was clean, V5 proved the app actually starts. The run.sh requirement closed the last gap
+- Triple gate - build clean + run.sh succeeds + all components reachable. Don't advance until all three pass
+- Dedicated test scripts with exit code 0 enforcement - run-unit-tests.sh, run-integration-tests.sh, etc. each must exit 0. No
+ambiguity
+
+Design & Planning
+
+- Design doc before building - all agents build from the same architecture document so backend endpoints match frontend API calls
+match database schema
+- User phase control - checkboxes to skip phases. Sometimes you just need build + test, not the full pipeline
+- Progress tracking with todo.md - know exactly where the workflow is at any point
+```
+
 ## Result
 
 https://github.com/diegopacheco/ai-playground/tree/main/pocs/adwf-twitter-like-opus-4-6-v5-skill
