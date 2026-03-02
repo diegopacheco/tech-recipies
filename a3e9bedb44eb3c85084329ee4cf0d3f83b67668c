@@ -1,0 +1,24 @@
+tech-notes/postgres-advanced.md
+  ec65fb30d3cbce59 1-323
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "a3e9bedb44eb3c85084329ee4cf0d3f83b67668c",
+  "prompts": {
+    "ec65fb30d3cbce59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5fffc09e-3487-468f-9ad7-884b2af820b0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 782,
+      "total_deletions": 0,
+      "accepted_lines": 782,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/01ad3cd520879666679a02625104837295bbbf1b73ccb52be840661798c82d41"
+    }
+  }
+}
