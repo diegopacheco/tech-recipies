@@ -1,0 +1,24 @@
+tech-notes/agents/Mastra.md
+  3dadb803f4794343 1-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "1d6264be272f43eabb37a7d511d291f5d0bb12cb",
+  "prompts": {
+    "3dadb803f4794343": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9420d817-ea43-4430-ba33-9b784cb31b25",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 92,
+      "total_deletions": 0,
+      "accepted_lines": 92,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/3791f17690ca41f372b628e949a6705d0865148eb6d59375775c7cea1dfcf84a"
+    }
+  }
+}
