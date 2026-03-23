@@ -1,0 +1,24 @@
+tech-notes/island-architecture.md
+  2bd86248e8403007 1-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "75edd0852671c1e31be7cee5987cb1f6a537af8d",
+  "prompts": {
+    "2bd86248e8403007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f8c84167-bb95-44c2-9b81-8b49ab7122f4",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 333,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/78b5d14390cbadf8de1cf4b11fe2da2f2edad0212586c911276df99f6d149569"
+    }
+  }
+}
