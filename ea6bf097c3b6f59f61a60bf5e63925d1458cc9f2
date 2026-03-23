@@ -1,0 +1,26 @@
+tech-notes/bundlers-frontend.md
+  2bd86248e8403007 1-120
+tech-notes/server-driver-ui.md
+  2bd86248e8403007 1-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "ea6bf097c3b6f59f61a60bf5e63925d1458cc9f2",
+  "prompts": {
+    "2bd86248e8403007": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f8c84167-bb95-44c2-9b81-8b49ab7122f4",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 228,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/78b5d14390cbadf8de1cf4b11fe2da2f2edad0212586c911276df99f6d149569"
+    }
+  }
+}
