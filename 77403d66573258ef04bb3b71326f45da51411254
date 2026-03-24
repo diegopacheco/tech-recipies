@@ -1,0 +1,24 @@
+tech-notes/sliding-windown.md
+  d25d0d338e59c268 1-160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "77403d66573258ef04bb3b71326f45da51411254",
+  "prompts": {
+    "d25d0d338e59c268": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2c77d3d0-95ce-4963-b691-b7d73f9c3343",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 160,
+      "total_deletions": 0,
+      "accepted_lines": 160,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/00a500f3d8e353fdd263b0aba28b8b5b07fee78c0696db11fb1f91e13777c10e"
+    }
+  }
+}
