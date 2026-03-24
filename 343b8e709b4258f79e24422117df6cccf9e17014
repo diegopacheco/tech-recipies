@@ -1,0 +1,24 @@
+tech-notes/dbt-db-marts.md
+  d25d0d338e59c268 1-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "343b8e709b4258f79e24422117df6cccf9e17014",
+  "prompts": {
+    "d25d0d338e59c268": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2c77d3d0-95ce-4963-b691-b7d73f9c3343",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 123,
+      "total_deletions": 0,
+      "accepted_lines": 123,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/4cff375a4e7fa3ba6a766fe21599004acb9e5f2f0473411d724b3f8224e6e8f8"
+    }
+  }
+}
