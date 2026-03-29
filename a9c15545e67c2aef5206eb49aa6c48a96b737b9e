@@ -1,0 +1,38 @@
+tech-notes/agents/agent-evaluation.md
+  1e4f39d4300b850f 1-256
+tech-notes/agents/vector-databases.md
+  1e4f39d4300b850f 1-251
+tech-notes/agents/langgraph.md
+  1e4f39d4300b850f 1-218
+tech-notes/agents/mcp.md
+  1e4f39d4300b850f 1-194
+tech-notes/agents/agent-sandboxing.md
+  1e4f39d4300b850f 1-257
+tech-notes/agents/google-adk.md
+  1e4f39d4300b850f 1-199
+tech-notes/agents/agent-memory.md
+  1e4f39d4300b850f 1-231
+tech-notes/agents/agent-security.md
+  1e4f39d4300b850f 1-259
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "a9c15545e67c2aef5206eb49aa6c48a96b737b9e",
+  "prompts": {
+    "1e4f39d4300b850f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20df2dc9-15f9-4f4a-ab69-addf45c9e1f5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>",
+      "messages": [],
+      "total_additions": 1865,
+      "total_deletions": 0,
+      "accepted_lines": 1865,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/3e05c5a74c05674f30800827dd78ac4e069d479872ae7a5174fbcb421420becc"
+    }
+  }
+}
