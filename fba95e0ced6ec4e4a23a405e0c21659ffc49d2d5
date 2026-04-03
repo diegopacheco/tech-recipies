@@ -1,0 +1,24 @@
+tech-notes/devops/unikernels.md
+  2d63261d0f35985d 1-296
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "fba95e0ced6ec4e4a23a405e0c21659ffc49d2d5",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 296,
+      "total_deletions": 0,
+      "accepted_lines": 296,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/37dcd9fed4e50089002839e659ad61f9d43a6a6f520fb762f5869d767bd67c43"
+    }
+  }
+}
