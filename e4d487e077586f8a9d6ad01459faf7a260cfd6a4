@@ -1,0 +1,26 @@
+tech-notes/json-schema.md
+  be0cbb11dc76e10f 1-418
+tech-notes/json-canvas.md
+  be0cbb11dc76e10f 1-320
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "e4d487e077586f8a9d6ad01459faf7a260cfd6a4",
+  "prompts": {
+    "be0cbb11dc76e10f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46c42377-2d6d-4e45-8e10-d37c60c1e737",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 738,
+      "total_deletions": 0,
+      "accepted_lines": 738,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/a28bf9379c79beb42c6efe4639ebc3350c24b6015f8efd73fa6ab32c96dc471e"
+    }
+  }
+}
