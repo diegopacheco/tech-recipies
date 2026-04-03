@@ -1,0 +1,24 @@
+tech-notes/devops/replay-traffic.md
+  2d63261d0f35985d 1-352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "ec2c8add566e0788703ea2118f4821a30e4d8d39",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 352,
+      "total_deletions": 0,
+      "accepted_lines": 352,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/d200a44e045f351b8af38a04be6ab01957ac5deac7dd3917e19a1605bc50e1e0"
+    }
+  }
+}
