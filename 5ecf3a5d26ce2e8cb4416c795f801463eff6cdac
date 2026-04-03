@@ -1,0 +1,24 @@
+tech-notes/sec/container-security.md
+  2d63261d0f35985d 1-349
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "5ecf3a5d26ce2e8cb4416c795f801463eff6cdac",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 349,
+      "total_deletions": 0,
+      "accepted_lines": 349,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/c55453f1db2ec23149ec11a0d7da9ee42105dbb1013a9897911dd69fc51079fd"
+    }
+  }
+}
