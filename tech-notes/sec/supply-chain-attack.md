@@ -20,6 +20,10 @@ A supply chain attack is an attack that targets the less-secure elements in the 
 
 **xz Utils (2024)**: a multi-year social engineering attack where an attacker gained co-maintainership of xz, a core Linux compression library, and inserted a backdoor targeting OpenSSH authentication. Caught by a Microsoft engineer who noticed a 500ms latency anomaly.
 
+**Trivy GitHub Actions (March 2026)**: attacker force-pushed 76 of 77 version tags in aquasecurity/trivy-action and all 7 tags in aquasecurity/setup-trivy, redirecting trusted references to malicious commits. The malware read directly from GitHub Actions Runner memory (/proc/\<pid\>/mem), bypassing log-masking, and harvested SSH keys, cloud credentials (AWS, GCP, Azure), Kubernetes tokens, Docker registry credentials, database passwords, TLS private keys, and cryptocurrency wallet files. Stolen data was encrypted with AES-256-CBC and wrapped with RSA-4096 and exfiltrated to a typosquatted domain (scan.aquasecurtiy[.]org). Every CI/CD pipeline that referenced trivy-action by tag became a credential harvester. Attributed to TeamPCP (also tracked as DeadCatx3, PCPcat, ShellForce), a cloud-native threat actor. The downstream impact cascaded into the litellm breach (March 24, 2026) where the Python dependency with 97M+ monthly downloads was compromised because its maintainers used Trivy in their CI/CD pipeline. Safe versions: trivy v0.69.3, trivy-action v0.35.0, setup-trivy v0.2.6.
+
+**Axios npm Compromise (March 2026)**: attacker gained access to the lead maintainer's PC through a targeted social engineering campaign and RAT malware, which provided npm publishing credentials despite 2FA being enabled. Two poisoned versions were published — axios@1.14.1 (tagged latest) and axios@0.30.4 (tagged legacy) — both injecting a hidden dependency called plain-crypto-js@4.2.1. The postinstall hook in plain-crypto-js executed setup.js which used string reversal, Base64 decoding, and XOR encryption to conceal its operations, then downloaded and executed platform-specific RATs: a PowerShell variant for Windows (persistence via Registry Run keys), a C++ binary for macOS (stored in /Library/Caches/com.apple.act.mond), and a Python script for Linux (stored in /tmp/ld.py). All three shared an identical C2 protocol with 60-second beacon interval, a spoofed IE8/Windows XP User-Agent string, and communicated via HTTP POST with Base64-encoded JSON to sfrclak[.]com (142.11.206[.]73). RAT capabilities included script execution, binary payload injection, directory enumeration, and self-termination. The dropper performed anti-forensic cleanup by deleting itself and replacing the malicious package.json with a clean version, leaving only lockfiles and npm audit logs as evidence. The malicious versions were live for ~3 hours before npm removed them. Attributed to Sapphire Sleet (Microsoft) / UNC1069 (Google), both North Korean state-linked threat actors, based on infrastructure overlaps and the macOS variant's overlap with the WAVESHAPER backdoor. Axios has 70M+ weekly downloads. Safe versions: axios@1.14.0 and axios@0.30.3.
+
 ## Attack Vectors
 
 ### 1. Compromised Dependencies
@@ -163,3 +167,15 @@ Run builds in isolated, ephemeral environments. No persistent state between buil
 - **Container Security**: scanning base images and layers for vulnerabilities and malicious content
 - **Package Registry Security**: npm, PyPI, crates.io, Maven Central implementing security controls
 - **Firmware Security**: verifying firmware integrity in IoT, networking equipment, and embedded systems
+
+## References
+
+- [Chainguard Libraries - Supply Chain Prevention](https://get.chainguard.dev/libraries-and-actions-signup)
+- [Microsoft - Mitigating the Axios npm Supply Chain Compromise](https://www.microsoft.com/en-us/security/blog/2026/04/01/mitigating-the-axios-npm-supply-chain-compromise/)
+- [Elastic - Inside the Axios Supply Chain Compromise](https://www.elastic.co/security-labs/axios-one-rat-to-rule-them-all)
+- [Axios Post-Mortem - GitHub Issue #10636](https://github.com/axios/axios/issues/10636)
+- [Google - North Korea-Nexus Threat Actor Targets Axios](https://cloud.google.com/blog/topics/threat-intelligence/north-korea-threat-actor-targets-axios-npm-package)
+- [Palo Alto - Breaking Down the Trivy Supply Chain Attack](https://www.paloaltonetworks.com/blog/cloud-security/trivy-supply-chain-attack/)
+- [Aqua Security - Trivy Supply Chain Attack](https://www.aquasec.com/blog/trivy-supply-chain-attack-what-you-need-to-know/)
+- [CrowdStrike - From Scanner to Stealer: Inside the trivy-action Compromise](https://www.crowdstrike.com/en-us/blog/from-scanner-to-stealer-inside-the-trivy-action-supply-chain-compromise/)
+- [GitGuardian - Trivy's March Supply Chain Attack](https://blog.gitguardian.com/trivys-march-supply-chain-attack-shows-where-secret-exposure-hurts-most/)
