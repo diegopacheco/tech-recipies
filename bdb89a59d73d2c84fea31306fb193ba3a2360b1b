@@ -1,0 +1,50 @@
+tech-notes/functional-programing/algebraic-data-types.md
+  2d63261d0f35985d 1-308
+tech-notes/databases/btree-vs-lsm.md
+  2d63261d0f35985d 1-293
+tech-notes/performance/gc-tuning.md
+  2d63261d0f35985d 1-367
+tech-notes/databases/time-series-databases.md
+  2d63261d0f35985d 1-320
+tech-notes/functional-programing/monads.md
+  2d63261d0f35985d 1-347
+tech-notes/functional-programing/pattern-matching.md
+  2d63261d0f35985d 1-353
+tech-notes/functional-programing/effect-systems.md
+  2d63261d0f35985d 1-327
+tech-notes/databases/graph-databases.md
+  2d63261d0f35985d 1-262
+tech-notes/databases/lsm-trees.md
+  2d63261d0f35985d 1-255
+tech-notes/performance/profiling.md
+  2d63261d0f35985d 1-360
+tech-notes/performance/simd.md
+  2d63261d0f35985d 1-302
+tech-notes/databases/mvcc.md
+  2d63261d0f35985d 1-284
+tech-notes/databases/database-replication.md
+  2d63261d0f35985d 1-354
+tech-notes/databases/database-sharding.md
+  2d63261d0f35985d 1-296
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "bdb89a59d73d2c84fea31306fb193ba3a2360b1b",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 4428,
+      "total_deletions": 0,
+      "accepted_lines": 4428,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/be0c59328391dd70e58d8cdb87b5b57b8b3dfe6980e209b625ec8f860e285918"
+    }
+  }
+}
