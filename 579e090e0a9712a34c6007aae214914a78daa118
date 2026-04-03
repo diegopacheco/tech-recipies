@@ -1,0 +1,38 @@
+tech-notes/sec/sandboxing.md
+  2d63261d0f35985d 1-175
+tech-notes/sec/supply-chain-attack.md
+  2d63261d0f35985d 1-165
+tech-notes/sec/zero-trust.md
+  2d63261d0f35985d 1-167
+tech-notes/sec/threat-analysis.md
+  2d63261d0f35985d 1-280
+tech-notes/sec/securing-ai-agents.md
+  2d63261d0f35985d 1-273
+tech-notes/sec/credential-vaulting.md
+  2d63261d0f35985d 1-262
+tech-notes/sec/waf.md
+  2d63261d0f35985d 1-294
+tech-notes/sec/mTLS.md
+  2d63261d0f35985d 1-240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "579e090e0a9712a34c6007aae214914a78daa118",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 1856,
+      "total_deletions": 0,
+      "accepted_lines": 1856,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/751adc61675756a0491f59b275c34d7b6e8efd535f1a5b6ea97e72fceb44942e"
+    }
+  }
+}
