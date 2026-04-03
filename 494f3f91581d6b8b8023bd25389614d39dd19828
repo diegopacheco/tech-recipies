@@ -1,0 +1,30 @@
+tech-notes/frontend-architecture/micro-frontends.md
+  2d63261d0f35985d 1-170
+tech-notes/frontend-architecture/state-management.md
+  2d63261d0f35985d 1-260
+tech-notes/contracts/protobuf.md
+  2d63261d0f35985d 1-196
+tech-notes/frontend-architecture/web-components.md
+  2d63261d0f35985d 1-294
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "494f3f91581d6b8b8023bd25389614d39dd19828",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 920,
+      "total_deletions": 0,
+      "accepted_lines": 920,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/1f28b47c39a28687f5e4acc89ae3cc6493697afa713189e4569ed2ec0eb7928d"
+    }
+  }
+}
