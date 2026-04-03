@@ -1,0 +1,26 @@
+tech-notes/contracts/flatbuffers.md
+  2d63261d0f35985d 1-215
+tech-notes/contracts/messagepack.md
+  2d63261d0f35985d 1-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "313a6bf982a3d2d6fd220ca18166c686fe2f0a4d",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 372,
+      "total_deletions": 0,
+      "accepted_lines": 372,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/802bd3ba4eb71d5de1a19108f6c6cfe1b164bddcfaca0685bd58b06a5eb0c144"
+    }
+  }
+}
