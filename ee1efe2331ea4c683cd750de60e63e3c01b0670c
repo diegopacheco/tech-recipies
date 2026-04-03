@@ -1,0 +1,28 @@
+tech-notes/contracts/avro.md
+  2d63261d0f35985d 1-225
+tech-notes/contracts/graphql-schema.md
+  2d63261d0f35985d 1-290
+tech-notes/contracts/openapi.md
+  2d63261d0f35985d 1-222
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "ee1efe2331ea4c683cd750de60e63e3c01b0670c",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 737,
+      "total_deletions": 0,
+      "accepted_lines": 737,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/e19d42ebe0d302027ecaa074df44bce525db3da0ba94873c15382211ceaa5265"
+    }
+  }
+}
