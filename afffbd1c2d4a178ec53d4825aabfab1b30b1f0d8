@@ -1,0 +1,24 @@
+tech-notes/sec/rbac-abac.md
+  2d63261d0f35985d 1-352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "afffbd1c2d4a178ec53d4825aabfab1b30b1f0d8",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 352,
+      "total_deletions": 0,
+      "accepted_lines": 352,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/63e09f211b6d1d9db57b081cd62d7d8772336124d165d509b36057ec2ec7ecfb"
+    }
+  }
+}
