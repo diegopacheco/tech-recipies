@@ -1,0 +1,24 @@
+tech-notes/sec/supply-chain-attack.md
+  2d63261d0f35985d 23-26,170-181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "c57554fd14988d513cbd2958363c17ec2d6503f5",
+  "prompts": {
+    "2d63261d0f35985d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f052975c-32cf-4a84-887a-fa96581b6529",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 18,
+      "total_deletions": 2,
+      "accepted_lines": 16,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/28d0d6752190b45dfd019277d5a18b59195eb58f282fe325ca1c2e95fdc2a2eb"
+    }
+  }
+}
