@@ -67,6 +67,13 @@ On February 14, 2026, Steinberger announced he was joining OpenAI and the projec
 │ Claw Code    │ Community       │ AI coding agent in Rust/Python. Clean-  │
 │              │                 │ room rewrite of Claude Code after the   │
 │              │                 │ March 2026 source leak. 72K stars.      │
+├──────────────┼─────────────────┼──────────────────────────────────────────┤
+│ MemoClaw     │ anajuliabit     │ Memory-as-a-Service for AI agents.      │
+│              │                 │ Persistent semantic vector memory with   │
+│              │                 │ no signup or API keys. Wallet = identity.│
+│              │                 │ 100 free calls, then x402 micropayments │
+│              │                 │ ($0.005/call USDC on Base). Integrates   │
+│              │                 │ with OpenClaw via hooks and MCP.         │
 └──────────────┴─────────────────┴──────────────────────────────────────────┘
 ```
 
@@ -325,4 +332,7 @@ Personal AI agents are the most disruptive force in e-commerce since the smartph
 - Checkly Content Negotiation Study: https://www.checklyhq.com/blog/state-of-ai-agent-content-negotation/
 - agents.json: https://github.com/wild-card-ai/agents-json
 - Microsoft NLWeb: https://news.microsoft.com/source/features/company-news/introducing-nlweb-bringing-conversational-interfaces-directly-to-the-web/
+- MemoClaw: https://memoclaw.com/
+- MemoClaw GitHub: https://github.com/anajuliabit/memoclaw-cli
+- MemoClaw Docs: https://docs.memoclaw.com/get-started/introduction
 - Travel Agents Skepticism (Skift): https://skift.com/2026/03/03/travel-brands-are-building-ai-agents-for-a-consumer-that-doesnt-exist/
