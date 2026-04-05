@@ -22,22 +22,116 @@ The shift from code-first to prompt-first development means that developer inten
 └───────────────────────────────────────────────────────────────┘
 ```
 
-Two paradigms are emerging in 2026:
+Two paradigms emerged in 2026, both deeply flawed:
+
+### Vibe Coding — The Dangerous Default
+
+Andrej Karpathy introduced "vibe coding" in February 2025: generating code via prompts without reading the output, assuming AI handles everything. In practice, this is trial-and-error development with no engineering discipline.
 
 ```
-┌──────────────────────────┬───────────────────────────────────────┐
-│ Vibe Coding              │ Spec-Driven Development               │
-├──────────────────────────┼───────────────────────────────────────┤
-│ Prompt iteratively       │ Write detailed specs first            │
-│ Conversational flow      │ Structured documents (requirements,   │
-│ Let the agent build,     │ constraints, architecture, acceptance │
-│ review, correct          │ criteria) before agent writes code    │
-│ Fast, exploratory        │ Rigorous, reproducible                │
-│                          │ GitHub Spec Kit: 72K+ stars           │
-└──────────────────────────┴───────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│              Why Vibe Coding Fails                             │
+│                                                               │
+│  Core AI failures:                                            │
+│    - Request Ignorance: ask for Java 25, get Java 21          │
+│    - Hallucinations: invents non-existent APIs                │
+│    - Library Dismissal: ignores specified libs for others     │
+│                                                               │
+│  Not reading code and not reading DIFFs is awful practice.    │
+│                                                               │
+│  Acceptable ONLY for:                                         │
+│    - Small throwaway utilities (CSV-to-JSON)                  │
+│    - Disposable prototypes never meant for production         │
+│                                                               │
+│  NEVER acceptable for:                                        │
+│    - Core business logic (the revenue engine)                 │
+│    - Production systems                                       │
+│    - Anything with real users                                 │
+│                                                               │
+│  Bus Factor problem: vibe coding creates succession planning  │
+│  vulnerabilities — no one understands the codebase because    │
+│  no one read the code. Bus factor drops to zero.              │
+│                                                               │
+│  The gap: works great in a 5-minute recording.                │
+│  Karpathy's Waymo: working 2014 prototype required 11+ years │
+│  of real engineering before production deployment in 2025.    │
+└───────────────────────────────────────────────────────────────┘
 ```
 
-In both cases, the developer's primary output is intent expressed as language, not code. The code is a byproduct. This means versioning, reviewing, and collaborating on prompts and specs becomes more important than reviewing diffs.
+### Spec-Driven Development (SDD) — Waterfall in Disguise
+
+SDD proposes writing detailed specification documents before the agent writes code. GitHub shipped the Spec Kit (72K+ stars). The idea: structured requirements, constraints, architecture, and acceptance criteria upfront.
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│              Why SDD Fails                                     │
+│                                                               │
+│  More documentation does NOT mean more clarity.               │
+│                                                               │
+│  Problems:                                                    │
+│    - Context window overhead: excessive spec text creates     │
+│      technical burden on the LLM itself                       │
+│    - Code displacement: teams stop writing code and start     │
+│      managing documents instead                               │
+│    - No evidence more text produces superior outcomes          │
+│    - Resurrects Waterfall anti-patterns in agile clothing     │
+│                                                               │
+│  François Zaninotto called it: "Waterfall Strikes Back"       │
+│  Martin Fowler published critique analyzing tool implications │
+│                                                               │
+│  SDD is MDD (Model Driven Development) rebranded for the     │
+│  LLM era. MDD failed. SDD will fail for the same reasons:    │
+│  the map is not the territory, and specs drift from reality   │
+│  the moment code starts running.                              │
+└───────────────────────────────────────────────────────────────┘
+```
+
+### The Real Alternative: Vintage Coding + AI as Accelerator
+
+Neither vibe coding (no discipline) nor SDD (all documents, no code) is the answer.
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│              Vintage Coding                                    │
+│                                                               │
+│  Deliberate coding practices where engineers write, read,     │
+│  and understand their code — with or without AI assistance.   │
+│                                                               │
+│  Principles:                                                  │
+│    - Read every line of AI-generated code                     │
+│    - Read every DIFF before committing                        │
+│    - Use AI for 10-30% productivity gain, not 100% delegation │
+│    - Practice coding dojos: TDD, pair programming, no AI      │
+│    - Master your tools, data structures, algorithms           │
+│    - Maintain the ability to code without AI at all           │
+│                                                               │
+│  Analogy: a driver who passed the exam and has years of       │
+│  practice drives safely. A driver constantly checking the     │
+│  manual is dangerous. Many programmers now resemble manual-   │
+│  consulting drivers — substituting LLMs for learning.         │
+│                                                               │
+│  AI is a power tool, not a replacement for skill.             │
+│  Use it. Don't depend on it. Don't stop learning.             │
+└───────────────────────────────────────────────────────────────┘
+```
+
+```
+┌──────────────────────────┬──────────────────┬─────────────────────────┐
+│ Approach                 │ Verdict          │ Risk                    │
+├──────────────────────────┼──────────────────┼─────────────────────────┤
+│ Vibe Coding              │ Avoid for prod   │ Bus factor 0, no        │
+│                          │                  │ understanding of code   │
+├──────────────────────────┼──────────────────┼─────────────────────────┤
+│ Spec-Driven Development  │ Avoid entirely   │ Waterfall rebranded,    │
+│                          │                  │ document management     │
+│                          │                  │ replaces engineering    │
+├──────────────────────────┼──────────────────┼─────────────────────────┤
+│ Vintage Coding + AI      │ Recommended      │ Requires discipline     │
+│                          │                  │ and continuous learning │
+└──────────────────────────┴──────────────────┴─────────────────────────┘
+```
+
+In all cases, the developer's primary output is shifting toward intent expressed as language. But intent without engineering discipline — whether expressed as vibe prompts or heavyweight specs — produces fragile systems. The code still matters. Reading it still matters.
 
 ## Prompt Requests (PRs Reimagined)
 
@@ -272,4 +366,6 @@ GitHub is not literally dying, but its role is being questioned. The PR-centric,
 - Spec-Driven Development + GitHub Spec Kit: https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/
 - GitHub Low-Quality Contributions Discussion: https://github.com/orgs/community/discussions/185387
 - Vibe Coding (Prompt-Iterative): https://dasroot.net/posts/2026/04/vibe-coding-ai-devops-2026/
+- Vibe Coding Critique: https://diegopacheco.github.io/The-Art-of-Sense-A-Philosophy-of-Modern-AI/chapter-1/VIBE_CODING.html
+- SDD Critique: https://diegopacheco.github.io/The-Art-of-Sense-A-Philosophy-of-Modern-AI/chapter-4/SDD.html
 - Microsoft Shaking Up GitHub for AI Battle: https://www.itpro.com/software/development/microsoft-github-reshuffle-ai-coding-anthropic-cursor
