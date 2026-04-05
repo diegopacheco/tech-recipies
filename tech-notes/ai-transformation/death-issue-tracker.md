@@ -85,6 +85,90 @@ Linear repositioned itself from an issue tracker to a context-capture platform f
 
 Linear is not alone. Basecamp and others are pivoting to "agent-first" positioning. The race is to become the central hub in an agent-driven future, but as The Register noted, "these products all aim to place themselves at the center of an agent-driven future, but they cannot all be in that position."
 
+## PM Tools Were Designed for Humans, Not Agents
+
+Traditional PM tools exist to compensate for human cognitive limits. Every ceremony maps to a human weakness:
+
+```
+┌──────────────────────────┬───────────────────────────────────────────────┐
+│ Ceremony                 │ Human Limitation It Compensates               │
+├──────────────────────────┼───────────────────────────────────────────────┤
+│ Standups                 │ Memory loss overnight                         │
+├──────────────────────────┼───────────────────────────────────────────────┤
+│ Sprint planning          │ Inability to estimate accurately              │
+├──────────────────────────┼───────────────────────────────────────────────┤
+│ Retros                   │ Recurring human mistakes                      │
+├──────────────────────────┼───────────────────────────────────────────────┤
+│ Confluence               │ Human context-holding limitations             │
+├──────────────────────────┼───────────────────────────────────────────────┤
+│ Jira tickets             │ Breaking work into chunks humans can digest   │
+└──────────────────────────┴───────────────────────────────────────────────┘
+```
+
+Agents do not need any of these structures. They maintain context, complete multi-phase work autonomously, and can be modified through specification rather than cultural retros. Removing human coordination bottlenecks reveals how much process manages people versus producing software.
+
+### The Atlassian Signal
+
+```
+┌────────────────────────────────────────┬────────────────────────────────┐
+│ Metric                                 │ Value                          │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Atlassian stock decline (12 months)    │ -70%                           │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Atlassian revenue growth (same period) │ +23%                           │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Atlassian cloud revenue milestone      │ >$1B (first time)              │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Atlassian layoffs (post-article)       │ 1,600 (10% workforce)          │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Atlassian stock reaction to layoffs    │ +4%                            │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Block (Dorsey) layoffs                 │ 40% workforce, stock +24%      │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ S&P 500 software index single-day drop │ -3.1% (~$1T market value)      │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Atlassian Data Center sales end        │ March 30, 2026                 │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Data Center full EOL                   │ 2029                           │
+├────────────────────────────────────────┼────────────────────────────────┤
+│ Cloud migration cost increase          │ ~50% for Premium tier          │
+└────────────────────────────────────────┴────────────────────────────────┘
+```
+
+The market is pricing in a future where AI agents eliminate the need for human Jira users. AI agents reduce headcount, fewer employees need fewer software seats, per-seat revenue shrinks. Companies selling collaboration tools are cutting their own user base — admission that the per-seat model shrinks from both directions.
+
+The forced Data Center EOL coincides with the moment alternatives shift from "which other human PM tool?" to "do we need human-coordination-optimized PM at all?"
+
+### Agent-Native PM Tools
+
+PM tools for the agent era function as APIs agents consume, not dashboards humans observe.
+
+```
+┌──────────────────┬──────────────────────────────────────────────────────┐
+│ Tool             │ Approach                                            │
+├──────────────────┼──────────────────────────────────────────────────────┤
+│ Linear           │ Expanded MCP server for Claude and Cursor.          │
+│                  │ Supports initiatives, milestones, updates.          │
+│                  │ "Workflows shared by humans and agents."            │
+├──────────────────┼──────────────────────────────────────────────────────┤
+│ Flux             │ Agent-native Kanban. CLI-first, git-native,         │
+│                  │ MCP-integrated. "flux ready" shows unblocked tasks  │
+│                  │ sorted by priority, consumable by agents directly.  │
+└──────────────────┴──────────────────────────────────────────────────────┘
+```
+
+### The Tooling Arc
+
+Developer tooling follows a consistent pattern: manual process -> tool managing process -> tool automating process -> process disappears entirely. Version control went from manual backups to CVS to Git to agents autonomously committing and branching. Testing went from manual QA to test frameworks to CI/CD to agents writing and fixing tests. Project management is entering the automation phase now.
+
+### What This Does Not Solve
+
+- Agents hallucinate, miss edge cases, introduce security vulnerabilities
+- Bad specifications execute as quickly as good ones — someone still decides what to build
+- Autonomous loops only work with clear acceptance criteria and review checkpoints
+- Teams still establishing basic CI/CD will not leap to agent-native PM
+- Agile principles (rapid iteration, working software over documentation) survive — the ceremony industrial complex does not
+
 ## Skepticism
 
 - Security features for agents are not well documented beyond "operates within existing permissions"
@@ -104,3 +188,4 @@ The real insight is not that issue tracking dies completely, but that the ticket
 - The Register: https://www.theregister.com/2026/03/26/linear_agent/
 - Hacker News Discussion: https://news.ycombinator.com/item?id=47507253
 - Department of Product: https://departmentofproduct.substack.com/p/linear-says-issue-tracking-is-dead
+- PM Tools Designed for Humans: https://paddo.dev/blog/your-pm-tool-was-designed-for-humans/
