@@ -1,0 +1,24 @@
+tech-notes/ai-transformation/build-vs-buy.md
+  91d121b7d3aebb87 1-328
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "d6fb4d7f994cb2d5a5b7a3945c7597b2c4818e4d",
+  "prompts": {
+    "91d121b7d3aebb87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb378b49-d2ea-4c56-b5d5-5b95439da9eb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 328,
+      "total_deletions": 0,
+      "accepted_lines": 328,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/f5f4e33818f0ad5ebdce6184804b3adf1dcfc9d6d011ca6ba3f9b153329b897c"
+    }
+  }
+}
