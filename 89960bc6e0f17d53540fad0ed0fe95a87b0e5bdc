@@ -1,0 +1,24 @@
+tech-notes/ai-transformation/personal-agents.md
+  91d121b7d3aebb87 70-76,335-337
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "89960bc6e0f17d53540fad0ed0fe95a87b0e5bdc",
+  "prompts": {
+    "91d121b7d3aebb87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb378b49-d2ea-4c56-b5d5-5b95439da9eb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 0,
+      "accepted_lines": 10,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/83879112b854a33ffe7c10adddd9ab623227cf1edc6e8b3c263c98d1f3bcccb1"
+    }
+  }
+}
