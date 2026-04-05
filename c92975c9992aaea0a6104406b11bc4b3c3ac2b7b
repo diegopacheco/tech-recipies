@@ -1,0 +1,26 @@
+tech-notes/ai-transformation/personal-agents.md
+  fed08f0d77204f00 1-328
+tech-notes/ai-transformation/ai-slop-crisis.md
+  fed08f0d77204f00 1-342
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "c92975c9992aaea0a6104406b11bc4b3c3ac2b7b",
+  "prompts": {
+    "fed08f0d77204f00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "89555cb1-0fc3-4c3b-bb95-7a16da77573f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 670,
+      "total_deletions": 0,
+      "accepted_lines": 670,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/43d03b2817e1b00360f7a1667983c0150704f61dacddc0013a696636e5ec1429"
+    }
+  }
+}
