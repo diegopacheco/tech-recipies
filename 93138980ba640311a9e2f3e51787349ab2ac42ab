@@ -1,0 +1,45 @@
+tech-notes/ai-transformation/ai-dark-factory.md
+  8c459c303c85d0a1 1-125
+tech-notes/ai-transformation/death-issue-tracker.md
+  8c459c303c85d0a1 1-106
+tech-notes/ai-transformation/death-github.md
+  8c459c303c85d0a1 1-2,65-127,174-194,196,221-265
+  f8f73949a3d26560 3-64,128-173,195,197-220,266-275
+tech-notes/ai-transformation/prototypes-over-prds.md
+  8c459c303c85d0a1 1-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "93138980ba640311a9e2f3e51787349ab2ac42ab",
+  "prompts": {
+    "8c459c303c85d0a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f3ff763-b7bf-4af0-94fd-298c1e7945b6",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 506,
+      "total_deletions": 0,
+      "accepted_lines": 504,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/9c69b15929632e8a65af2df8113684df9f0279fdb72d87f9c4f4b2ee5575b593"
+    },
+    "f8f73949a3d26560": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "55021e9b-0eb4-45bb-a033-ba78cadcaab0",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 143,
+      "total_deletions": 2,
+      "accepted_lines": 143,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/3e05ff1f996eee3c916549e3046e92cfb245483d13cb5babd2ed2b31d9b366cf"
+    }
+  }
+}
