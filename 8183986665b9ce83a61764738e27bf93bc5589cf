@@ -1,0 +1,24 @@
+tech-notes/ai-transformation/SDLC-death.md
+  91d121b7d3aebb87 1-441
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "8183986665b9ce83a61764738e27bf93bc5589cf",
+  "prompts": {
+    "91d121b7d3aebb87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb378b49-d2ea-4c56-b5d5-5b95439da9eb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 441,
+      "total_deletions": 0,
+      "accepted_lines": 441,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/581ab16816e0f55e2929dc494d92a0ddb38ceca3e50f2d5eec0545558d28781f"
+    }
+  }
+}
