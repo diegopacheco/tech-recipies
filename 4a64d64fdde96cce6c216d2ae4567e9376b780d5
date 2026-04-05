@@ -1,0 +1,26 @@
+tech-notes/ai-transformation/death-github.md
+  91d121b7d3aebb87 89-169,452-453
+tech-notes/ai-transformation/autosearch.md
+  91d121b7d3aebb87 1-325
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "4a64d64fdde96cce6c216d2ae4567e9376b780d5",
+  "prompts": {
+    "91d121b7d3aebb87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb378b49-d2ea-4c56-b5d5-5b95439da9eb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 408,
+      "total_deletions": 0,
+      "accepted_lines": 408,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/8bb85b294ae11901efa1056424c6680d6fd5111a8cb7fcc81e3e22dd311d6ec5"
+    }
+  }
+}
