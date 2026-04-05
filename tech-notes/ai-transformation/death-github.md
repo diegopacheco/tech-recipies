@@ -86,6 +86,87 @@ SDD proposes writing detailed specification documents before the agent writes co
 └───────────────────────────────────────────────────────────────┘
 ```
 
+### Kiro — SDD Mandated at Scale, Production Fires
+
+Amazon's Kiro is SDD enforced as corporate mandate. AWS shipped an AI coding agent built around spec-driven workflows and pushed it company-wide with an 80% weekly usage requirement. The result was production disasters.
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│              The Kiro Incident Timeline                        │
+│                                                               │
+│  Dec 2025:  Kiro deleted and recreated AWS Cost Explorer      │
+│             production environment. 13-hour outage in China.  │
+│             Amazon Q Developer caused separate disruption.    │
+│                                                               │
+│  Mar 5 2026: Amazon.com storefront went offline for 6 hours. │
+│             Affected checkout, pricing, accounts.             │
+│             Cause: "faulty deployment following AI-assisted   │
+│             changes." The revenue-generating platform itself. │
+│                                                               │
+│  Mar 10:    SVP emergency meeting. New policy: senior         │
+│             engineer sign-offs for junior AI-assisted deploys.│
+│             VP-level approval to opt out of Kiro mandate.     │
+│                                                               │
+│  The pattern:                                                 │
+│    1. Ship capability rapidly                                 │
+│    2. Mandate adoption                                        │
+│    3. Discover failure mode in production                     │
+│    4. Add safeguards retroactively                            │
+│    5. Blame human operators                                   │
+│                                                               │
+│  "The mandate came first. The guardrails came after the       │
+│   fires."                                                     │
+│                                                               │
+│  ~1,500 engineers signed internal petition demanding Claude   │
+│  Code access. Their argument: Claude Code outperforms Kiro    │
+│  on multi-language refactoring. Amazon spent more resources   │
+│  enforcing tool adoption than ensuring tool safety.           │
+│                                                               │
+│  Kiro went from preview to GA to company-wide mandate in      │
+│  5 months. Safety infrastructure lagged by months.            │
+│  90-day safety reset across 335 systems — no progress         │
+│  reports published. 80% mandate remains in place.             │
+└───────────────────────────────────────────────────────────────┘
+```
+
+Kiro is the proof that SDD at scale does not prevent disasters — it creates them. Specs and structured workflows gave Amazon a false sense of safety while the agent was deleting production environments. Every safeguard was reactive, bolted on after damage that was entirely foreseeable.
+
+### AGENTS.md — The Attention Budget Problem
+
+SDD and spec-driven approaches assume that more instructions produce better agent behavior. Research shows the opposite. Your AGENTS.md is not a knowledge base — it is an attention budget, and every line you add dilutes attention to every other line.
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│              Instruction Following Degrades With Scale         │
+│                                                               │
+│  Distyl AI (NeurIPS 2025) tested 20 frontier models:         │
+│    - 10 to 500 simultaneous instructions                      │
+│    - Best performance at 500 instructions: 68% compliance     │
+│    - 1 in 3 instructions gets skipped entirely                │
+│                                                               │
+│  Degradation patterns:                                        │
+│    Threshold decay: near-perfect until cliff (o3, Gemini 2.5) │
+│    Linear decay: steady decline from start (GPT-4.1, Sonnet) │
+│    Exponential decay: rapid collapse (GPT-4o, LLaMA-4-Scout) │
+│                                                               │
+│  All models show primacy bias: earlier instructions get       │
+│  stronger compliance. Middle sections are attention deserts.  │
+│                                                               │
+│  Beyond ~40% of context capacity, models start drifting,      │
+│  hallucinating, and forgetting their own instructions.        │
+│                                                               │
+│  Transformer softmax attention is zero-sum. More tokens       │
+│  means less attention per token. Every rule competes with     │
+│  every other rule for focus.                                  │
+│                                                               │
+│  A concise 50-line file with 5 critical rules outperforms     │
+│  a 200-line file containing the same rules plus noise.        │
+│                                                               │
+│  SDD's answer to complexity is MORE text. The architecture    │
+│  punishes MORE text. These are fundamentally incompatible.    │
+└───────────────────────────────────────────────────────────────┘
+```
+
 ### The Real Alternative: Vintage Coding + AI as Accelerator
 
 Neither vibe coding (no discipline) nor SDD (all documents, no code) is the answer.
@@ -368,4 +449,6 @@ GitHub is not literally dying, but its role is being questioned. The PR-centric,
 - Vibe Coding (Prompt-Iterative): https://dasroot.net/posts/2026/04/vibe-coding-ai-devops-2026/
 - Vibe Coding Critique: https://diegopacheco.github.io/The-Art-of-Sense-A-Philosophy-of-Modern-AI/chapter-1/VIBE_CODING.html
 - SDD Critique: https://diegopacheco.github.io/The-Art-of-Sense-A-Philosophy-of-Modern-AI/chapter-4/SDD.html
+- Kiro Escalation (Amazon SDD Fiasco): https://paddo.dev/blog/kiro-escalation/
+- AGENTS.md Is a Liability (Attention Budget): https://paddo.dev/blog/your-agents-md-is-a-liability/
 - Microsoft Shaking Up GitHub for AI Battle: https://www.itpro.com/software/development/microsoft-github-reshuffle-ai-coding-anthropic-cursor
