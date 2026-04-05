@@ -1,0 +1,26 @@
+tech-notes/ai-transformation/death-issue-tracker.md
+  91d121b7d3aebb87 88-171,191
+tech-notes/ai-transformation/12-factor-agents.md
+  91d121b7d3aebb87 1-310
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "c64c0bec106c5388da388ba687ddb36db393ce1e",
+  "prompts": {
+    "91d121b7d3aebb87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb378b49-d2ea-4c56-b5d5-5b95439da9eb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 395,
+      "total_deletions": 0,
+      "accepted_lines": 395,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/21294273b1dfcb875ec49ec3733b11e7d55ee5e6065d381f311dc53dd719ed26"
+    }
+  }
+}
