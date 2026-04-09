@@ -1,0 +1,24 @@
+tech-notes/agents/claude-dispatch.md
+  8736970086c5b4bd 1-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "18707f71db5533001a1eacb8d749d8bac6aae392",
+  "prompts": {
+    "8736970086c5b4bd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a31220e-d8de-4d2a-86b6-8e30265ae26f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 195,
+      "total_deletions": 106,
+      "accepted_lines": 89,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/1e38658309f7a8f64709972b675bf54458cdfcf05d67b5fc87c143049e3e70f8"
+    }
+  }
+}
