@@ -1,0 +1,24 @@
+tech-notes/agents/harness.md
+  c8aaa42263035a5f 1-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "35b8be20c2844e644f6cca8c81ae56fa0ebbb40d",
+  "prompts": {
+    "c8aaa42263035a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "814e4627-c742-4462-89f7-13c431f78b87",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 94,
+      "total_deletions": 0,
+      "accepted_lines": 94,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/c4714201fd6e6faf6d2732fa39301b708db81ab53a49bec1d189dea41eb69af2"
+    }
+  }
+}
