@@ -1,0 +1,26 @@
+tech-notes/agents/blockchain-platforms.md
+  c8aaa42263035a5f 1-175
+tech-notes/agents/stablecoins.md
+  c8aaa42263035a5f 1-150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "5d6165fc6c832cbae1108de2e9939eff77d37f21",
+  "prompts": {
+    "c8aaa42263035a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "814e4627-c742-4462-89f7-13c431f78b87",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 325,
+      "total_deletions": 0,
+      "accepted_lines": 325,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/fd5e7a2a7297749ac5921b9d70fc9a73db557cef954b35b8c8b961622bfa853e"
+    }
+  }
+}
