@@ -1,0 +1,24 @@
+tech-notes/agents/codex-via-bedrock.md
+  c8aaa42263035a5f 1-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "55899eb8164428c69bff3ba2042da887ef611732",
+  "prompts": {
+    "c8aaa42263035a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "814e4627-c742-4462-89f7-13c431f78b87",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 114,
+      "total_deletions": 9,
+      "accepted_lines": 105,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/757970d79c3c06997b200e20b4e267fc5ce41badf11e9836618d3bb1529eb998"
+    }
+  }
+}
