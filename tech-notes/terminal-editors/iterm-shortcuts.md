@@ -3,6 +3,7 @@
 | Action | Shortcut |
 |--------|----------|
 | Full Screen Mode | Command + Control + F |
+| Full/Restore mode for Tabs | Command + Shift + Enter |
 | Open New Tab | Command + T |
 | Open New Window | Command + N |
 | Close Tab | Command + W |
