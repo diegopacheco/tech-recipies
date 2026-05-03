@@ -1,0 +1,24 @@
+tech-notes/ai-transformation/law-firm-model.md
+  7b64eb9e0f1ab35b 1-374
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "f4ff02b5d3eb44a4a82e51cc50954995d080d979",
+  "prompts": {
+    "7b64eb9e0f1ab35b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f02caead-eaa5-4285-a90e-e0d4cb651d7b",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 374,
+      "total_deletions": 0,
+      "accepted_lines": 374,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/bf29c96b5605d04bf371c804d4dbf5d82a5e1f85f258df5c084359d26848de8d"
+    }
+  }
+}
