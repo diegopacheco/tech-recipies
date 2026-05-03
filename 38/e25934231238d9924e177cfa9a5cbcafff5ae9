@@ -1,0 +1,24 @@
+tech-notes/ai-transformation/briefs-as-code.md
+  3223978bf73e19f6 1-235
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "38e25934231238d9924e177cfa9a5cbcafff5ae9",
+  "prompts": {
+    "3223978bf73e19f6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6423a057-873e-4bf7-bc9c-8c4e8265dee1",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco",
+      "messages": [],
+      "total_additions": 235,
+      "total_deletions": 0,
+      "accepted_lines": 235,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/a3b189dbb819b517fc63c483c76a5e2aa3c54f89e53ef99caacf63364eae600a"
+    }
+  }
+}
