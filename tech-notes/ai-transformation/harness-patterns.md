@@ -243,15 +243,6 @@ Skills (or sub-agents) trigger themselves based on detected intent — keywords,
 - **Agent = Model + Harness**: anything that isn't the model is harness. As models commoditize, the harness becomes the competitive surface.
 - **Three interlocking systems**: context engineering (what the agent knows), architectural constraints (deterministic checks), entropy management (drift repair). A production harness needs all three.
 
-## See Also
-
-- [agents-pocs.md](./agents-pocs.md) — full POC catalog backing these patterns
-- [continuous-claude.md](./continuous-claude.md) — background/loop + stop-condition pitfalls in depth
-- [claude-managed-agents.md](./claude-managed-agents.md) — sandbox/worktree, outcome-driven loops, sub-agents
-- [SDD-research.md](./SDD-research.md) — spec-driven flows, over-prompting caveats
-- [multi-agents/claude-flow-vs-bmad-method.md](./multi-agents/claude-flow-vs-bmad-method.md) — orchestration vs guided patterns
-- [frontend-tools-models-coding-agents.md](./frontend-tools-models-coding-agents.md) — harness comparison
-
 ## External References
 
 - [Anthropic — Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps)
