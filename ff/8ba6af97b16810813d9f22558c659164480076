@@ -1,0 +1,19 @@
+tech-notes/ai-transformation/generative-ui.md
+  s_433df0ff506d7b::t_847e84be1b2165 1-370
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "ff8ba6af97b16810813d9f22558c659164480076",
+  "prompts": {},
+  "sessions": {
+    "s_433df0ff506d7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6001d1bd-564b-4d3a-96fa-09bf7a15511f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
