@@ -1,0 +1,21 @@
+tech-notes/ai-transformation/ai-psychosis.md
+  s_c794811a6f4b74::t_a4cd6e64a06312 1-260
+tech-notes/ai-transformation/token-maxing.md
+  s_c794811a6f4b74::t_36806b81e5871d 1-153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "0e74fa6a7c6160edff3da63b2d678d084e2129ad",
+  "prompts": {},
+  "sessions": {
+    "s_c794811a6f4b74": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01c89ced-3f81-4f37-8627-963038041ee4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
