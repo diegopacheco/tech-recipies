@@ -1,0 +1,23 @@
+tech-notes/ai-transformation/one-person-unicorn.md
+  s_d57db0ebaac358::t_38729ef688a26c 1-157
+tech-notes/ai-transformation/rl-environments.md
+  s_d57db0ebaac358::t_d74a6fafc86210 1-148
+tech-notes/ai-transformation/agentic-commerce.md
+  s_d57db0ebaac358::t_59834b728f47ab 1-154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "40a1749296879bb4ed1e88e5408900925309a6a2",
+  "prompts": {},
+  "sessions": {
+    "s_d57db0ebaac358": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "30b339bc-dae1-4a57-8804-dd8897ca1016",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
