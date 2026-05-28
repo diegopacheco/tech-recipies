@@ -1,0 +1,26 @@
+tech-notes/agents/claude-auto-mode.md
+  s_2a81880d5339e8::t_294a3b04ae544b 1-111,143-158
+  s_2a81880d5339e8::t_401e7f0192956d 112-142
+  h_8e2c3875396153 159-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "573548a5ac4ca2e4448062e34f80dcb788a72a64",
+  "prompts": {},
+  "humans": {
+    "h_8e2c3875396153": {
+      "author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_2a81880d5339e8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "89f750d4-7e44-4933-b30f-fe7230220037",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
