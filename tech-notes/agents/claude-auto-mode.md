@@ -77,6 +77,23 @@ Auto mode is meant to replace `--dangerously-skip-permissions` without bringing 
 
 Backstop: if a session hits **3 consecutive denials or 20 total**, the model stops and escalates to the human. In headless mode (`claude -p`) there is no UI to ask, so the process terminates.
 
+## What it costs in tokens
+
+Auto mode adds two model-based layers that do not exist in manual mode, so it strictly costs more tokens than manual approval (where a human is the gate and costs zero tokens) and more than `--dangerously-skip-permissions` (which has no gate at all):
+
+- **Input layer** - the prompt-injection probe runs on tool outputs before they enter context.
+- **Output layer** - the transcript classifier (Sonnet 4.6) runs on each Tier 3 action, in up to two stages.
+
+The design is built to keep this small. Three things bound the cost:
+
+1. **Most actions never trigger the classifier.** Only Tier 3 hits it - shell commands, web fetches, external integrations, subagent spawns, out-of-project filesystem ops. Tiers 1-2 (reads, searches, in-project edits), which are the bulk of agent activity, cost zero classifier calls.
+2. **When it does fire, the input is stripped down.** The classifier is reasoning-blind - it sees only user messages and bare tool calls, with assistant prose and tool outputs removed. Tool outputs are normally the bulk of context, so the classifier's prefill is far smaller than the main agent's. It also runs on Sonnet 4.6, cheaper than the Opus that may be driving the session.
+3. **Stage 2 is rare.** Stage 1 emits a single token (`yes`/`no`) and clears most actions; the expensive chain-of-thought only runs on the ~8.5% flagged on real traffic.
+
+**Rough magnitude (estimate, not published):** per Tier 3 action you pay one cheap-model prefill over a stripped transcript plus ~1 output token, with occasional Stage 2 reasoning bursts, plus a per-tool-output injection scan on the input side. Netted out, this lands in roughly the **low single-digit to low-teens percent** overhead on total token spend, scaling with how Tier-3-heavy the session is and how long the transcript grows (classifier input grows with it). A read/edit-heavy refactor sits near the bottom of that range; a session full of shell commands and web fetches sits near the top.
+
+This band is reasoned from the architecture above, not measured or published by Anthropic - the source material commits to accuracy tradeoffs (0.4% FPR, 17% FNR) but not to cost. For a real number you would measure it on your own workload.
+
 ## Results
 
 Evaluated on three datasets:
