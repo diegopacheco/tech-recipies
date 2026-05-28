@@ -1,0 +1,19 @@
+tech-notes/agents/hermes-agent.md
+  s_4ed58795110bc9::t_d18e7d64896830 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "32f7125ec31ed46555a345b442f9582f2273c276",
+  "prompts": {},
+  "sessions": {
+    "s_4ed58795110bc9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d5e544d-e49a-4a17-bbde-4ca3515256f0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
