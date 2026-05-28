@@ -1,0 +1,21 @@
+tech-notes/ai-transformation/ai-native-leadership.md
+  s_ce269c00ab2eaf::t_b80c6c34294807 1-150
+tech-notes/ai-transformation/ai-native-engineering.md
+  s_ce269c00ab2eaf::t_95ad44c5a41656 1-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a4d6e92a3a634b647d2e986ee38ae5e948a37d0e",
+  "prompts": {},
+  "sessions": {
+    "s_ce269c00ab2eaf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "102f33ad-221d-4e30-85ba-54807b572768",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
