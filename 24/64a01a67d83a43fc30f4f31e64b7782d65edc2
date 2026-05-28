@@ -1,0 +1,19 @@
+tech-notes/agents/claude-auto-mode.md
+  s_247705628476bf::t_1b8075c1843171 80-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2464a01a67d83a43fc30f4f31e64b7782d65edc2",
+  "prompts": {},
+  "sessions": {
+    "s_247705628476bf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "71a72236-7725-4007-bc17-06d654704f42",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
