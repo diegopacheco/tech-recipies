@@ -1,0 +1,27 @@
+tech-notes/agents/claude-dynamic-workflows.md
+  s_f5162381ba8792::t_3ab25e80b9caad 1-139
+tech-notes/agents/litellm-agent-platform.md
+  s_f5162381ba8792::t_4e32b5b119d985 1-90
+tech-notes/agents/merge-ai-agent-gateway.md
+  s_f5162381ba8792::t_6c9e30db9da7ff 1-101
+tech-notes/agents/langchain-managed-deep-agents.md
+  s_f5162381ba8792::t_92f92fbc369946 1-85
+tech-notes/agents/claude-finance-agents.md
+  s_f5162381ba8792::t_e257fc229d81e7 1-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "75ea2148b8f49111b5dca29e176628a8a0bf836d",
+  "prompts": {},
+  "sessions": {
+    "s_f5162381ba8792": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb693183-8e45-4c74-adea-0b31eb176d77",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
