@@ -1,0 +1,25 @@
+tech-notes/distributed-systems/traffic-replay.md
+  s_da0c63f0e486f2::t_05578652134b68 1-220
+  h_8e2c3875396153 221-230
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "95e66262c62335d96f99336a89c0b4cda1dd532d",
+  "prompts": {},
+  "humans": {
+    "h_8e2c3875396153": {
+      "author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_da0c63f0e486f2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36e7f8f8-e02f-4139-8ba8-d35cc8232765",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
