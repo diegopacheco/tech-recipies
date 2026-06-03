@@ -1,0 +1,19 @@
+tech-notes/ai-transformation/slow-down-to-speed-up.md
+  s_451daeb700d256::t_ea9848edd3ec4d 1-171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8bca7af4f1907ff163064fc3a09207711122cb37",
+  "prompts": {},
+  "sessions": {
+    "s_451daeb700d256": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3b415209-ca8e-406e-be70-e19709119c54",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
