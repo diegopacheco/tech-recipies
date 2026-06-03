@@ -1,0 +1,31 @@
+tech-notes/distributed-systems/gossip-swim.md
+  s_6531d90391fc52::t_ab4b9258ef6f64 1-159
+tech-notes/distributed-systems/rate-limiting.md
+  s_6531d90391fc52::t_b300a79082f908 1-204
+tech-notes/distributed-systems/load-shedding-backpressure.md
+  s_6531d90391fc52::t_0a573a74102649 1-212
+tech-notes/distributed-systems/lsm-tree-vs-b-tree.md
+  s_6531d90391fc52::t_a25e182b828d18 1-195
+tech-notes/distributed-systems/write-ahead-log.md
+  s_6531d90391fc52::t_54997da7668c00 1-153
+tech-notes/distributed-systems/consensus-raft-paxos.md
+  s_6531d90391fc52::t_cff89f236096ef 1-233
+tech-notes/distributed-systems/cap-pacelc.md
+  s_6531d90391fc52::t_951d600fc7ffc2 1-177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f6f4c7982fe5a0f7676b0a38bc4a7bcd0d25c92e",
+  "prompts": {},
+  "sessions": {
+    "s_6531d90391fc52": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd773f9f-2b15-4ce3-a8fa-a2b3f42cbbaf",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
