@@ -1,0 +1,19 @@
+tech-notes/agents/cc-sandbox.md
+  s_631dd32c5c35cf::t_923cb12c119dd9 1-204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a08b2a417d94b8a6b0b779fd89c94169d9fbffd4",
+  "prompts": {},
+  "sessions": {
+    "s_631dd32c5c35cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "69c9a927-1963-478e-bd14-5c454b5c3c8d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
