@@ -1,0 +1,28 @@
+tech-notes/ai-transformation/open-models.md
+  s_25696d28db69d2::t_83bfb40c8b22fe 1-19,21-32,62-72,113,116-147,150-192,195-197,212,215-227,254-295,315-367,379-395,397-426,430-437
+  s_7bff874abc5db8::t_358c465c4aa27c 20,33-61,73-112,114-115,148-149,193-194,198-211,213-214,228-253,296-314,368-378,396,427-429
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "e60728ba2cb4c34703cc8bdbaf7a365e7137a599",
+  "prompts": {},
+  "sessions": {
+    "s_25696d28db69d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9c577478-29af-4ec5-a9e6-2c546eaa590a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    },
+    "s_7bff874abc5db8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f91aa9b5-5f75-41a1-910c-bf7898066af4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
