@@ -1,0 +1,19 @@
+tech-notes/agents/mcp-enterprise-managed-auth.md
+  s_ddf7fcf24530bf::t_2b93f3f9a5d1e0 1-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "98f457ffe20a15f25a8948412f8259a6a19e16a1",
+  "prompts": {},
+  "sessions": {
+    "s_ddf7fcf24530bf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0f0b04d4-a168-427e-9d22-18442c397b67",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
