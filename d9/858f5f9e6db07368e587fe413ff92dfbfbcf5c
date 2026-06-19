@@ -1,0 +1,19 @@
+tech-notes/ai-transformation/agentic-resource-discovery.md
+  s_2baf33781f5bef::t_e224bac3b33977 1-324
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "d9858f5f9e6db07368e587fe413ff92dfbfbcf5c",
+  "prompts": {},
+  "sessions": {
+    "s_2baf33781f5bef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f21d7d88-5950-468b-982c-dd576b201f01",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
