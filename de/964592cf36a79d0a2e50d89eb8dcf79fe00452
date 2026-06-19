@@ -1,0 +1,19 @@
+tech-notes/ai-transformation/loop-engineering.md
+  s_ec0cd5d17c3802::t_be0996a792304b 1-256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "de964592cf36a79d0a2e50d89eb8dcf79fe00452",
+  "prompts": {},
+  "sessions": {
+    "s_ec0cd5d17c3802": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "927da092-cffe-4ded-bf1e-781dc2e34b2e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
