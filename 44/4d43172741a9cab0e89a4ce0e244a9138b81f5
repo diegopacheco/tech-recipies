@@ -1,0 +1,19 @@
+tech-notes/ai-transformation/eval-driven-development.md
+  s_cfd32aa0f901de::t_7749f990eba536 1-242
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "444d43172741a9cab0e89a4ce0e244a9138b81f5",
+  "prompts": {},
+  "sessions": {
+    "s_cfd32aa0f901de": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7d66f017-9cfa-47df-b7cf-df9923b9dc3c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
