@@ -72,7 +72,7 @@ TAP is one piece of a fragmenting stack, not a monolith. Most of these compose r
 | **x402** | Coinbase | HTTP 402 **stablecoin settlement** |
 | **Agent Pay** | Mastercard | Rival **network-led** agent-payment scheme |
 
-The clean mental model: ACP standardizes *how the agent checks out*, AP2 provides the *signed buyer mandate proving authority*, x402/MPP handle *raw settlement* — and TAP is the *identity wrapper* that tells the merchant the agent is real before any of that runs. An agent can carry an AP2 mandate into an ACP checkout behind a TAP-signed request. Visa's bet is that everyone needs the recognition layer regardless of which checkout/settlement rail wins.
+The clean mental model: the [[agentic-commerce-protocol]] (ACP) standardizes *how the agent checks out*, the [[agent-payments-protocol]] (AP2) provides the *signed buyer mandate proving authority*, [[x402-machine-payments]] (x402/MPP) handles *raw settlement* — and TAP is the *identity wrapper* that tells the merchant the agent is real before any of that runs. An agent can carry an AP2 mandate into an ACP checkout behind a TAP-signed request. Visa's bet is that everyone needs the recognition layer regardless of which checkout/settlement rail wins.
 
 ## Why it matters
 
