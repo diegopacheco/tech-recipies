@@ -1,0 +1,25 @@
+tech-notes/agents/agentic-commerce-protocol.md
+  s_c77bb37596f52f::t_43a53d1dc2bc83 1-78
+tech-notes/agents/trusted-agent-protocol.md
+  s_c77bb37596f52f::t_732d9256ef8e9c 75
+tech-notes/agents/x402-machine-payments.md
+  s_c77bb37596f52f::t_bf462acac0a14f 1-70
+tech-notes/agents/agent-payments-protocol.md
+  s_c77bb37596f52f::t_192260459bbc77 1-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "3a50bcf4eb379bffcc1f933693136316d8dc5b42",
+  "prompts": {},
+  "sessions": {
+    "s_c77bb37596f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38c800a1-32eb-4dcd-b0dc-4770e61a94c5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
