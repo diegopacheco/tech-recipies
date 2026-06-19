@@ -1,0 +1,19 @@
+tech-notes/agents/trusted-agent-protocol.md
+  s_c77bb37596f52f::t_690d9b1bda6724 1-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "969c13e7ff02345f22e48a902b2f1496a7a953ce",
+  "prompts": {},
+  "sessions": {
+    "s_c77bb37596f52f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38c800a1-32eb-4dcd-b0dc-4770e61a94c5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
