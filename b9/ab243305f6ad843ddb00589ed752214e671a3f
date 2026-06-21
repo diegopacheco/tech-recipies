@@ -1,0 +1,19 @@
+tech-notes/frontend-architecture/html-first.md
+  s_45ef7d19186d20::t_331174c3d5e59b 1-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "b9ab243305f6ad843ddb00589ed752214e671a3f",
+  "prompts": {},
+  "sessions": {
+    "s_45ef7d19186d20": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff3dd9df-f2d6-4793-a10d-708c41bcf6ea",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
