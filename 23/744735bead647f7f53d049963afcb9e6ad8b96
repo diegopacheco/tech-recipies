@@ -1,0 +1,22 @@
+tech-notes/frontend-architecture/webassembly-wasm.md
+  s_529998e2405877::t_1d7cdc0f34aa71 1-127
+tech-notes/frontend-architecture/resumability.md
+  s_529998e2405877::t_762d1bb8c2556d 1-79,81-82,96-145
+  s_529998e2405877::t_8fedba3616d8a4 80,83-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "23744735bead647f7f53d049963afcb9e6ad8b96",
+  "prompts": {},
+  "sessions": {
+    "s_529998e2405877": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "166a466c-4d18-409b-97aa-fb8a65780b5b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
