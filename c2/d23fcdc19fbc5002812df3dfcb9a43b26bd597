@@ -1,0 +1,19 @@
+tech-notes/frontend-architecture/htmx.md
+  s_1221fed7693c4c::t_ff3aa1d2dd1c57 1-171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "c2d23fcdc19fbc5002812df3dfcb9a43b26bd597",
+  "prompts": {},
+  "sessions": {
+    "s_1221fed7693c4c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fd7f4c13-c8c0-4487-9ff8-7bff84bc1872",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
