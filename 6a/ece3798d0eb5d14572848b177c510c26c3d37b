@@ -1,0 +1,19 @@
+tech-notes/contracts/json-ld.md
+  s_b0faa996226e53::t_f1c74120b5194c 1-289
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "6aece3798d0eb5d14572848b177c510c26c3d37b",
+  "prompts": {},
+  "sessions": {
+    "s_b0faa996226e53": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8da587ca-caff-411e-a138-18adfd92d0ad",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
