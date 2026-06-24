@@ -1,0 +1,19 @@
+tech-notes/databases/quadtree.md
+  s_0ee4c90d32c05f::t_00fe08431f0266 1-342
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "0cdf59ac6c1a6ba7ebd4573888a7afae06a62f03",
+  "prompts": {},
+  "sessions": {
+    "s_0ee4c90d32c05f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f4ea515-2e25-4953-8f1f-7bf3ba61de3f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
