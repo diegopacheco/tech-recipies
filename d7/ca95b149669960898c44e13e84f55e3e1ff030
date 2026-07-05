@@ -1,0 +1,25 @@
+tech-notes/sec/dns-over-https.md
+  s_844038b571edd5::t_fac8da88927856 1-84,86-90,93-96,98-123,125,127-128,130,132-133,135,137,139,141-198
+  h_8e2c3875396153 85,91-92,97,124,126,129,131,134,136,138,140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d7ca95b149669960898c44e13e84f55e3e1ff030",
+  "prompts": {},
+  "humans": {
+    "h_8e2c3875396153": {
+      "author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_844038b571edd5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "639eac55-29d9-4487-acdc-a61a087c4998",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
