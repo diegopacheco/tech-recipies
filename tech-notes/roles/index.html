@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A concise field guide to eight engineering roles.">
+  <title>Engineering Roles Field Guide</title>
+  <style>
+    :root {
+      --ink: #172019;
+      --muted: #697169;
+      --paper: #f3f0e7;
+      --sheet: #fffdf7;
+      --line: #c8c8bb;
+      --accent: #e9532f;
+      --shadow: 0 18px 50px rgba(40, 46, 35, .13);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: "Avenir Next", Avenir, "Century Gothic", sans-serif; }
+    button, a { font: inherit; }
+    button { color: inherit; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    .topbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+    .brand-mark { width: 28px; height: 28px; border: 1px solid var(--ink); display: grid; place-items: center; transform: rotate(-4deg); }
+    .counter { color: var(--muted); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; }
+    .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 48px; padding: 86px 0 64px; align-items: end; }
+    .eyebrow { margin: 0 0 18px; color: var(--accent); font-size: .76rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 780px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.7rem, 8vw, 7.7rem); font-weight: 400; letter-spacing: -.065em; line-height: .82; }
+    .hero-copy { margin: 0; max-width: 330px; color: var(--muted); font-family: Georgia, "Times New Roman", serif; font-size: 1.15rem; line-height: 1.6; }
+    .rule { width: 52px; height: 3px; margin-bottom: 25px; background: var(--accent); }
+    .deck-heading { display: flex; justify-content: space-between; gap: 30px; align-items: flex-end; margin: 0 0 24px; }
+    h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 400; letter-spacing: -.035em; }
+    .hint { margin: 0 0 5px; color: var(--muted); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; }
+    .deck { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding-bottom: 100px; }
+    .role-card { --tone: #d9e8d6; position: relative; min-height: 330px; padding: 0; overflow: hidden; text-align: left; border: 1px solid var(--ink); background: var(--sheet); box-shadow: 5px 5px 0 var(--tone); cursor: pointer; transition: transform .25s ease, box-shadow .25s ease; animation: arrive .55s both; animation-delay: calc(var(--i) * 60ms); }
+    .role-card:nth-child(2n) { transform: translateY(16px); }
+    .role-card:hover, .role-card:focus-visible { transform: translate(-4px, -6px) rotate(-.7deg); box-shadow: 11px 13px 0 var(--tone); outline: none; z-index: 2; }
+    .role-card:nth-child(2n):hover, .role-card:nth-child(2n):focus-visible { transform: translate(-4px, 10px) rotate(.7deg); }
+    .card-band { display: block; height: 11px; background: var(--tone); border-bottom: 1px solid var(--ink); }
+    .card-inner { height: 318px; display: flex; flex-direction: column; padding: 24px 22px 20px; }
+    .card-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
+    .card-title { margin: auto 0 16px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.8rem, 2.6vw, 2.5rem); font-weight: 400; line-height: .98; letter-spacing: -.045em; }
+    .card-summary { min-height: 58px; margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.5; }
+    .card-open { display: flex; justify-content: space-between; align-items: center; padding-top: 17px; margin-top: 17px; border-top: 1px solid var(--line); font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .arrow { font-size: 1.25rem; transition: transform .2s ease; }
+    .role-card:hover .arrow { transform: translateX(4px); }
+    .detail { position: fixed; inset: 0; z-index: 10; visibility: hidden; overflow-y: auto; background: rgba(23, 32, 25, .42); opacity: 0; transition: opacity .25s ease, visibility .25s; }
+    .detail.open { visibility: visible; opacity: 1; }
+    .detail-sheet { width: min(930px, calc(100% - 30px)); min-height: 100%; margin-left: auto; padding: 34px clamp(24px, 6vw, 76px) 70px; background: var(--sheet); box-shadow: -20px 0 70px rgba(20, 27, 22, .22); transform: translateX(40px); transition: transform .35s ease; }
+    .detail.open .detail-sheet { transform: translateX(0); }
+    .detail-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 27px; border-bottom: 1px solid var(--line); }
+    .back { display: flex; gap: 10px; align-items: center; padding: 10px 0; border: 0; background: transparent; cursor: pointer; font-size: .73rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .back:hover, .back:focus-visible { color: var(--accent); outline: none; }
+    .detail-index { color: var(--muted); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
+    .detail-header { position: relative; padding: 65px 0 50px; }
+    .detail-header::before { content: ""; position: absolute; top: 0; left: -76px; width: 12px; height: 100%; background: var(--tone); }
+    .detail-title { max-width: 720px; margin: 0 0 22px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3rem, 7vw, 6rem); font-weight: 400; letter-spacing: -.06em; line-height: .88; }
+    .detail-lede { max-width: 640px; margin: 0; color: var(--muted); font-family: Georgia, "Times New Roman", serif; font-size: 1.16rem; line-height: 1.55; }
+    .sections { border-top: 1px solid var(--ink); }
+    .section { display: grid; grid-template-columns: 205px 1fr; gap: 42px; padding: 34px 0; border-bottom: 1px solid var(--line); }
+    .section h3 { margin: 0; font-size: .74rem; letter-spacing: .12em; line-height: 1.5; text-transform: uppercase; }
+    .section ol { margin: 0; padding: 0; list-style: none; counter-reset: notes; }
+    .section li { position: relative; padding: 0 0 15px 39px; color: #39423b; line-height: 1.55; counter-increment: notes; }
+    .section li:last-child { padding-bottom: 0; }
+    .section li::before { content: counter(notes, decimal-leading-zero); position: absolute; left: 0; top: 3px; color: var(--accent); font-size: .67rem; font-weight: 700; letter-spacing: .08em; }
+    .read-full { display: inline-flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 42px; padding: 22px 0; color: var(--ink); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; }
+    .read-full:hover, .read-full:focus-visible { color: var(--accent); outline: none; }
+    body.locked { overflow: hidden; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; } }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 28px; }
+      .deck { grid-template-columns: repeat(2, 1fr); }
+      .role-card:nth-child(2n) { transform: none; }
+      .role-card:nth-child(2n):hover, .role-card:nth-child(2n):focus-visible { transform: translate(-4px, -6px) rotate(.7deg); }
+      .detail-header::before { left: calc(clamp(24px, 6vw, 76px) * -1); }
+    }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 24px, 1180px); }
+      .topbar { min-height: 64px; }
+      .hero { padding: 58px 0 52px; }
+      .deck-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .deck { grid-template-columns: 1fr; gap: 14px; padding-bottom: 55px; }
+      .role-card { min-height: 280px; }
+      .card-inner { height: 268px; }
+      .detail-sheet { width: calc(100% - 10px); padding-top: 20px; }
+      .section { grid-template-columns: 1fr; gap: 18px; }
+      .detail-header { padding: 50px 0 38px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell topbar">
+    <div class="brand"><span class="brand-mark">R</span><span>Engineering Field Guide</span></div>
+    <div class="counter">08 roles · one deck</div>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Choose your altitude</p>
+        <h1 id="page-title">How do you want to lead?</h1>
+      </div>
+      <div>
+        <div class="rule"></div>
+        <p class="hero-copy">Eight roles. Different kinds of leverage, proximity, authority, and risk. Pick a card for the concise field notes.</p>
+      </div>
+    </section>
+    <section aria-labelledby="deck-title">
+      <div class="deck-heading">
+        <h2 id="deck-title">The role deck</h2>
+        <p class="hint">Select a card to inspect</p>
+      </div>
+      <div class="deck" id="deck"></div>
+    </section>
+  </main>
+  <aside class="detail" id="detail" aria-hidden="true" aria-labelledby="detail-title">
+    <div class="detail-sheet" role="dialog" aria-modal="true">
+      <div class="detail-top">
+        <button class="back" id="back" type="button"><span>←</span><span>Back to the deck</span></button>
+        <span class="detail-index" id="detail-index"></span>
+      </div>
+      <header class="detail-header" id="detail-header">
+        <p class="eyebrow" id="detail-track"></p>
+        <h2 class="detail-title" id="detail-title"></h2>
+        <p class="detail-lede" id="detail-lede"></p>
+      </header>
+      <div class="sections" id="sections"></div>
+      <a class="read-full" id="read-full"><span>Read the complete role file</span><span>↗</span></a>
+    </div>
+  </aside>
+  <script>
+    const roles = [
+      {
+        title: 'Staff Engineer', track: 'Individual contributor', file: 'StaffEngineer.md', tone: '#dbe8d4',
+        summary: 'Technical direction and organizational leverage without direct reports.',
+        lede: 'The first Staff-plus rung: finding the right problems, setting direction, and making other engineers more effective without becoming a people manager.',
+        sections: {
+          'What it is': ['A senior individual-contributor path parallel to engineering management.', 'Leadership comes through judgment, influence, and visible cross-team impact.', 'Common modes include Tech Lead, Architect, Solver, and senior leader Right Hand.'],
+          'Core work': ['Set technical direction across a team, domain, or organization.', 'Own ambiguous migrations, reliability crises, and cross-cutting technical gaps.', 'Multiply engineers through mentoring, design review, clear strategy, and sponsorship.'],
+          'Where it sits': ['Usually follows Senior Engineer and precedes Senior Staff or Principal.', 'Operates laterally with managers and leaders rather than through direct reports.', 'Promotion depends on sponsored, visible impact more than tenure or a fixed checklist.'],
+          'Advantages': ['Retain deep technical work while influencing a much larger surface area.', 'Set direction that improves the work of dozens of engineers.', 'Earn senior compensation without taking on formal people management.'],
+          'Tradeoffs': ['Mandates are ambiguous and often must be discovered or created.', 'Every major outcome depends on persuasion rather than formal authority.', 'Invisible glue work can consume time without translating into recognition.'],
+          'Rewarding parts': ['Choose deep, consequential problems that match your technical strengths.', 'Remain close to the craft while becoming a trusted escalation point.', 'Build a durable career home for engineers who do not want to manage people.'],
+          'Political reality': ['Sponsorship and visibility can outweigh quiet technical excellence.', 'Ownership overlaps create turf conflict with managers and other senior engineers.', 'Cross-team accountability makes the role an easy target when execution diverges.']
+        }
+      },
+      {
+        title: 'Engineering Manager', track: 'People leadership', file: 'EM.md', tone: '#f0d9b8',
+        summary: 'One team’s people, delivery, health, and operating environment.',
+        lede: 'The first management rung changes the profession: success is measured through the team’s output, growth, and health rather than personal production.',
+        sections: {
+          'What it is': ['Accountable for one engineering team and the conditions in which it works.', 'Management demands availability and interruption rather than long blocks of maker time.', 'Strong managers can move between the management and individual-contributor tracks.'],
+          'Core work': ['Handle coaching, feedback, performance, hiring, and difficult personnel decisions.', 'Own planning, prioritization, delivery, and the removal of blockers.', 'Translate strategy into team work while protecting engineers from churn and politics.'],
+          'Where it sits': ['Usually reports to a Director, Head, or VP of Engineering.', 'Typically leads four to eight engineers on one team.', 'Often levels alongside Senior or Staff Engineer rather than above the IC track.'],
+          'Advantages': ['Improve the effectiveness and careers of an entire team.', 'Shape culture, collaboration, and the daily engineering environment.', 'Stay close to product and technology while opening a path to senior leadership.'],
+          'Tradeoffs': ['Deep maker flow largely disappears and technical skills can decay.', 'Stress is absorbed from both leadership and the team.', 'Team wins belong to the team while failures concentrate on the manager.'],
+          'Rewarding parts': ['See people gain confidence, expand scope, and earn promotions.', 'Remove environmental friction that holds several engineers back at once.', 'Build broad working relationships across product, design, and engineering.'],
+          'Political reality': ['The role is the permanent shock absorber between dates and reality.', 'Headcount, promotions, and roadmaps require active advocacy in leadership rooms.', 'Performance actions, layoffs, and conflict are difficult, confidential, and lonely.']
+        }
+      },
+      {
+        title: 'Architect', track: 'Architecture', file: 'Architect.md', tone: '#cfe2eb',
+        summary: 'System shape, technical blueprints, standards, and durable tradeoffs.',
+        lede: 'An umbrella role spanning technical, solution, and enterprise architecture, with scope ranging from one platform to the company-wide technology landscape.',
+        sections: {
+          'What it is': ['Technical architects own design within a stack or system.', 'Solution architects map one business problem to an end-to-end technical answer.', 'Enterprise architects guide the organization-wide landscape, roadmap, and standards.'],
+          'Core work': ['Turn stakeholder needs into requirements, models, and technical blueprints.', 'Choose stacks, define standards, and defend cost, time, and quality tradeoffs.', 'Stay involved through delivery to manage risk and protect critical quality attributes.'],
+          'Where it sits': ['May be a Staff-plus archetype or part of a dedicated architecture ladder.', 'Works alongside delivery teams or closer to CTO and technology-strategy leadership.', 'Often reports through a Chief Architect, VP, or CTO depending on scope.'],
+          'Advantages': ['Own the large technical picture without managing a people organization.', 'Make decisions whose value compounds across teams and years.', 'Build rare breadth across systems, constraints, and business domains.'],
+          'Tradeoffs': ['Distance from implementation can erode credibility and practical judgment.', 'Teams may ignore a design that has no line authority behind it.', 'Central review can turn the architect into a delivery bottleneck.'],
+          'Rewarding parts': ['Think deeply about how complex systems fit together and evolve.', 'Create technical structures that outlive many feature cycles.', 'Understand the end-to-end landscape that most contributors only see in slices.'],
+          'Political reality': ['Architecture debates often become proxy contests for status and turf.', 'Prevented failures are invisible while flawed bets remain attached to the architect.', 'Vendor pressure and executive preferences can override sound technical reasoning.']
+        }
+      },
+      {
+        title: 'Forward Deployed Engineer', track: 'Customer engineering', file: 'fde.md', tone: '#f3c8bc',
+        summary: 'Production engineering embedded with customers and measured by outcomes.',
+        lede: 'A customer-embedded engineer who turns a vendor platform into a working production solution and carries field insight back into the core product.',
+        sections: {
+          'What it is': ['Combines software engineering, product judgment, and customer partnership.', 'Success is measured by customer outcomes rather than feature volume.', 'The defining boundary is shipping production code in the customer environment.'],
+          'Core work': ['Learn the customer domain, data estate, constraints, and real sources of value.', 'Architect and build production solutions on the vendor platform.', 'Turn recurring customer pain into reusable improvements for the core product.'],
+          'Where it sits': ['Bridges product engineering, implementation, and technical customer success.', 'Common in complex enterprise, defense, data, and AI deployments.', 'Often includes substantial on-site work, travel, and direct executive exposure.'],
+          'Advantages': ['See impact quickly through direct contact with the people using the work.', 'Build unusual range across industries, systems, data, and organizational problems.', 'Gain valuable pattern recognition and a strong market premium for the hybrid skill set.'],
+          'Tradeoffs': ['Client pressure, travel, and deep technical work create structural burnout risk.', 'Heavy customization can hide product gaps and resist efficient scaling.', 'The title is inconsistent and may conceal a shallow integration role.'],
+          'Rewarding parts': ['Work beside the people whose outcomes change when the solution ships.', 'Learn industries and operating models most engineers never encounter.', 'Carry real customer pain into product decisions that benefit every account.'],
+          'Political reality': ['Customer and vendor priorities can pull the engineer in opposite directions.', 'Local stakeholders may block access, resist change, or redirect credit and blame.', 'A technically sound deployment can still lose to budget, power, or adoption politics.']
+        }
+      },
+      {
+        title: 'Director of Engineering', track: 'Organizational leadership', file: 'Director.md', tone: '#d9d2ed',
+        summary: 'A manager of managers translating strategy into multi-team execution.',
+        lede: 'The operational depth layer between executive strategy and team execution, responsible for a group of teams through their engineering managers.',
+        sections: {
+          'What it is': ['Manages managers and a portfolio of related engineering teams.', 'Translates broad company direction into concrete quarterly plans.', 'Owns operational quality inside an established organizational structure.'],
+          'Core work': ['Grow managers and run delivery, health, and staffing across multiple teams.', 'Align engineering with product, design, data, security, and compliance.', 'Own budgets, metrics, operating processes, and executive reporting for the area.'],
+          'Where it sits': ['Usually reports to a VP, Head of Engineering, or CTO.', 'Often leads two to six teams and twenty to sixty or more engineers.', 'Works mostly through three to six managers and senior individual contributors.'],
+          'Advantages': ['Fix organizational systems that affect dozens of people at once.', 'Develop leaders whose decisions compound across every team they manage.', 'Operate where strategy becomes concrete work and measurable outcomes.'],
+          'Tradeoffs': ['Production coding is largely gone and influence is several layers indirect.', 'Budgets, staffing, compliance, and process become a large share of the work.', 'The role is squeezed between executive expectations and frontline constraints.'],
+          'Rewarding parts': ['Improve the system of work instead of resolving one isolated issue.', 'Watch managers grow into stronger leaders and build healthier teams.', 'Connect strategy, cross-functional alignment, and visible delivery outcomes.'],
+          'Political reality': ['Directors compete with peers for scope, people, and desirable charters.', 'Reorganizations frequently redraw or eliminate this layer’s responsibilities.', 'Perception in leadership rooms can determine outcomes as much as operational results.']
+        }
+      },
+      {
+        title: 'Head of Engineering', track: 'Startup leadership', file: 'Head.md', tone: '#e8dfad',
+        summary: 'The flexible top engineering role before the organization fully formalizes.',
+        lede: 'A context-dependent startup title for the person running engineering, often balancing hands-close technical leadership with delivery, hiring, and company strategy.',
+        sections: {
+          'What it is': ['Usually the senior engineering leader in a startup or scaling company.', 'More operational and hands-close than a mature VP role.', 'May act as the CTO counterpart or grow into the VP or CTO position.'],
+          'Core work': ['Run engineering delivery, quality, hiring, standards, and team health.', 'Stay involved in architecture, technical decisions, and sometimes code review.', 'Build the processes and leadership structure required for the next growth stage.'],
+          'Where it sits': ['Usually reports to the CEO or founder-CTO.', 'Scope can range from one small team to a hundred-person engineering group.', 'The title remains intentionally flexible while company structure is unsettled.'],
+          'Advantages': ['Set culture, architecture, process, and hiring standards from the beginning.', 'Work directly with founders while staying close to technical choices.', 'Create visible company impact and gain a path toward VP or CTO.'],
+          'Tradeoffs': ['Undefined scope turns every missing capability into part of the job.', 'The title may be valued below VP or CTO in the external market.', 'Strategy, delivery, hiring, and incidents can overload one person.'],
+          'Rewarding parts': ['Build an engineering organization from a nearly blank starting point.', 'Stay close to both implementation choices and company-level decisions.', 'See operating changes take effect quickly while the organization is compact.'],
+          'Political reality': ['A new VP or CTO may be hired above the role as the company scales.', 'Founder control can quietly override formal engineering authority.', 'Responsibility and workload may reach executive level before title and reward do.']
+        }
+      },
+      {
+        title: 'VP of Engineering', track: 'Executive leadership', file: 'VP.md', tone: '#c9dfd8',
+        summary: 'The operating system, structure, and outcomes of the engineering function.',
+        lede: 'The executive owner of engineering as a whole: how teams are designed, how decisions and work flow, and how the organization scales predictably.',
+        sections: {
+          'What it is': ['Owns the breadth and operating systems of the full engineering function.', 'Converts technology and business strategy into a scalable organization.', 'Often complements a CTO who focuses more on outward vision and technology direction.'],
+          'Core work': ['Design the organization, planning cadence, decision rights, and delivery system.', 'Own the hiring engine, engineering budget, and company-wide headcount plan.', 'Grow directors and represent engineering with executives, the board, and peer functions.'],
+          'Where it sits': ['Usually reports to the CEO or CTO and leads Directors of Engineering.', 'Owns organizations ranging from dozens to hundreds of engineers.', 'Sits at the executive table, several layers away from production code.'],
+          'Advantages': ['Shape company strategy and the environment experienced by all engineers.', 'Remove structural friction that no individual team can solve.', 'Build senior leaders and systems whose impact persists beyond one tenure.'],
+          'Tradeoffs': ['The craft is replaced by meetings, organizational systems, and executive work.', 'Accountability is comprehensive while direct control is limited.', 'The position is exposed, demanding, and often short-lived.'],
+          'Rewarding parts': ['Design the culture and operating system used by the full organization.', 'Resolve structural pain whose removal saves large amounts of collective time.', 'Grow directors who extend sound leadership throughout engineering.'],
+          'Political reality': ['Alliances with CEO, CFO, CPO, and CTO materially affect engineering resources.', 'CTO and VP mandates frequently overlap around technology strategy.', 'Boards often use a VP replacement to signal change after broad company failures.']
+        }
+      },
+      {
+        title: 'Chief Architect', track: 'Enterprise architecture', file: 'ChiefArchitect.md', tone: '#edccb6',
+        summary: 'Company-wide architecture coherence and the highest technical authority.',
+        lede: 'The senior architecture authority who translates technology strategy into a coherent enterprise design and protects its integrity across systems and teams.',
+        sections: {
+          'What it is': ['Owns the overarching technical architecture rather than the people organization.', 'Leads the technical decision process through research, prototypes, and analysis.', 'Acts as the top of the architecture track and a peer to senior executives.'],
+          'Core work': ['Set enterprise principles, standards, reference architectures, and long-term direction.', 'Guide architects and evaluate major platform, vendor, and build-versus-buy choices.', 'Protect scalability, maintainability, security, resilience, and system coherence.'],
+          'Where it sits': ['Usually reports to a CTO, CIO, or VP of Engineering.', 'Often maps to Distinguished Engineer or Fellow-level individual-contributor scope.', 'Most common in large organizations with substantial, long-lived system estates.'],
+          'Advantages': ['Hold the company’s highest level of technical authority and influence.', 'Make durable decisions that shape platforms and teams for years.', 'Work with executives while remaining on a technical leadership track.'],
+          'Tradeoffs': ['The role is distant from code and heavy on strategy, documents, and meetings.', 'Enforcement depends on influence because line authority is usually absent.', 'Every inherited system and long-horizon technical bet becomes part of the accountability.'],
+          'Rewarding parts': ['Shape the technical direction of the entire company.', 'Make decisions whose effects compound across a long system lifespan.', 'Set the technical bar while guiding the organization’s strongest architects.'],
+          'Political reality': ['The boundary with the CTO can become a persistent contest over direction.', 'Standards attract exceptions, workarounds, and pressure from powerful stakeholders.', 'Large failures are easily reframed as architecture failures regardless of execution context.']
+        }
+      }
+    ];
+
+    const deck = document.querySelector('#deck');
+    const detail = document.querySelector('#detail');
+    const back = document.querySelector('#back');
+    const sections = document.querySelector('#sections');
+    let activeCard = null;
+
+    roles.forEach((role, index) => {
+      const card = document.createElement('button');
+      card.className = 'role-card';
+      card.type = 'button';
+      card.style.setProperty('--tone', role.tone);
+      card.style.setProperty('--i', index);
+      card.innerHTML = `<span class="card-band"></span><span class="card-inner"><span class="card-meta"><span>${role.track}</span><span>${String(index + 1).padStart(2, '0')}</span></span><span class="card-title">${role.title}</span><span class="card-summary">${role.summary}</span><span class="card-open"><span>Inspect role</span><span class="arrow">→</span></span></span>`;
+      card.addEventListener('click', () => openRole(role, index, card));
+      deck.appendChild(card);
+    });
+
+    function openRole(role, index, card) {
+      activeCard = card;
+      document.querySelector('#detail-index').textContent = `${String(index + 1).padStart(2, '0')} / ${String(roles.length).padStart(2, '0')}`;
+      document.querySelector('#detail-track').textContent = role.track;
+      document.querySelector('#detail-title').textContent = role.title;
+      document.querySelector('#detail-lede').textContent = role.lede;
+      document.querySelector('#detail-header').style.setProperty('--tone', role.tone);
+      detail.querySelector('.detail-sheet').style.setProperty('--tone', role.tone);
+      sections.replaceChildren();
+      Object.entries(role.sections).forEach(([title, items]) => {
+        const section = document.createElement('section');
+        section.className = 'section';
+        const heading = document.createElement('h3');
+        heading.textContent = title;
+        const list = document.createElement('ol');
+        items.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = item;
+          list.appendChild(li);
+        });
+        section.append(heading, list);
+        sections.appendChild(section);
+      });
+      document.querySelector('#read-full').href = role.file;
+      detail.classList.add('open');
+      detail.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('locked');
+      detail.scrollTop = 0;
+      back.focus();
+    }
+
+    function closeDetail() {
+      detail.classList.remove('open');
+      detail.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('locked');
+      if (activeCard) activeCard.focus();
+    }
+
+    back.addEventListener('click', closeDetail);
+    detail.addEventListener('click', event => {
+      if (event.target === detail) closeDetail();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && detail.classList.contains('open')) closeDetail();
+    });
+  </script>
+</body>
+</html>
