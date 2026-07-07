@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/index.html
+  s_6673207eb96c2f::t_69608fc9cccadd 1-1282
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d854599c99c1a1d7290311a03b358a43b0ed2503",
+  "prompts": {},
+  "sessions": {
+    "s_6673207eb96c2f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3e21-c221-7553-b765-16ff5bc44547",
+        "model": "gpt-5.5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
