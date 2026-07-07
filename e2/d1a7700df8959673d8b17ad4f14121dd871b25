@@ -1,0 +1,31 @@
+tech-notes/sec/webauthn-passkeys.md
+  s_a7fe315e3d68a5::t_2fce8d3fe7f4ad 1-157
+tech-notes/sec/oauth2-oidc.md
+  s_a7fe315e3d68a5::t_ccd393fe0aeece 1-257
+tech-notes/sec/jwt-tokens.md
+  s_a7fe315e3d68a5::t_13416556acbc2f 1-206
+tech-notes/sec/agent-identity-trends.md
+  s_a7fe315e3d68a5::t_c9d9d056046c8f 1-151
+tech-notes/sec/fine-grained-authorization.md
+  s_a7fe315e3d68a5::t_943f84fc55ac58 1-199
+tech-notes/sec/sso-federation-saml.md
+  s_a7fe315e3d68a5::t_1920a1c74bc539 1-178
+tech-notes/sec/agent-identity-mcp-a2a.md
+  s_a7fe315e3d68a5::t_c73ec743e2c252 1-213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e2d1a7700df8959673d8b17ad4f14121dd871b25",
+  "prompts": {},
+  "sessions": {
+    "s_a7fe315e3d68a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9bc57523-1a12-40a3-9c26-dca4bedb821e",
+        "model": "claude-fable-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
