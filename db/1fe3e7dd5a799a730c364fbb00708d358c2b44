@@ -1,0 +1,19 @@
+tech-notes/sec/index.html
+  s_0c3969f05eed16::t_fa317610bb98cc 1-970
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "db1fe3e7dd5a799a730c364fbb00708d358c2b44",
+  "prompts": {},
+  "sessions": {
+    "s_0c3969f05eed16": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3b14-35da-7862-930d-711a4ab4516c",
+        "model": "gpt-5.5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
