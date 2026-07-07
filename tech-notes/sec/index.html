@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security Notes Index</title>
+  <style>
+    :root {
+      --paper: #fbfaf7;
+      --ink: #1e252b;
+      --muted: #65717c;
+      --line: #d8ddd8;
+      --soft: #eef2ed;
+      --white: #ffffff;
+      --blue: #2f6f9f;
+      --green: #3c7a57;
+      --amber: #b36b1e;
+      --red: #b4463a;
+      --teal: #26777a;
+      --violet: #6f5a91;
+      --shadow: 0 18px 44px rgba(35, 45, 38, .12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(47,111,159,.07) 1px, transparent 1px) 0 0 / 44px 44px,
+        linear-gradient(0deg, rgba(60,122,87,.06) 1px, transparent 1px) 0 0 / 44px 44px,
+        var(--paper);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .shell {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      min-height: 86vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr);
+      gap: 34px;
+      align-items: center;
+      padding: 34px 0 52px;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: var(--white);
+    }
+
+    h1 {
+      margin: 24px 0 18px;
+      max-width: 850px;
+      font-size: clamp(46px, 7vw, 92px);
+      line-height: .92;
+      letter-spacing: 0;
+      font-weight: 900;
+    }
+
+    .lead {
+      max-width: 760px;
+      color: #3c474f;
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 11px 15px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--ink);
+      color: var(--white);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 5px 5px 0 rgba(30,37,43,.18);
+    }
+
+    .btn.secondary {
+      background: var(--white);
+      color: var(--ink);
+    }
+
+    .atlas {
+      background: var(--white);
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .atlas-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .atlas-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .node {
+      min-height: 92px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      padding: 11px;
+      background: var(--soft);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .node:hover {
+      transform: translateY(-3px);
+      box-shadow: 4px 4px 0 rgba(30,37,43,.2);
+    }
+
+    .node strong {
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 14px;
+      line-height: 1.1;
+    }
+
+    .node span {
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .node.identity {
+      background: #e8f1f8;
+    }
+
+    .node.authorization {
+      background: #edf4ea;
+    }
+
+    .node.agent {
+      background: #f4edf6;
+    }
+
+    .node.edge {
+      background: #f8f0e4;
+    }
+
+    .node.platform {
+      background: #f7e9e5;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: -24px 0 44px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.86);
+      border-radius: 8px;
+      padding: 18px;
+      min-height: 110px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 34px;
+      line-height: 1;
+      margin-bottom: 9px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .section {
+      padding: 38px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin: 0;
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .controls {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background: rgba(251,250,247,.92);
+      border-block: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+      padding: 12px 0;
+      margin-bottom: 22px;
+    }
+
+    .search {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      padding: 0 14px;
+      background: var(--white);
+      color: var(--ink);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      overflow: auto;
+      padding-bottom: 2px;
+    }
+
+    .chip {
+      min-height: 38px;
+      white-space: nowrap;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--ink);
+      padding: 8px 12px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .map {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .lane {
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--white);
+      overflow: hidden;
+      min-height: 300px;
+    }
+
+    .lane-head {
+      padding: 14px;
+      border-bottom: 1px solid var(--ink);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .lane-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .mini-link {
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 9px;
+      background: var(--soft);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      line-height: 1.2;
+      transition: transform .18s ease, border-color .18s ease;
+    }
+
+    .mini-link:hover {
+      transform: translateX(4px);
+      border-color: var(--ink);
+    }
+
+    .diagram {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .stage {
+      min-height: 150px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stage:before {
+      content: attr(data-step);
+      position: absolute;
+      right: 10px;
+      top: 8px;
+      color: rgba(30,37,43,.11);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 52px;
+      font-weight: 900;
+    }
+
+    .stage h3 {
+      margin: 0 0 10px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 16px;
+    }
+
+    .stage p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 15px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 390px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 8px 8px 0 rgba(30,37,43,.09);
+      overflow: hidden;
+    }
+
+    .card-top {
+      min-height: 10px;
+    }
+
+    .card-body {
+      padding: 18px;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .card-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 27px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .card p {
+      color: #48535b;
+      line-height: 1.48;
+      margin: 0 0 14px;
+      font-size: 16px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: auto 0 16px;
+    }
+
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 8px;
+      background: var(--soft);
+      color: #4b5660;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .source {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .source span {
+      color: var(--muted);
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 18px;
+    }
+
+    .panel h3 {
+      margin: 0 0 14px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 18px;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flow-row {
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .flow-label {
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--soft);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-weight: 900;
+    }
+
+    .flow-text {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .empty {
+      display: none;
+      border: 1px dashed var(--ink);
+      border-radius: 8px;
+      background: rgba(255,255,255,.7);
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-weight: 900;
+    }
+
+    .footer {
+      padding: 42px 0 18px;
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+    }
+
+    [data-color="blue"] {
+      background: var(--blue);
+    }
+
+    [data-color="green"] {
+      background: var(--green);
+    }
+
+    [data-color="amber"] {
+      background: var(--amber);
+    }
+
+    [data-color="red"] {
+      background: var(--red);
+    }
+
+    [data-color="teal"] {
+      background: var(--teal);
+    }
+
+    [data-color="violet"] {
+      background: var(--violet);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .matrix {
+        grid-template-columns: 1fr;
+      }
+
+      .stats,
+      .diagram {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .map,
+      .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .shell {
+        padding: 18px;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 18px;
+      }
+
+      .atlas-grid,
+      .stats,
+      .diagram,
+      .map,
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .flow-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Security notes index</div>
+        <h1>Security patterns, attacks, and identity systems in one map.</h1>
+        <p class="lead">A visual guide to the Markdown notes in this folder, grouped by how security decisions flow from identity to authorization, network control, platform isolation, agent safety, and supply-chain integrity.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#topics">Browse topics</a>
+          <a class="btn secondary" href="#map">View map</a>
+        </div>
+      </div>
+      <aside class="atlas" aria-label="Topic preview">
+        <div class="atlas-title">
+          <span>Content clusters</span>
+          <span>19 files</span>
+        </div>
+        <div class="atlas-grid" id="heroNodes"></div>
+      </aside>
+    </section>
+
+    <section class="stats" aria-label="Summary counts">
+      <div class="stat"><strong>5</strong><span>main security domains for quick navigation</span></div>
+      <div class="stat"><strong>19</strong><span>source Markdown files linked from the cards</span></div>
+      <div class="stat"><strong>4</strong><span>core decision layers: prove, authorize, isolate, observe</span></div>
+      <div class="stat"><strong>1</strong><span>self-contained HTML page with embedded CSS and JavaScript</span></div>
+    </section>
+
+    <section class="section" id="map">
+      <div class="section-head">
+        <h2>Topic Map</h2>
+        <p>Start with identity, decide permissions, guard the edge, harden the platform, then model what can still go wrong.</p>
+      </div>
+      <div class="map" id="topicMap"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Security Flow</h2>
+        <p>Most notes fit into this operating loop: identify actors, scope access, reduce blast radius, and watch for abuse.</p>
+      </div>
+      <div class="diagram">
+        <div class="stage" data-step="01">
+          <h3>Identify</h3>
+          <p>Use SSO, OIDC, WebAuthn, mTLS, JWT validation, and agent identity to establish who or what is calling.</p>
+        </div>
+        <div class="stage" data-step="02">
+          <h3>Authorize</h3>
+          <p>Use RBAC, ABAC, policy engines, ReBAC, and fine-grained checks to answer what the caller may do.</p>
+        </div>
+        <div class="stage" data-step="03">
+          <h3>Contain</h3>
+          <p>Use zero trust, sandboxing, container controls, vaults, and short-lived credentials to limit damage.</p>
+        </div>
+        <div class="stage" data-step="04">
+          <h3>Defend</h3>
+          <p>Use threat analysis, WAFs, anti-bot controls, DNS privacy, and supply-chain guardrails to catch attacks earlier.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="topics">
+      <div class="section-head">
+        <h2>Index</h2>
+        <p>Search by protocol, threat, vendor class, control, or file name. Each card links to the original Markdown file.</p>
+      </div>
+      <div class="controls">
+        <input class="search" id="search" type="search" placeholder="Search identity, OAuth, WAF, agents, containers, secrets..." aria-label="Search topics">
+        <div class="filters" id="filters" aria-label="Category filters"></div>
+      </div>
+      <div class="cards" id="cards"></div>
+      <div class="empty" id="empty">No topics match the current filter.</div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>How To Read It</h2>
+        <p>Use the page as a field guide: pick a system area, then follow the notes that explain the main choices and traps.</p>
+      </div>
+      <div class="matrix">
+        <div class="panel">
+          <h3>Build an access model</h3>
+          <div class="flow">
+            <div class="flow-row"><div class="flow-label">Human login</div><div class="flow-text">Start with WebAuthn, SSO/SAML, OAuth/OIDC, and JWT validation.</div></div>
+            <div class="flow-row"><div class="flow-label">Service calls</div><div class="flow-text">Use mTLS, SPIFFE, short-lived tokens, and audience-bound JWTs.</div></div>
+            <div class="flow-row"><div class="flow-label">Permissions</div><div class="flow-text">Choose RBAC for simple roles, ABAC for context, and ReBAC/FGA for object sharing.</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Reduce attack impact</h3>
+          <div class="flow">
+            <div class="flow-row"><div class="flow-label">Runtime</div><div class="flow-text">Use sandboxing, container hardening, admission control, and runtime detection.</div></div>
+            <div class="flow-row"><div class="flow-label">Secrets</div><div class="flow-text">Centralize secrets, rotate them, audit access, and remove long-lived credentials.</div></div>
+            <div class="flow-row"><div class="flow-label">Exposure</div><div class="flow-text">Put WAF and anti-bot layers on public paths, then threat-model the gaps they cannot cover.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">Generated from the Markdown notes in this directory. Links are relative, so the page works from the filesystem.</footer>
+  </main>
+
+  <script>
+    const categories = [
+      { id: "identity", name: "Identity", color: "blue" },
+      { id: "authorization", name: "Authorization", color: "green" },
+      { id: "agent", name: "Agents", color: "violet" },
+      { id: "edge", name: "Edge Defense", color: "amber" },
+      { id: "platform", name: "Platform Risk", color: "red" }
+    ];
+
+    const topics = [
+      {
+        title: "OAuth 2.0 and OIDC",
+        file: "oauth2-oidc.md",
+        category: "identity",
+        focus: "Delegated access and modern login",
+        summary: "OAuth grants scoped access tokens without sharing passwords. OIDC adds signed ID tokens, discovery, and login semantics. The note centers on authorization code with PKCE, token exchange, CIBA, and anti-patterns such as implicit flow, password grant, weak redirect URI checks, and ID-token misuse.",
+        tags: ["OAuth", "OIDC", "PKCE", "CIBA", "Token exchange"]
+      },
+      {
+        title: "JWT and Token Security",
+        file: "jwt-tokens.md",
+        category: "identity",
+        focus: "Signed claims and token validation",
+        summary: "JWTs give fast stateless verification but make revocation harder. The note explains JWS/JWE/JWKS, registered claims, algorithm choices, key rotation, DPoP, mTLS-bound tokens, refresh token rotation, and validation failures such as alg none, audience confusion, kid injection, and weak HMAC secrets.",
+        tags: ["JWT", "JWKS", "DPoP", "JWS", "Opaque tokens"]
+      },
+      {
+        title: "WebAuthn and Passkeys",
+        file: "webauthn-passkeys.md",
+        category: "identity",
+        focus: "Phishing-resistant user authentication",
+        summary: "WebAuthn replaces shared secrets with per-site public key credentials, bound by browser origin. Passkeys make FIDO credentials usable across devices. The note compares synced and device-bound keys, shows registration and login flows, and explains why passwords and OTPs remain phishable.",
+        tags: ["WebAuthn", "Passkeys", "FIDO2", "Origin binding", "MFA"]
+      },
+      {
+        title: "SSO, Federation, and SAML",
+        file: "sso-federation-saml.md",
+        category: "identity",
+        focus: "Enterprise single sign-on",
+        summary: "SAML lets service providers trust signed assertions from identity providers, while SCIM handles provisioning and deprovisioning. The note covers SP-initiated login, assertion validation, SAML versus OIDC, and recurring risks such as XML signature wrapping, replay, IdP-initiated login issues, and Golden SAML.",
+        tags: ["SAML", "SSO", "SCIM", "Federation", "Golden SAML"]
+      },
+      {
+        title: "mTLS",
+        file: "mTLS.md",
+        category: "identity",
+        focus: "Mutual certificate identity",
+        summary: "mTLS authenticates both client and server with X.509 certificates before encrypted traffic flows. The note covers handshake mechanics, certificate fields, CA structure, SPIFFE/SPIRE identities, service mesh automation with Istio, Linkerd, and Consul, plus the operational burden of PKI.",
+        tags: ["mTLS", "SPIFFE", "SPIRE", "Service mesh", "Certificates"]
+      },
+      {
+        title: "RBAC, ABAC, and PBAC",
+        file: "rbac-abac.md",
+        category: "authorization",
+        focus: "Authorization model choices",
+        summary: "RBAC maps users to roles, ABAC evaluates attributes at request time, and PBAC externalizes decisions into policy engines such as OPA or Cedar. The note explains when each model fits, where XACML came from, and how policy engines decouple authorization from application code.",
+        tags: ["RBAC", "ABAC", "OPA", "Cedar", "Policy"]
+      },
+      {
+        title: "Fine-Grained Authorization",
+        file: "fine-grained-authorization.md",
+        category: "authorization",
+        focus: "Per-object permissions at scale",
+        summary: "Fine-grained authorization asks whether one subject can perform one action on one object. The note explains ReBAC, relationship tuples, Zanzibar, OpenFGA, SpiceDB, consistency tokens, reverse queries, and the point where role explosion should become a relationship graph.",
+        tags: ["ReBAC", "Zanzibar", "OpenFGA", "SpiceDB", "Permissions"]
+      },
+      {
+        title: "Agent Identity for MCP and A2A",
+        file: "agent-identity-mcp-a2a.md",
+        category: "agent",
+        focus: "Delegated identity for AI agents",
+        summary: "Agent identity answers who the agent is, who it acts for, and what consent or scope applies. The note maps OAuth 2.1, token exchange, CIBA, MCP authorization, A2A agent cards, token vaults, and FGA into practical controls for autonomous agents.",
+        tags: ["MCP", "A2A", "CIBA", "Token vault", "Delegation"]
+      },
+      {
+        title: "Agent Identity Trends",
+        file: "agent-identity-trends.md",
+        category: "agent",
+        focus: "Market and protocol direction",
+        summary: "The identity market is expanding from workforce and CIAM into non-human and agent identity. The note tracks incumbents, startups, M&A, MCP and A2A moves, WIMSE, CAEP, AP2, and the shift from static keys to delegated, continuous, human-bound agent access.",
+        tags: ["IAM market", "NHI", "MCP", "A2A", "CAEP"]
+      },
+      {
+        title: "Securing AI Agents",
+        file: "securing-ai-agents.md",
+        category: "agent",
+        focus: "Threat model for autonomous systems",
+        summary: "AI agents introduce prompt injection, excessive agency, tool abuse, data poisoning, confused deputy paths, and multi-agent exploitation. The note focuses on least privilege, human approval, input and output validation, sandboxing, monitoring, audit logs, and trust boundaries.",
+        tags: ["Prompt injection", "Sandboxing", "Tools", "Audit", "Least privilege"]
+      },
+      {
+        title: "WAF",
+        file: "waf.md",
+        category: "edge",
+        focus: "HTTP-layer request filtering",
+        summary: "A WAF inspects layer-7 traffic to block SQL injection, XSS, command injection, request smuggling, and other web attacks. The note compares reverse proxy, cloud, and embedded modes, detection styles, ModSecurity, Cloudflare, AWS WAF, Coraza, and what WAFs cannot catch.",
+        tags: ["WAF", "OWASP CRS", "ModSecurity", "Cloudflare", "AWS WAF"]
+      },
+      {
+        title: "Anti-Bot Protection",
+        file: "anti-bot-protection.md",
+        category: "edge",
+        focus: "Human versus automation decisions",
+        summary: "Anti-bot systems score requests using IP reputation, TLS and HTTP fingerprints, browser signals, behavior, and business logic. The note covers challenges, throttling, tarpits, deception, vendor approaches, CAPTCHA tradeoffs, false positives, and the goal of raising attacker cost.",
+        tags: ["Bots", "CAPTCHA", "Fingerprinting", "Credential stuffing", "Scraping"]
+      },
+      {
+        title: "DoH",
+        file: "dns-over-https.md",
+        category: "edge",
+        focus: "Encrypted DNS resolution",
+        summary: "DNS over HTTPS hides DNS queries inside encrypted HTTPS to a resolver, reducing on-path visibility and tampering. The note compares DoH with DoT, DoQ, and plaintext DNS, then explains the privacy gains, enterprise visibility tradeoffs, resolver centralization, and malware abuse risk.",
+        tags: ["DoH", "DNS", "DoT", "DoQ", "Privacy"]
+      },
+      {
+        title: "Zero Trust",
+        file: "zero-trust.md",
+        category: "platform",
+        focus: "Never trust, always verify",
+        summary: "Zero trust removes the trusted internal network assumption. Every request is authenticated, authorized, and continuously evaluated against identity, context, device posture, and risk. The note explains policy engines, enforcement points, BeyondCorp, NIST SP 800-207, SASE, and ZTNA.",
+        tags: ["Zero trust", "BeyondCorp", "ZTNA", "SASE", "Policy engine"]
+      },
+      {
+        title: "Sandboxing",
+        file: "sandboxing.md",
+        category: "platform",
+        focus: "Containment for untrusted code",
+        summary: "Sandboxing restricts processes to a defined resource boundary so compromise does not become host compromise. The note compares chroot, namespaces, cgroups, seccomp, SELinux, browser sandboxes, WebAssembly, gVisor, Kata, Firecracker, VMs, and hardware-backed isolation.",
+        tags: ["Sandbox", "seccomp", "gVisor", "Firecracker", "Wasm"]
+      },
+      {
+        title: "Container Security",
+        file: "container-security.md",
+        category: "platform",
+        focus: "Build, store, deploy, run",
+        summary: "Container security spans image selection, dependency scanning, signing, registry controls, Kubernetes RBAC, pod security standards, admission controllers, network policies, runtime detection, and secrets. The note ties build-time and runtime controls into a full lifecycle.",
+        tags: ["Containers", "Kubernetes", "SBOM", "Cosign", "Network policy"]
+      },
+      {
+        title: "Secrets Management",
+        file: "credential-vaulting.md",
+        category: "platform",
+        focus: "Vaulting, rotation, and audit",
+        summary: "Secrets management centralizes API keys, database passwords, certificates, SSH keys, and tokens behind authenticated, authorized, audited access. The note compares Vault, AWS Secrets Manager, Parameter Store, GCP Secret Manager, Azure Key Vault, and Kubernetes Secrets.",
+        tags: ["Vault", "Secrets", "Rotation", "KMS", "Audit"]
+      },
+      {
+        title: "Supply Chain Attack",
+        file: "supply-chain-attack.md",
+        category: "platform",
+        focus: "Trusted dependency compromise",
+        summary: "Supply-chain attacks compromise dependencies, build systems, update channels, signing keys, or hardware so trusted artifacts deliver malicious code. The note walks through major incidents and defenses such as SBOMs, lock files, signatures, reproducible builds, SLSA, in-toto, TUF, and build isolation.",
+        tags: ["Supply chain", "SBOM", "SLSA", "Signatures", "CI/CD"]
+      },
+      {
+        title: "Threat Analysis",
+        file: "threat-analysis.md",
+        category: "platform",
+        focus: "Find risks before attackers do",
+        summary: "Threat analysis decomposes a system, identifies threats, ranks them, and chooses mitigation. The note covers DFDs, trust boundaries, STRIDE, attack trees, MITRE ATT&CK, PASTA, LINDDUN, DREAD, CVSS, and risk matrices.",
+        tags: ["Threat modeling", "STRIDE", "ATT&CK", "Risk", "DFD"]
+      }
+    ];
+
+    let activeCategory = "all";
+
+    const categoryById = Object.fromEntries(categories.map(category => [category.id, category]));
+    const cards = document.getElementById("cards");
+    const filters = document.getElementById("filters");
+    const search = document.getElementById("search");
+    const empty = document.getElementById("empty");
+    const topicMap = document.getElementById("topicMap");
+    const heroNodes = document.getElementById("heroNodes");
+
+    function renderHeroNodes() {
+      heroNodes.innerHTML = topics.slice(0, 9).map(topic => {
+        const category = categoryById[topic.category];
+        return `<a class="node ${topic.category}" href="${topic.file}"><strong>${topic.title}</strong><span>${category.name}</span></a>`;
+      }).join("");
+    }
+
+    function renderMap() {
+      topicMap.innerHTML = categories.map(category => {
+        const links = topics.filter(topic => topic.category === category.id).map(topic => `<a class="mini-link" href="#${slug(topic.title)}">${topic.title}</a>`).join("");
+        return `<section class="lane"><div class="lane-head" data-color="${category.color}">${category.name}</div><div class="lane-body">${links}</div></section>`;
+      }).join("");
+    }
+
+    function renderFilters() {
+      const all = [{ id: "all", name: "All" }, ...categories];
+      filters.innerHTML = all.map(category => `<button class="chip ${category.id === activeCategory ? "active" : ""}" data-filter="${category.id}">${category.name}</button>`).join("");
+      filters.querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => {
+          activeCategory = button.dataset.filter;
+          renderFilters();
+          renderCards();
+        });
+      });
+    }
+
+    function renderCards() {
+      const query = search.value.trim().toLowerCase();
+      const visible = topics.filter(topic => {
+        const matchesCategory = activeCategory === "all" || topic.category === activeCategory;
+        const haystack = [topic.title, topic.file, topic.focus, topic.summary, topic.tags.join(" "), categoryById[topic.category].name].join(" ").toLowerCase();
+        return matchesCategory && (!query || haystack.includes(query));
+      });
+
+      cards.innerHTML = visible.map(topic => {
+        const category = categoryById[topic.category];
+        return `<article class="card" id="${slug(topic.title)}">
+          <div class="card-top" data-color="${category.color}"></div>
+          <div class="card-body">
+            <div class="card-kicker"><span>${category.name}</span><span>${topic.focus}</span></div>
+            <h3>${topic.title}</h3>
+            <p>${topic.summary}</p>
+            <div class="tags">${topic.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
+            <a class="source" href="${topic.file}"><span>${topic.file}</span><strong>Open source</strong></a>
+          </div>
+        </article>`;
+      }).join("");
+
+      empty.style.display = visible.length ? "none" : "block";
+    }
+
+    function slug(value) {
+      return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    search.addEventListener("input", renderCards);
+
+    renderHeroNodes();
+    renderMap();
+    renderFilters();
+    renderCards();
+  </script>
+</body>
+</html>
