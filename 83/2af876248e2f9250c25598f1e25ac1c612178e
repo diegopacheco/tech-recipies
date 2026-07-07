@@ -1,0 +1,19 @@
+tech-notes/sec/anti-bot-protection.md
+  s_0602e89c9ac57a::t_4e187b7b5c2181 1-244
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "832af876248e2f9250c25598f1e25ac1c612178e",
+  "prompts": {},
+  "sessions": {
+    "s_0602e89c9ac57a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a8149e10-8079-4d7f-a506-e24dfcb5ef57",
+        "model": "claude-fable-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
