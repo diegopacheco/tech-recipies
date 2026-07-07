@@ -1,0 +1,31 @@
+tech-notes/sec/sso-federation-saml.md
+  s_f2d7610b7edebe::t_343abea0b86360 5,9,23-24,60,66,96,126,149,159
+tech-notes/sec/rbac-abac.md
+  s_f2d7610b7edebe::t_343abea0b86360 245
+tech-notes/sec/oauth2-oidc.md
+  s_f2d7610b7edebe::t_343abea0b86360 5,9,18,220,236
+tech-notes/sec/webauthn-passkeys.md
+  s_f2d7610b7edebe::t_343abea0b86360 5,9,124
+tech-notes/sec/fine-grained-authorization.md
+  s_f2d7610b7edebe::t_343abea0b86360 9,136
+tech-notes/sec/agent-identity-mcp-a2a.md
+  s_f2d7610b7edebe::t_343abea0b86360 9,54,154
+tech-notes/sec/agent-identity-trends.md
+  s_f2d7610b7edebe::t_343abea0b86360 5,9,17-18,90,108,113,119,122,136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3067100ab5389fc0a371a3b8c110c1dba1be09ee",
+  "prompts": {},
+  "sessions": {
+    "s_f2d7610b7edebe": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3a2d-6801-7310-8246-39e29064d7c0",
+        "model": "gpt-5.5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
