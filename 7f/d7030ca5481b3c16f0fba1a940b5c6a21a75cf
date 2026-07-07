@@ -1,0 +1,33 @@
+tech-notes/sec/index.html
+  s_c8ff86a6485dd5::t_b61866e9a9893f 879,1421-1426,1431,1437,1471,1483-1571
+  s_c8ff86a6485dd5::t_6c01e18570c9f5 1468
+  s_c8ff86a6485dd5::t_2f539974e73570 490,497-501,503-504,508-509,511-513,515,528-727,821-822,867-878
+  s_c8ff86a6485dd5::t_34df2d3f2fd915 491-496,502,505-507,510,514,516-527
+  s_c8ff86a6485dd5::t_e28c5847994f49 985-998
+  s_c8ff86a6485dd5::t_3ecd13986ffce6 1163-1411
+  s_85db769a0b9fac::t_4989a7a23e8f1a 1572
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7fd7030ca5481b3c16f0fba1a940b5c6a21a75cf",
+  "prompts": {},
+  "sessions": {
+    "s_85db769a0b9fac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b18e7db0-2a28-4881-aa6f-ed21e5d498f4",
+        "model": "claude-fable-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    },
+    "s_c8ff86a6485dd5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3b1c-2b5f-7320-837d-d1a5899388c5",
+        "model": "gpt-5.5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
