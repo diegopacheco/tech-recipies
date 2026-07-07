@@ -487,6 +487,244 @@
       overflow-wrap: anywhere;
     }
 
+    .topic-trigger {
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .card .topic-trigger {
+      width: 100%;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      font: inherit;
+    }
+
+    .card h3 .topic-trigger {
+      display: block;
+      font: inherit;
+    }
+
+    .card h3 .topic-trigger {
+      transition: color .18s ease;
+    }
+
+    .card h3 .topic-trigger:hover {
+      color: var(--blue);
+    }
+
+    button.node {
+      text-align: left;
+      cursor: pointer;
+    }
+
+    button.mini-link {
+      width: 100%;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .source button {
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--ink);
+      color: var(--white);
+      padding: 8px 10px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(30,37,43,.42);
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(1120px, 100%);
+      max-height: min(88vh, 920px);
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 16px 16px 0 rgba(30,37,43,.22);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+      border-bottom: 1px solid var(--ink);
+      background: var(--white);
+      padding: 18px;
+    }
+
+    .modal-kicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .modal h2 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 54px);
+    }
+
+    .modal-summary {
+      margin: 0;
+      color: #3c474f;
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .modal-close {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--ink);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      max-height: calc(min(88vh, 920px) - 150px);
+      overflow: auto;
+      padding: 18px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: 16px;
+    }
+
+    .learn-panel {
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--white);
+      padding: 16px;
+    }
+
+    .learn-panel h3 {
+      margin: 0 0 12px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 17px;
+    }
+
+    .learn-panel p {
+      margin: 0;
+      color: #48535b;
+      line-height: 1.5;
+    }
+
+    .learn-list {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .learn-list li {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      padding: 10px;
+      color: #48535b;
+      line-height: 1.42;
+    }
+
+    .learn-flow {
+      display: grid;
+      gap: 8px;
+    }
+
+    .learn-step {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .learn-step span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      background: var(--white);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .learn-step p {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      padding: 9px;
+    }
+
+    .modal-diagram {
+      width: 100%;
+      margin: 0;
+      overflow: auto;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: #f5f6f1;
+      color: #263038;
+      padding: 14px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.22;
+      white-space: pre;
+    }
+
+    .modal-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      margin-top: 14px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: var(--ink);
+      color: var(--white);
+      padding: 8px 11px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
     .matrix {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -580,7 +818,8 @@
 
     @media (max-width: 980px) {
       .hero,
-      .matrix {
+      .matrix,
+      .modal-grid {
         grid-template-columns: 1fr;
       }
 
@@ -624,6 +863,19 @@
 
       .flow-row {
         grid-template-columns: 1fr;
+      }
+
+      .modal-backdrop {
+        padding: 10px;
+      }
+
+      .modal-head {
+        grid-template-columns: 1fr auto;
+        padding: 14px;
+      }
+
+      .modal-body {
+        padding: 12px;
       }
     }
   </style>
@@ -729,6 +981,20 @@
 
     <footer class="footer">Generated from the Markdown notes in this directory. Links are relative, so the page works from the filesystem.</footer>
   </main>
+
+  <div class="modal-backdrop" id="topicModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <div class="modal-kicker" id="modalKicker"></div>
+          <h2 id="modalTitle"></h2>
+          <p class="modal-summary" id="modalSummary"></p>
+        </div>
+        <button class="modal-close" id="modalClose" type="button" aria-label="Close topic">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
 
   <script>
     const categories = [
@@ -894,6 +1160,255 @@
       }
     ];
 
+    const topicDetails = {
+      "oauth2-oidc.md": {
+        core: "OAuth delegates access with scoped tokens. OIDC adds login semantics through an ID token, discovery metadata, standard claims, and nonce validation. The safe center is authorization code with PKCE, short access tokens, refresh token rotation, and strict audience handling.",
+        diagram: `User ──login/consent──► Authorization Server
+  ▲                         │
+  │                         │ code + PKCE
+  │                         ▼
+Client ◄──── tokens ───── Token Endpoint
+  │
+  │ access token, aud = API
+  ▼
+Resource Server`,
+        scheme: ["OAuth answers whether an app may call an API for a user.", "OIDC answers who logged in and how strongly they authenticated.", "PKCE protects public clients when an authorization code is intercepted.", "CIBA and token exchange make OAuth useful for devices, agents, and on-behalf-of chains."],
+        flow: ["Client creates a code verifier and sends only its challenge to the authorization server.", "User authenticates and consents at the authorization server.", "Client redeems the returned code with the original verifier.", "API validates access token issuer, audience, expiry, scopes, and sender constraints when used."],
+        watch: ["Implicit and password grants are legacy risk.", "ID tokens belong to clients, not APIs.", "Wildcard redirect URIs turn login into code theft.", "Bearer tokens need short TTLs or DPoP/mTLS binding."],
+        apply: ["Use authorization code with PKCE by default.", "Keep access tokens scoped and audience-bound.", "Rotate refresh tokens and detect reuse.", "Use token exchange for downstream delegation instead of service-wide credentials."]
+      },
+      "jwt-tokens.md": {
+        core: "JWTs are signed claim envelopes. They are fast because APIs can verify them locally, but revocation is hard because a valid signature remains valid until expiration. Treat validation as a strict checklist, not a convenience decode.",
+        diagram: `header.payload.signature
+   │       │       │
+   │       │       └─ proves integrity with issuer key
+   │       └───────── claims: iss, sub, aud, exp, scope
+   └───────────────── alg and kid, never trusted blindly`,
+        scheme: ["JWS signs and exposes claims.", "JWE encrypts claims for confidentiality.", "JWKS distributes public keys for verification.", "Opaque tokens trade local speed for server-side revocation."],
+        flow: ["Read the token header only to select from a fixed trusted key set.", "Verify signature with an expected issuer key.", "Check issuer, audience, expiry, not-before, token type, and allowed algorithms.", "Only after validation, use business claims such as scope, tenant, and role."],
+        watch: ["alg none, RS-to-HS confusion, kid injection, weak HMAC secrets, and missing audience checks.", "Readable payloads leak when logs, proxies, or browser storage capture them.", "Large claim sets create stale authorization decisions."],
+        apply: ["Pin algorithms server-side.", "Use asymmetric signing for multi-service validation.", "Keep access tokens short-lived.", "Use opaque tokens or denylisted jti values when instant revocation matters."]
+      },
+      "webauthn-passkeys.md": {
+        core: "WebAuthn replaces shared secrets with per-site public keys. The private key stays inside an authenticator, and the browser binds every assertion to the real origin, which makes phishing pages unable to obtain a valid signature.",
+        diagram: `Registration: server challenge ─► authenticator creates keypair
+                         │
+                         └─ server stores public key only
+
+Login: server challenge ─► authenticator signs origin-bound data
+                         │
+                         └─ server verifies signature and origin`,
+        scheme: ["The relying party stores public keys, not passwords.", "The authenticator signs a fresh challenge after user presence or verification.", "The browser writes origin data into the signed payload.", "Passkeys add sync and discoverable credentials for practical recovery."],
+        flow: ["Register a credential for one relying-party ID.", "Store credential ID, public key, sign counter, and user binding.", "On login, issue a random challenge.", "Verify signature, challenge, origin, relying-party hash, and UV/UP flags."],
+        watch: ["Weak account recovery can defeat strong login.", "Password fallback preserves the phishing path.", "Ignoring user-verification flags silently weakens assurance.", "Session theft remains outside WebAuthn’s protection."],
+        apply: ["Use passkeys as primary authentication where possible.", "Require device-bound keys for high-assurance admin paths.", "Make recovery as strong as login.", "Pair with short sessions or sender-constrained tokens."]
+      },
+      "sso-federation-saml.md": {
+        core: "SSO moves authentication to a trusted identity provider. SAML carries signed XML assertions through the browser, while SCIM keeps user and group lifecycle synchronized so offboarding is not manual.",
+        diagram: `User browser
+  │
+  ├─► Service Provider asks for authentication
+  │
+  ├─► Identity Provider authenticates user
+  │
+  └─► Signed SAML assertion posted to SP ACS`,
+        scheme: ["Federation is trust between identity provider and service provider.", "The assertion carries subject, issuer, audience, timestamps, and attributes.", "SCIM handles create, update, group, and deactivate operations.", "OIDC is preferred for new systems, SAML remains essential for enterprise estates."],
+        flow: ["SP redirects user to IdP with an AuthnRequest.", "IdP authenticates user and signs an assertion.", "Browser posts SAMLResponse to the SP assertion consumer endpoint.", "SP validates signature, issuer, audience, time bounds, recipient, and request correlation."],
+        watch: ["XML signature wrapping, replay, unsigned assertions, IdP-initiated CSRF, certificate rollover outages, and Golden SAML signing-key theft.", "Single Logout rarely works well enough to rely on alone."],
+        apply: ["Prefer SP-initiated flows.", "Use a hardened SAML library.", "Protect IdP signing keys with HSM-backed controls.", "Use SCIM for immediate deprovisioning."]
+      },
+      "mTLS.md": {
+        core: "mTLS makes both sides prove identity with certificates before application data flows. It is strongest when certificates are short-lived, automatically rotated, and tied to workload identity such as SPIFFE IDs.",
+        diagram: `Client                         Server
+  │──── ClientHello ───────────►│
+  │◄── Server certificate ─────│
+  │──── Client certificate ────►│
+  │◄══ encrypted channel ═════►│
+       both identities verified`,
+        scheme: ["Regular TLS authenticates the server only.", "mTLS adds client certificate authentication.", "SPIFFE names workloads with stable URI identities.", "Service meshes move certificate work into sidecars."],
+        flow: ["Client and server negotiate TLS.", "Server presents a certificate chain.", "Server requests and validates a client certificate.", "Both sides derive session keys and enforce policy from certificate identity."],
+        watch: ["CA compromise, clock skew, broken rotation, revocation gaps, non-mesh services, and sidecar overhead.", "Encrypted traffic improves security but can make debugging harder."],
+        apply: ["Use automated issuance and rotation.", "Prefer short certificate lifetimes over fragile revocation.", "Authorize from SAN or SPIFFE identity, not network location.", "Monitor certificate expiry and CA health."]
+      },
+      "rbac-abac.md": {
+        core: "RBAC, ABAC, and policy engines answer the same question with different inputs. RBAC uses roles, ABAC uses attributes, and PBAC externalizes decisions into systems like OPA or Cedar so policy can be reviewed, tested, and shared.",
+        diagram: `Subject + Action + Resource + Context
+                  │
+                  ▼
+            Policy Decision
+                  │
+          allow, deny, or obligations`,
+        scheme: ["RBAC is simple and auditable until roles multiply.", "ABAC is context-aware but harder to reason about.", "OPA evaluates structured input with Rego.", "Cedar uses typed entities and analyzable policies."],
+        flow: ["Collect subject, resource, action, and environmental context.", "Send a normalized decision request to the policy layer.", "Evaluate roles, attributes, and rules.", "Enforce the answer at the application, gateway, database, or admission point."],
+        watch: ["Role explosion, stale attributes, policy sprawl, untested rules, and latency from central decision services.", "Authorization spread across code paths drifts over time."],
+        apply: ["Use RBAC for stable organizational permissions.", "Use ABAC for context and data classification.", "Use PBAC when multiple systems need one policy plane.", "Write policy tests alongside policy changes."]
+      },
+      "fine-grained-authorization.md": {
+        core: "Fine-grained authorization asks whether this subject can perform this action on this object. ReBAC represents permissions as relationships, so sharing, hierarchy, ownership, and group membership become graph traversal rather than role naming.",
+        diagram: `user:bob ─member─► group:engineering
+group:engineering ─viewer─► folder:eng
+folder:eng ─parent of─► doc:readme
+
+check bob viewer doc:readme = allow`,
+        scheme: ["Relationship tuples are facts in the graph.", "The model defines how relations imply permissions.", "check answers one access question.", "list-objects and list-users power permission-aware UI and search."],
+        flow: ["Write tuples when resources are created, shared, moved, or revoked.", "Model inheritance such as viewer from parent.", "Query the FGA service from application enforcement points.", "Thread consistency tokens through content writes and authorization checks."],
+        watch: ["Dual writes between app data and tuples, stale caching, recursive group complexity, and ignoring reverse queries.", "JWT claims are usually the wrong place for per-object permissions."],
+        apply: ["Use ReBAC when roles start including resource IDs.", "Version and review the authorization model.", "Keep tuple updates transactional through outbox or CDC patterns.", "Use conditions for expiry, IP, or other ABAC-style constraints."]
+      },
+      "agent-identity-mcp-a2a.md": {
+        core: "Agent identity binds an autonomous agent to a human principal, scopes what it may do, and keeps irreversible actions behind explicit approval. The practical stack is OAuth 2.1, token exchange, CIBA, token vaults, and FGA.",
+        diagram: `Human ─OIDC──► App session
+  │              │
+  │              ▼
+  │        Agent task
+  │              │ token exchange / vault
+  ▼              ▼
+Approval ◄── sensitive action ──► API or MCP server`,
+        scheme: ["MCP servers act as OAuth resource servers.", "A2A agent cards declare capabilities and security schemes.", "Token vaults hold third-party provider tokens per user.", "CIBA lets the human approve specific high-impact actions later."],
+        flow: ["User authenticates to the agent app.", "Agent obtains scoped, audience-bound tokens for the tool or API.", "Sensitive actions pause for async human approval.", "Every tool call records agent, user, scope, resource, and decision."],
+        watch: ["God-mode service accounts, token passthrough, prompt-stored secrets, unfiltered RAG, and multi-hop identity laundering.", "Spec churn requires explicit version tracking."],
+        apply: ["Never give an agent more reach than the user.", "Use token exchange instead of forwarding incoming tokens.", "Use FGA before retrieval results reach the model.", "Put payments, deletes, sends, and trades behind CIBA-style approval."]
+      },
+      "agent-identity-trends.md": {
+        core: "Identity is expanding from employees and customers into machines, workloads, and agents. The market is moving toward platforms that can govern non-human identities, delegated agent access, continuous signals, and protocol-level control points.",
+        diagram: `Workforce IAM ─┐
+CIAM ──────────┼─► Identity control plane ─► Human, app, workload, agent
+Authorization ─┤
+NHI security ──┘`,
+        scheme: ["Workforce IAM owns employee access.", "CIAM owns customer login.", "Authorization platforms own what authenticated identities may do.", "NHI and agent identity govern software actors that outnumber humans."],
+        flow: ["Agents multiply identities and token grants.", "Platforms add MCP, A2A, token vault, and FGA support.", "Continuous access signals replace login-only decisions.", "Payments and commerce force stronger proof of human authorization."],
+        watch: ["Long-lived keys, unmanaged service accounts, vendor consolidation, immature agent registries, and weak human-principal propagation.", "Dashboards without protocol leverage may not survive consolidation."],
+        apply: ["Track OAuth, MCP, A2A, WIMSE, Shared Signals, and AP2.", "Prefer delegated identity over raw API keys.", "Govern agent identities like privileged workloads.", "Watch M&A as a signal for where security budgets move."]
+      },
+      "securing-ai-agents.md": {
+        core: "AI agents combine untrusted natural language, powerful tools, and runtime judgment. Security must cap what the agent can reach, validate what it reads, filter what it emits, and log every action for review.",
+        diagram: `User input ─┐
+External data ├─► Agent reasoning ─► Tools
+System policy ┘        │             │
+                       ▼             ▼
+                monitors        sandbox and approvals`,
+        scheme: ["Prompt injection attacks the instruction boundary.", "Excessive agency turns a mistake into real damage.", "Tool abuse moves data or changes systems through allowed channels.", "Sandboxing and least privilege reduce blast radius."],
+        flow: ["Classify tools by risk.", "Grant the minimum file, network, API, and data scope.", "Require approval for high-impact actions.", "Log tool input, output, identity, and result."],
+        watch: ["Prompt injection, data poisoning, confused deputy paths, output exfiltration, multi-agent manipulation, and approval fatigue.", "No prompt-only defense is complete."],
+        apply: ["Separate data from instructions.", "Use allowlists for commands and endpoints.", "Run code in isolated environments.", "Add kill switches and anomaly alerts."]
+      },
+      "waf.md": {
+        core: "A WAF is an HTTP-aware enforcement point that inspects requests and sometimes responses. It blocks known attack patterns, scores anomalies, validates schemas, and rate-limits abusive paths, but it cannot understand every business rule.",
+        diagram: `Client ─HTTPS─► WAF ─clean request─► App
+                  │
+                  ├─ signatures
+                  ├─ anomaly score
+                  ├─ schema allowlist
+                  └─ rate and bot signals`,
+        scheme: ["Reverse proxy mode sits inline.", "Cloud WAFs run at the edge.", "ModSecurity and Coraza use SecRule and OWASP CRS.", "Positive security models define valid requests rather than chasing bad ones."],
+        flow: ["Inspect method, URL, headers, cookies, body, and uploads.", "Normalize encodings so rules see the real payload.", "Apply managed and custom rules.", "Log decisions and tune false positives."],
+        watch: ["False positives, bypass encodings, TLS termination trust, WAF blind spots, and cost at scale.", "IDOR and broken access control often look like valid requests."],
+        apply: ["Use WAF as virtual patching and abuse friction.", "Protect login, payment, and public API paths first.", "Run new rules in observe mode before blocking.", "Pair with secure code and authorization checks."]
+      },
+      "anti-bot-protection.md": {
+        core: "Anti-bot systems decide whether a request comes from a human, a welcome crawler, or hostile automation. The goal is not perfect blocking but making abuse more expensive than the value extracted.",
+        diagram: `Request
+  │
+  ▼
+Signals: IP + TLS + headers + JS + behavior + business logic
+  │
+  ▼
+Decision: allow, challenge, throttle, block, deceive`,
+        scheme: ["Network reputation is cheap but spoofable.", "Protocol fingerprints reveal automation stacks.", "Browser and behavior signals raise attacker cost.", "Business logic catches abuse that raw traffic rules miss."],
+        flow: ["Score each request and session.", "Allow low-risk traffic silently.", "Challenge or step up uncertain traffic.", "Throttle, block, or feed fake data to confirmed automation."],
+        watch: ["False positives, accessibility issues, CAPTCHA conversion loss, residential proxies, sensor breakage, API bypasses, and privacy trade-offs.", "Attackers adapt from feedback quickly."],
+        apply: ["Protect login, registration, checkout, reset, search, and gift card endpoints.", "Rate-limit by account, session, and fingerprint, not only IP.", "Verify good bots instead of trusting user agents.", "Feed bot scores into fraud workflows."]
+      },
+      "dns-over-https.md": {
+        core: "DoH encrypts DNS queries inside HTTPS. It protects the client-to-resolver hop from observation and tampering, but it shifts trust to the DoH resolver and can bypass local DNS security controls.",
+        diagram: `Classic DNS: client ─clear port 53 query─► resolver
+DoH:         client ─TLS port 443 /dns-query─► resolver
+
+Observer sees resolver traffic, not queried names`,
+        scheme: ["DoH uses HTTPS and application/dns-message.", "DoT uses TLS on a dedicated port.", "DoQ uses QUIC.", "Application-level DoH can bypass OS and enterprise resolvers."],
+        flow: ["Client connects to a configured DoH endpoint.", "DNS wire-format query is sent over HTTPS.", "Resolver performs recursive lookup.", "Client caches the encrypted response by TTL."],
+        watch: ["Resolver centralization, split-horizon failures, malware C2 over DoH, bootstrapping, and lost enterprise visibility.", "DoH hides DNS queries, not destination IPs."],
+        apply: ["Use trusted resolvers with clear privacy posture.", "Run internal DoH if enterprise visibility is required.", "Set browser policy controls where needed.", "Monitor for unknown DoH endpoints on managed networks."]
+      },
+      "zero-trust.md": {
+        core: "Zero trust removes the trusted internal network assumption. Every access request is evaluated from identity, context, device state, resource sensitivity, and risk, then continuously monitored after access is granted.",
+        diagram: `Subject ─request─► Policy Enforcement Point ─► Resource
+                     │
+                     ▼
+              Policy Engine
+          identity + device + risk + data`,
+        scheme: ["Verify explicitly.", "Grant least privilege.", "Assume breach.", "Continuously re-evaluate sessions and context."],
+        flow: ["Subject requests a resource.", "PEP gathers identity, device, location, behavior, and resource context.", "Policy engine returns allow, deny, or step-up.", "Monitoring can revoke or narrow access when risk changes."],
+        watch: ["Legacy apps, policy explosion, IdP dependency, user friction, partial rollout false confidence, and per-request latency.", "Zero trust is architecture, not one product."],
+        apply: ["Start with identity and device posture.", "Replace broad VPN access with per-application access.", "Micro-segment service traffic.", "Log every decision and revisit policies as systems change."]
+      },
+      "sandboxing.md": {
+        core: "Sandboxing confines untrusted or risky code to an explicit resource boundary. The boundary may be OS namespaces, syscall filters, browser process isolation, Wasm, containers, micro-VMs, or hardware enclaves.",
+        diagram: `Host
+┌──────────────────────────────┐
+│ Sandbox                      │
+│  process ─► allowed resources│
+│     ✗ file system outside    │
+│     ✗ broad network          │
+│     ✗ other processes        │
+└──────────────────────────────┘`,
+        scheme: ["Namespaces change what a process can see.", "cgroups limit what it can consume.", "seccomp filters system calls.", "VM and micro-VM isolation reduce shared-kernel risk."],
+        flow: ["Launch code inside a restricted boundary.", "Attach filesystem, network, CPU, memory, and syscall policy.", "Broker privileged operations where necessary.", "Terminate or deny when policy is violated."],
+        watch: ["Sandbox escapes, overly broad policies, shared kernel risk, side channels, compatibility failures, and debugging friction.", "Allowed channels can still exfiltrate data."],
+        apply: ["Use the strongest boundary that latency and cost allow.", "Drop capabilities and deny network by default.", "Prefer read-only filesystems.", "Keep kernels, runtimes, and sandbox profiles updated."]
+      },
+      "container-security.md": {
+        core: "Container security covers build, store, deploy, and run. Because containers share the host kernel, security depends on image integrity, minimal privileges, Kubernetes controls, network segmentation, and runtime detection.",
+        diagram: `Build ─► Store ─► Deploy ─► Run
+  │       │        │        │
+ scan    sign     admit    monitor
+ SBOM    registry PSS/RBAC syscalls`,
+        scheme: ["Minimal base images reduce package exposure.", "SBOMs and scanners reveal vulnerable components.", "Admission controllers reject unsafe workloads.", "Runtime tools catch behavior static scans miss."],
+        flow: ["Build from pinned, minimal base images.", "Scan dependencies and image layers.", "Sign images and verify before admission.", "Run with non-root, dropped capabilities, network policy, and monitoring."],
+        watch: ["Vulnerability noise, privileged containers, weak RBAC, exposed service account tokens, network-policy gaps, and shared-kernel exploits.", "Scanners do not prove exploitability by themselves."],
+        apply: ["Use restricted Pod Security Standards.", "Disable default service account token mounts where possible.", "Drop all capabilities and add back only what is needed.", "Alert on shells, sensitive file reads, and unexpected egress."]
+      },
+      "credential-vaulting.md": {
+        core: "Secrets management moves credentials out of code, env files, chats, and CI configs into an audited, encrypted, access-controlled system. Mature systems issue short-lived dynamic secrets instead of merely storing static values.",
+        diagram: `App identity ─auth─► Vault
+                    │
+                    ├─ policy check
+                    ├─ decrypt or mint secret
+                    └─ audit log
+                         │
+                         ▼
+                  short-lived credential`,
+        scheme: ["Vaults authenticate callers before secret access.", "Policies bind identities to secret paths.", "Dynamic engines create per-request credentials.", "Audit logs make access review possible."],
+        flow: ["Application authenticates with IAM, Kubernetes, mTLS, OIDC, AppRole, or a token.", "Vault evaluates access policy.", "Secret is returned over TLS and used in memory.", "Rotation or lease expiry revokes old credentials."],
+        watch: ["Bootstrapping first trust, vault availability, shared service accounts, long-lived keys, and secrets in process listings or crash logs.", "A vault does not fix poor identity design."],
+        apply: ["Prefer dynamic credentials for databases and cloud IAM.", "Rotate static secrets on schedule and on incident.", "Use External Secrets Operator for Kubernetes sync.", "Audit reads and alert on unusual secret access."]
+      },
+      "supply-chain-attack.md": {
+        core: "Supply-chain attacks abuse trust in dependencies, maintainers, build systems, update channels, and signing keys. The compromise happens upstream, but the malicious artifact lands inside downstream systems as trusted code.",
+        diagram: `Maintainer or CI compromise
+          │
+          ▼
+Package, image, installer, or update
+          │
+          ▼
+Thousands of downstream builds and runtimes`,
+        scheme: ["Dependency poisoning spreads through package managers.", "Build compromise can produce malicious artifacts from clean source.", "Update-channel compromise reaches already-installed software.", "SBOMs, signatures, and reproducible builds improve traceability."],
+        flow: ["Inventory dependencies and build inputs.", "Pin versions and verify lockfiles.", "Build in isolated, ephemeral environments.", "Sign artifacts and verify provenance before deployment."],
+        watch: ["Maintainer takeover, tag rewriting, dependency confusion, stolen tokens, malicious postinstall scripts, and compromised signing keys.", "A vulnerability scanner misses many deliberate malicious changes."],
+        apply: ["Use SBOMs, SLSA, in-toto, TUF, lockfiles, and isolated CI.", "Pin actions and containers by digest or immutable commit.", "Limit CI secret exposure.", "Monitor dependency and maintainer changes."]
+      },
+      "threat-analysis.md": {
+        core: "Threat analysis is a structured way to find security issues before attackers do. It decomposes the system, identifies what can go wrong, ranks risk, and chooses mitigations or accepted residual risk.",
+        diagram: `Decompose ─► Identify ─► Rank ─► Mitigate
+     ▲                              │
+     └──────────── iterate ◄────────┘`,
+        scheme: ["DFDs reveal data flows, stores, entry points, and trust boundaries.", "STRIDE categorizes threat types.", "Attack trees show paths to an attacker goal.", "Risk scoring orders work by likelihood and impact."],
+        flow: ["Define the system and security objectives.", "Draw trust boundaries and data flows.", "Apply STRIDE, ATT&CK, PASTA, or LINDDUN as appropriate.", "Record mitigations, owners, and verification tasks."],
+        watch: ["Stale models, subjective scoring, scope creep, analysis paralysis, and missing new attack paths.", "A model is only as useful as the fixes it drives."],
+        apply: ["Threat-model new architecture and major changes.", "Keep findings actionable and owned.", "Update models after incidents.", "Use the same vocabulary across engineering and security teams."]
+      }
+    };
+
     let activeCategory = "all";
 
     const categoryById = Object.fromEntries(categories.map(category => [category.id, category]));
@@ -903,17 +1418,23 @@
     const empty = document.getElementById("empty");
     const topicMap = document.getElementById("topicMap");
     const heroNodes = document.getElementById("heroNodes");
+    const topicModal = document.getElementById("topicModal");
+    const modalKicker = document.getElementById("modalKicker");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSummary = document.getElementById("modalSummary");
+    const modalBody = document.getElementById("modalBody");
+    const modalClose = document.getElementById("modalClose");
 
     function renderHeroNodes() {
       heroNodes.innerHTML = topics.slice(0, 9).map(topic => {
         const category = categoryById[topic.category];
-        return `<a class="node ${topic.category}" href="${topic.file}"><strong>${topic.title}</strong><span>${category.name}</span></a>`;
+        return `<button class="node ${topic.category} topic-trigger" type="button" data-topic="${topic.file}"><strong>${topic.title}</strong><span>${category.name}</span></button>`;
       }).join("");
     }
 
     function renderMap() {
       topicMap.innerHTML = categories.map(category => {
-        const links = topics.filter(topic => topic.category === category.id).map(topic => `<a class="mini-link" href="#${slug(topic.title)}">${topic.title}</a>`).join("");
+        const links = topics.filter(topic => topic.category === category.id).map(topic => `<button class="mini-link topic-trigger" type="button" data-topic="${topic.file}">${topic.title}</button>`).join("");
         return `<section class="lane"><div class="lane-head" data-color="${category.color}">${category.name}</div><div class="lane-body">${links}</div></section>`;
       }).join("");
     }
@@ -944,10 +1465,10 @@
           <div class="card-top" data-color="${category.color}"></div>
           <div class="card-body">
             <div class="card-kicker"><span>${category.name}</span><span>${topic.focus}</span></div>
-            <h3>${topic.title}</h3>
+            <h3><button class="topic-trigger" type="button" data-topic="${topic.file}">${topic.title}</button></h3>
             <p>${topic.summary}</p>
             <div class="tags">${topic.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
-            <a class="source" href="${topic.file}"><span>${topic.file}</span><strong>Open source</strong></a>
+            <div class="source"><a href="${topic.file}"><span>${topic.file}</span><strong>Open file</strong></a><button type="button" data-topic="${topic.file}">Study</button></div>
           </div>
         </article>`;
       }).join("");
@@ -958,6 +1479,96 @@
     function slug(value) {
       return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     }
+
+    function findTopic(file) {
+      return topics.find(topic => topic.file === file);
+    }
+
+    function listItems(items) {
+      return items.map(item => `<li>${escapeHtml(item)}</li>`).join("");
+    }
+
+    function flowItems(items) {
+      return items.map((item, index) => `<div class="learn-step"><span>${String(index + 1).padStart(2, "0")}</span><p>${escapeHtml(item)}</p></div>`).join("");
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[character]));
+    }
+
+    function openTopic(file) {
+      const topic = findTopic(file);
+      const detail = topicDetails[file];
+      if (!topic || !detail) {
+        return;
+      }
+      const category = categoryById[topic.category];
+      modalKicker.innerHTML = `<span>${escapeHtml(category.name)}</span><span>${escapeHtml(topic.focus)}</span><span>${escapeHtml(topic.file)}</span>`;
+      modalTitle.textContent = topic.title;
+      modalSummary.textContent = detail.core;
+      modalBody.innerHTML = `<div class="modal-grid">
+        <section class="learn-panel">
+          <h3>Operating Scheme</h3>
+          <ul class="learn-list">${listItems(detail.scheme)}</ul>
+        </section>
+        <section class="learn-panel">
+          <h3>System Diagram</h3>
+          <pre class="modal-diagram">${escapeHtml(detail.diagram)}</pre>
+        </section>
+        <section class="learn-panel">
+          <h3>How It Moves</h3>
+          <div class="learn-flow">${flowItems(detail.flow)}</div>
+        </section>
+        <section class="learn-panel">
+          <h3>Failure Modes</h3>
+          <ul class="learn-list">${listItems(detail.watch)}</ul>
+        </section>
+        <section class="learn-panel">
+          <h3>Practical Controls</h3>
+          <ul class="learn-list">${listItems(detail.apply)}</ul>
+          <a class="modal-link" href="${topic.file}">Open markdown file</a>
+        </section>
+        <section class="learn-panel">
+          <h3>Keywords</h3>
+          <div class="tags">${topic.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
+          <p>${escapeHtml(topic.summary)}</p>
+        </section>
+      </div>`;
+      topicModal.classList.add("open");
+      document.body.style.overflow = "hidden";
+      modalClose.focus();
+    }
+
+    function closeTopic() {
+      topicModal.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
+    document.addEventListener("click", event => {
+      const trigger = event.target.closest("[data-topic]");
+      if (trigger) {
+        openTopic(trigger.dataset.topic);
+      }
+    });
+
+    modalClose.addEventListener("click", closeTopic);
+    topicModal.addEventListener("click", event => {
+      if (event.target === topicModal) {
+        closeTopic();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && topicModal.classList.contains("open")) {
+        closeTopic();
+      }
+    });
 
     search.addEventListener("input", renderCards);
 
