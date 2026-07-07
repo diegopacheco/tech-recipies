@@ -242,7 +242,7 @@ Check: can alice view doc:readme?
 
 Open source implementations:
 - **SpiceDB (AuthZed)**: most mature Zanzibar-inspired system
-- **OpenFGA (Auth0/Okta)**: CNCF sandbox project
+- **OpenFGA**: CNCF sandbox project
 - **Keto (Ory)**: Go-based Zanzibar implementation
 
 ## Comparison

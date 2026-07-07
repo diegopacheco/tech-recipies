@@ -2,11 +2,11 @@
 
 ## What is it?
 
-This note is a map, not a protocol: who the players are in identity, where the money and M&A are moving, and where agent identity — the newest and fastest-moving front — is heading. Identity has split into distinct markets that get conflated: **workforce IAM** (employees logging into SaaS — Okta, Microsoft Entra), **CIAM** (your customers logging into your product — Auth0, and a wave of developer-first startups), **authorization** (what a logged-in identity may do — the FGA/policy-engine space), **non-human identity (NHI)** (service accounts, API keys, workloads — the category analysts started naming in 2024), and now **agent identity** (AI agents acting on behalf of humans across all of the above). The strategic thesis driving the whole space: every company deploying agents multiplies its identity count by orders of magnitude — agents outnumber employees the way containers outnumber servers — and whoever owns the identity control plane for agents owns the choke point of the agent economy.
+This note is a map, not a protocol: who the players are in identity, where the money and M&A are moving, and where agent identity — the newest and fastest-moving front — is heading. Identity has split into distinct markets that get conflated: **workforce IAM** (employees logging into SaaS through enterprise identity providers such as Microsoft Entra), **CIAM** (customers logging into your product through developer-first identity platforms such as Auth0), **authorization** (what a logged-in identity may do — the FGA/policy-engine space), **non-human identity (NHI)** (service accounts, API keys, workloads — the category analysts started naming in 2024), and now **agent identity** (AI agents acting on behalf of humans across all of the above). The strategic thesis driving the whole space: every company deploying agents multiplies its identity count by orders of magnitude — agents outnumber employees the way containers outnumber servers — and whoever owns the identity control plane for agents owns the choke point of the agent economy.
 
 ## Why does it matter?
 
-For an architect role that "researches market adjacencies to inform company strategy, m&a decisions and future investment ideas", knowing the protocols is table stakes; the differentiator is reading the board. Okta's own moves tell the story: buying Auth0 (**2021, $6.5B**) for developers, Spera (**2023**) for identity security posture, Axiom Security (**2025**) for privileged access, and incubating Auth for GenAI and humanprincipal.ai inside Auth0Lab. Meanwhile Palo Alto Networks agreed to buy CyberArk (**announced July 2025, ~$25B**) largely for machine and agent identity — the loudest possible market signal that identity is consolidating into the security platforms.
+Knowing the protocols is table stakes; the differentiator is reading the board. Workforce identity platforms have moved into developer CIAM, identity security posture, privileged access, and agent authorization. Meanwhile Palo Alto Networks agreed to buy CyberArk (**announced July 2025, ~$25B**) largely for machine and agent identity — the loudest possible market signal that identity is consolidating into the security platforms.
 
 ## The Landscape
 
@@ -14,8 +14,8 @@ For an architect role that "researches market adjacencies to inform company stra
 
 ```
 ┌────────────────┬──────────────────────────────────────────────────────┐
-│ Okta / Auth0   │ Workforce (Okta) + CIAM (Auth0) + FGA + Auth for     │
-│                │ GenAI. Betting identity is the agent control plane   │
+│ Workforce +    │ Enterprise IdP + developer CIAM + FGA + Auth for     │
+│ CIAM platforms │ GenAI. Betting identity is the agent control plane   │
 ├────────────────┼──────────────────────────────────────────────────────┤
 │ Microsoft      │ Entra ID: bundled with M365, the gravity well of     │
 │ Entra          │ workforce identity; Entra Agent ID (2025) extends    │
@@ -87,7 +87,7 @@ The pattern: each attacks Auth0's weak flank at its founding moment — Clerk on
 ```
 ┌──────────────────┬────────────────────────────────────────────────────┐
 │ Aembit           │ Workload IAM: policy-based, secretless auth between│
-│                  │ workloads and agents — "Okta for machines"         │
+│                  │ workloads and agents — enterprise IdP for machines │
 │ Astrix, Oasis,   │ NHI security posture: discover, govern, and rotate │
 │ Entro, Token     │ the service accounts and API keys nobody owns      │
 │ Security, Clutch │ (several acquired or acquiring through 2025)       │
@@ -105,21 +105,21 @@ The pattern: each attacks Auth0's weak flank at its founding moment — Clerk on
 ## Where Agent Identity Is Heading
 
 - **From API keys to delegated identity**: the current mess (agents holding long-lived keys) is recapitulating 2005-era auth; the correction is OAuth-shaped — token exchange, audience binding, short TTLs. The MCP authorization spec is the beachhead
-- **The human principal problem**: the frontier question is preserving "which human is behind this agent, with what consent" across multi-hop agent chains — IETF **OAuth identity chaining / Identity Assertion Authorization Grant** drafts (Okta's Aaron Parecki is a driving author) and Auth0Lab's humanprincipal.ai both aim here
+- **The human principal problem**: the frontier question is preserving "which human is behind this agent, with what consent" across multi-hop agent chains — IETF **OAuth identity chaining / Identity Assertion Authorization Grant** drafts and Auth0Lab's humanprincipal.ai both aim here
 - **Workload identity converges with agent identity**: **SPIFFE/SPIRE**-style attested workload IDs and the IETF **WIMSE** working group provide the "who is this process" layer under "who is this agent for"
 - **Continuous access over session-based access**: agents run for days; **Shared Signals Framework / CAEP** (revoke and signal in real time) fits agents better than login-time checks
 - **Agentic commerce forces the issue**: Visa Intelligent Commerce, Mastercard Agent Pay, and Google's **AP2 (Agent Payments Protocol, 2025)** need cryptographic proof a human authorized a purchase — payments will drag agent identity into regulation
 - **Agent registries and reputation**: expect "app store" style trust: signed agent manifests, verifiable credentials for agents, and per-agent risk scoring — the space startups and platforms are racing to own
-- **Consolidation**: NHI startups are being absorbed into platforms (CyberArk→Palo Alto being the tone-setter); prediction: the standalone winners will be the ones owning a protocol position (MCP/A2A ecosystems), not a dashboard
+- **Consolidation**: NHI startups are being absorbed into platforms (CyberArk→Palo Alto being the tone-setter); prediction: the standalone winners will be the ones owning protocol leverage (MCP/A2A ecosystems), not a dashboard
 
 ## Notable M&A and Signals
 
 ```
 ┌──────┬────────────────────────────────────────────────────────────────┐
-│ 2021 │ Okta buys Auth0 ($6.5B) — workforce buys developer CIAM        │
+│ 2021 │ Auth0 acquired ($6.5B) — workforce identity moves into CIAM    │
 │ 2022 │ Thoma Bravo takes Ping ($2.8B), ForgeRock ($2.3B), SailPoint   │
 │      │ ($6.9B) private — PE consolidation wave                        │
-│ 2023 │ Okta buys Spera — identity security posture (ISPM)             │
+│ 2023 │ Identity security posture acquisitions heat up                 │
 │ 2024 │ CyberArk buys Venafi ($1.54B) — machine identity land grab;    │
 │      │ WorkOS buys Warrant — CIAM absorbs FGA                         │
 │ 2025 │ Palo Alto to buy CyberArk (~$25B) — security platforms decide  │
@@ -133,7 +133,7 @@ The pattern: each attacks Auth0's weak flank at its founding moment — Clerk on
 - **Specs in motion**: MCP authorization changelog, A2A releases, IETF OAuth WG drafts (identity chaining, transaction tokens), WIMSE, OpenID Foundation's AI/agent identity work and Shared Signals (CAEP)
 - **Vendor labs**: Auth0 blog + auth0-lab GitHub, WorkOS/Stytch/Clerk/Descope changelogs (watch what they ship for agents, not what they post), Microsoft Entra Agent ID announcements
 - **Conferences**: Identiverse, Internet Identity Workshop (IIW — where passkeys and OAuth extensions actually get hashed out), Authenticate (FIDO), Gartner IAM Summit for the buyer view
-- **Money flow**: Okta Ventures portfolio, a16z/YC identity investments, and NHI acquisition announcements — funding maps the perceived gaps
+- **Money flow**: identity venture portfolios, a16z/YC identity investments, and NHI acquisition announcements — funding maps the perceived gaps
 
 ## Links
 
@@ -146,6 +146,5 @@ The pattern: each attacks Auth0's weak flank at its founding moment — Clerk on
 - OpenID Shared Signals / CAEP: https://openid.net/wg/sharedsignals/
 - Google AP2 — Agent Payments Protocol: https://github.com/google-agentic-commerce/AP2
 - SPIFFE: https://spiffe.io/
-- Okta Ventures: https://www.okta.com/okta-ventures/
 - Internet Identity Workshop: https://internetidentityworkshop.com/
 - Identiverse: https://identiverse.com/

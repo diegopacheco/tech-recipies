@@ -2,11 +2,11 @@
 
 ## What is it?
 
-Single Sign-On (SSO) lets a user authenticate once and access many applications without logging in again. Identity **federation** is the trust machinery underneath: an application (the **Service Provider**, SP) outsources authentication to an external **Identity Provider** (IdP) it trusts, and accepts signed assertions about who the user is. **SAML 2.0** (Security Assertion Markup Language) is the XML-based federation protocol that still dominates enterprise SSO: when you log into Salesforce or Workday through your company's Okta, a SAML assertion is what crosses the wire. The federation stack also includes **SCIM** for provisioning (creating/updating/deactivating accounts across apps automatically) and the workforce-vs-customer split: **workforce identity** (employees, IT-managed, Okta's core) versus **CIAM** (customers signing up to your product, Auth0's core). For a B2B SaaS company, "supports SAML SSO + SCIM" is not a feature — it is the toll gate to selling upmarket.
+Single Sign-On (SSO) lets a user authenticate once and access many applications without logging in again. Identity **federation** is the trust machinery underneath: an application (the **Service Provider**, SP) outsources authentication to an external **Identity Provider** (IdP) it trusts, and accepts signed assertions about who the user is. **SAML 2.0** (Security Assertion Markup Language) is the XML-based federation protocol that still dominates enterprise SSO: when you log into Salesforce or Workday through your company's IdP, a SAML assertion is what crosses the wire. The federation stack also includes **SCIM** for provisioning (creating/updating/deactivating accounts across apps automatically) and the workforce-vs-customer split: **workforce identity** (employees, IT-managed) versus **CIAM** (customers signing up to your product). For a B2B SaaS company, "supports SAML SSO + SCIM" is not a feature — it is the toll gate to selling upmarket.
 
 ## Who created it? When?
 
-SAML was created by the **OASIS Security Services Technical Committee**: **SAML 1.0 in November 2002**, and the still-current **SAML 2.0 in March 2005**, merging SAML 1.1 with the Liberty Alliance's ID-FF and Shibboleth work — contributors spanned **Sun, IBM, RSA, and Ping Identity**. Microsoft and IBM pushed the rival **WS-Federation (2003)**, which survives mostly in legacy ADFS estates. **SCIM (System for Cross-domain Identity Management)** was standardized as **RFC 7643/7644 in September 2015** (work started at IETF in 2011). **Okta (founded 2009, Todd McKinnon and Frederic Kerrest)** built the leading workforce IdP on SAML's back; **Auth0 (founded 2013)** made federation programmable for developers and was **acquired by Okta in 2021**. The modern trajectory: new integrations prefer **OIDC**, but SAML remains entrenched because thousands of enterprise apps and IdPs already speak it.
+SAML was created by the **OASIS Security Services Technical Committee**: **SAML 1.0 in November 2002**, and the still-current **SAML 2.0 in March 2005**, merging SAML 1.1 with the Liberty Alliance's ID-FF and Shibboleth work — contributors spanned **Sun, IBM, RSA, and Ping Identity**. Microsoft and IBM pushed the rival **WS-Federation (2003)**, which survives mostly in legacy ADFS estates. **SCIM (System for Cross-domain Identity Management)** was standardized as **RFC 7643/7644 in September 2015** (work started at IETF in 2011). Commercial IdPs and developer identity platforms later productized SAML and SCIM for enterprise and customer identity. The modern trajectory: new integrations prefer **OIDC**, but SAML remains entrenched because thousands of enterprise apps and IdPs already speak it.
 
 ## How it works?
 
@@ -20,8 +20,8 @@ SAML was created by the **OASIS Security Services Technical Committee**: **SAML 
 ┌──▼──────────────┐                        ┌────────────▼─────────┐
 │  Identity        │                        │  Service Provider    │
 │  Provider (IdP)  │                        │  (SP: Salesforce,    │
-│  Okta / Entra /  │                        │  Workday, your SaaS) │
-│  Auth0 / ADFS    │                        │                      │
+│  Entra / Auth0 / │                        │  Workday, your SaaS) │
+│  ADFS / Keycloak │                        │                      │
 └──────────┬───────┘                        └───────────┬──────────┘
            │           ┌──────────┐                     │
            └──────────►│  User's  │◄────────────────────┘
@@ -57,13 +57,13 @@ SAML never has the SP and IdP talk directly during login — signed XML rides th
    │◄──────────────────────│                             │
 ```
 
-IdP-initiated flow skips steps 1-3: the user clicks a tile in the Okta dashboard and an unsolicited assertion is POSTed to the SP. It is convenient but weaker (no `InResponseTo` correlation, larger CSRF/injection surface); SP-initiated is preferred.
+IdP-initiated flow skips steps 1-3: the user clicks a tile in the IdP portal and an unsolicited assertion is POSTed to the SP. It is convenient but weaker (no `InResponseTo` correlation, larger CSRF/injection surface); SP-initiated is preferred.
 
 ### The Assertion
 
 ```
 <saml:Assertion ID="_8e9f..." IssueInstant="2026-07-06T12:00:00Z">
-  <saml:Issuer>https://idp.okta.com/exk1a2b3</saml:Issuer>
+  <saml:Issuer>https://idp.acme.com/exk1a2b3</saml:Issuer>
   <ds:Signature>...X.509 signed...</ds:Signature>
   <saml:Subject>
     <saml:NameID Format="...emailAddress">alice@acme.com</saml:NameID>
@@ -93,7 +93,7 @@ Everything the SP trusts is here: who (NameID), from whom (Issuer + signature), 
 SSO answers "can Alice log in?"; SCIM answers "does Alice's account exist, with the right groups, and is it killed the minute she is offboarded?" — the IdP pushes lifecycle changes to a REST API the app exposes:
 
 ```
-IdP (Okta)                              App (SP)
+IdP                                     App (SP)
    │  POST /scim/v2/Users {userName: alice@acme.com, ...}
    │──────────────────────────────────────────────────────►
    │  PATCH /scim/v2/Users/42 {active: false}   (offboard!)
@@ -123,7 +123,7 @@ Deprovisioning is the security payoff: without SCIM, ex-employees keep working a
 └────────────────┴──────────────────────────┴──────────────────────────┘
 ```
 
-Direction of travel: OIDC for anything new, SAML supported forever because the enterprise install base demands it. Products like Auth0 and Okta translate between them — an app integrated once via OIDC can accept any customer's SAML IdP upstream.
+Direction of travel: OIDC for anything new, SAML supported forever because the enterprise install base demands it. Identity platforms translate between them — an app integrated once via OIDC can accept any customer's SAML IdP upstream.
 
 ## Attacks and Defenses
 
@@ -146,7 +146,7 @@ Direction of travel: OIDC for anything new, SAML supported forever because the e
 
 ## Cons
 
-- **IdP is a single point of failure and compromise**: Okta's own 2022 (Lapsus$) and 2023 (support system) breaches rippled to thousands of customers
+- **IdP is a single point of failure and compromise**: a breach of the central identity provider can ripple to every connected application
 - **XML complexity is an attack surface**: canonicalization, signature wrapping, and entity bugs keep recurring; JWT/OIDC has a much smaller parsing story
 - **Painful multi-tenant setup**: per-customer metadata exchange, certificate rotations, and clock-skew tickets are a permanent support tax
 - **No native API/mobile story**: SAML assumes a browser; APIs and native apps need OIDC/OAuth anyway
@@ -156,7 +156,7 @@ Direction of travel: OIDC for anything new, SAML supported forever because the e
 
 ## Use Cases
 
-- **Workforce SSO**: employees reaching Salesforce, Workday, GitHub, and AWS through Okta/Entra with one login
+- **Workforce SSO**: employees reaching Salesforce, Workday, GitHub, and AWS through an enterprise IdP with one login
 - **B2B SaaS enterprise readiness**: letting each customer bring their own IdP (SAML or OIDC) to your product, per-tenant
 - **Automated joiner/mover/leaver**: HR-driven SCIM provisioning and same-day deprovisioning across the app estate
 - **Education and government federation**: Shibboleth/InCommon academic federations built on SAML
@@ -171,7 +171,6 @@ Direction of travel: OIDC for anything new, SAML supported forever because the e
 - RFC 7643 — SCIM Core Schema: https://datatracker.ietf.org/doc/html/rfc7643
 - RFC 7644 — SCIM Protocol: https://datatracker.ietf.org/doc/html/rfc7644
 - Auth0 docs — SAML: https://auth0.com/docs/authenticate/protocols/saml
-- Okta — SAML overview: https://developer.okta.com/docs/concepts/saml/
 - Duo — Duo Finds SAML Vulnerabilities Affecting Multiple Implementations (2018): https://duo.com/blog/duo-finds-saml-vulnerabilities-affecting-multiple-implementations
 - CISA on Golden SAML / detecting abuse: https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-008a
 - On Breaking SAML: Be Whoever You Want to Be (USENIX 2012): https://www.usenix.org/conference/usenixsecurity12/technical-sessions/presentation/somorovsky

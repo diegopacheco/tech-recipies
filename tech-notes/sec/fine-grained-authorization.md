@@ -6,7 +6,7 @@ Fine-grained authorization (FGA) answers the question "can **this user** perform
 
 ## Who created it? When?
 
-Google built **Zanzibar** internally starting around **2013** and published the paper "**Zanzibar: Google's Consistent, Global Authorization System**" at **USENIX ATC 2019** (Ruoming Pang et al.). Zanzibar serves authorization for **Google Docs, Drive, YouTube, Photos, and Cloud IAM** — millions of authorization checks per second at 95th percentile latency under 10ms with 99.999% availability. The paper triggered a wave of open-source implementations: **SpiceDB** by **Authzed (2021, Jake Moshenko)**, **Ory Keto (2021)**, **Permify**, and **OpenFGA**, created by the **Auth0Lab team** (the team behind this note's motivating job posting) and open-sourced in **2022**, then donated to the **CNCF** (sandbox 2022, incubating 2025). Auth0 sells the hosted version as **Auth0 FGA**. The policy-engine cousins are **OPA/Rego (Styra, 2016, CNCF graduated)** and **Cedar (AWS, 2023)**, which evaluate policies over inputs rather than storing a relationship graph.
+Google built **Zanzibar** internally starting around **2013** and published the paper "**Zanzibar: Google's Consistent, Global Authorization System**" at **USENIX ATC 2019** (Ruoming Pang et al.). Zanzibar serves authorization for **Google Docs, Drive, YouTube, Photos, and Cloud IAM** — millions of authorization checks per second at 95th percentile latency under 10ms with 99.999% availability. The paper triggered a wave of open-source implementations: **SpiceDB** by **Authzed (2021, Jake Moshenko)**, **Ory Keto (2021)**, **Permify**, and **OpenFGA**, created by the **Auth0Lab team** and open-sourced in **2022**, then donated to the **CNCF** (sandbox 2022, incubating 2025). Auth0 sells the hosted version as **Auth0 FGA**. The policy-engine cousins are **OPA/Rego (Styra, 2016, CNCF graduated)** and **Cedar (AWS, 2023)**, which evaluate policies over inputs rather than storing a relationship graph.
 
 ## How it works?
 
@@ -133,7 +133,7 @@ The classic tell that you have outgrown RBAC: roles named `project_42_viewer` mu
 │             │ (paper)       │ + zookies        │ only, powers Docs etc  │
 ├─────────────┼───────────────┼──────────────────┼────────────────────────┤
 │ OpenFGA     │ Auth0Lab 2022 │ ReBAC + condit.  │ CNCF, DSL + Playground,│
-│ / Auth0 FGA │               │                  │ hosted by Okta         │
+│ / Auth0 FGA │               │                  │ hosted service         │
 ├─────────────┼───────────────┼──────────────────┼────────────────────────┤
 │ SpiceDB     │ Authzed 2021  │ ReBAC, closest   │ caveats, watch API,    │
 │             │               │ to the paper     │ strong consistency knbs│

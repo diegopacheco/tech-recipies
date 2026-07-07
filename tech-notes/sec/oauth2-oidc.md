@@ -2,11 +2,11 @@
 
 ## What is it?
 
-OAuth 2.0 is a delegated **authorization** framework: it lets a user grant an application limited access to resources hosted by another service, without ever sharing their password with that application. Instead of credentials, the application receives a scoped, expiring **access token**. OpenID Connect (OIDC) is a thin **authentication** layer built on top of OAuth 2.0: it adds an **ID token** (a signed JWT describing who the user is), standard identity claims, and a discovery mechanism, turning OAuth's "can this app access this API?" into "who is this user and how did they log in?". Together they are the backbone of modern login: "Sign in with Google", enterprise SSO, mobile app auth, API-to-API access, and increasingly, auth for AI agents. The distinction matters and is a classic interview trap: OAuth by itself is not a login protocol — using a bare access token as proof of identity is a known vulnerability pattern; OIDC exists precisely to fix that.
+OAuth 2.0 is a delegated **authorization** framework: it lets a user grant an application limited access to resources hosted by another service, without ever sharing their password with that application. Instead of credentials, the application receives a scoped, expiring **access token**. OpenID Connect (OIDC) is a thin **authentication** layer built on top of OAuth 2.0: it adds an **ID token** (a signed JWT describing who the user is), standard identity claims, and a discovery mechanism, turning OAuth's "can this app access this API?" into "who is this user and how did they log in?". Together they are the backbone of modern login: "Sign in with Google", enterprise SSO, mobile app auth, API-to-API access, and increasingly, auth for AI agents. The distinction matters: OAuth by itself is not a login protocol — using a bare access token as proof of identity is a known vulnerability pattern; OIDC exists precisely to fix that.
 
 ## Who created it? When?
 
-OAuth 1.0 emerged in **2007** from a group including **Blaine Cook (Twitter)** and **Chris Messina**, formalized as **RFC 5849 (2010)**. OAuth 2.0 was standardized by the **IETF OAuth Working Group** as **RFC 6749 and RFC 6750 in October 2012**, edited by **Dick Hardt**; original lead author **Eran Hammer** famously resigned and removed his name, calling the result too loose a framework. The ecosystem hardened it over the following decade: **PKCE (RFC 7636, 2015)**, **Device Authorization Grant (RFC 8628, 2019)**, **Token Exchange (RFC 8693, 2020)**, **Security Best Current Practice (RFC 9700, 2025)**, and the consolidating **OAuth 2.1 draft** which deletes the insecure legacy grants. **OpenID Connect 1.0** was published by the **OpenID Foundation in February 2014**, authored by **Nat Sakimura, John Bradley, Mike Jones, Breno de Medeiros, and Chuck Mortimore**, replacing SAML-era OpenID 2.0. **CIBA (Client-Initiated Backchannel Authentication)** was finalized by the OpenID Foundation in **2021**. **Auth0 (founded 2013 by Eugenio Pace and Matias Woloski, acquired by Okta in 2021 for $6.5B)** built its entire business on making these protocols easy for developers.
+OAuth 1.0 emerged in **2007** from a group including **Blaine Cook (Twitter)** and **Chris Messina**, formalized as **RFC 5849 (2010)**. OAuth 2.0 was standardized by the **IETF OAuth Working Group** as **RFC 6749 and RFC 6750 in October 2012**, edited by **Dick Hardt**; original lead author **Eran Hammer** famously resigned and removed his name, calling the result too loose a framework. The ecosystem hardened it over the following decade: **PKCE (RFC 7636, 2015)**, **Device Authorization Grant (RFC 8628, 2019)**, **Token Exchange (RFC 8693, 2020)**, **Security Best Current Practice (RFC 9700, 2025)**, and the consolidating **OAuth 2.1 draft** which deletes the insecure legacy grants. **OpenID Connect 1.0** was published by the **OpenID Foundation in February 2014**, authored by **Nat Sakimura, John Bradley, Mike Jones, Breno de Medeiros, and Chuck Mortimore**, replacing SAML-era OpenID 2.0. **CIBA (Client-Initiated Backchannel Authentication)** was finalized by the OpenID Foundation in **2021**. **Auth0 (founded 2013 by Eugenio Pace and Matias Woloski)** built its business on making these protocols easy for developers.
 
 ## How it works?
 
@@ -15,7 +15,7 @@ OAuth 1.0 emerged in **2007** from a group including **Blaine Cook (Twitter)** a
 ```
 ┌────────────────┐        ┌────────────────────────┐
 │ Resource Owner │        │  Authorization Server  │
-│   (the user)   │        │ (Auth0, Okta, Google)  │
+│   (the user)   │        │ (Auth0, Google, Entra) │
 │ owns the data  │        │ authenticates the user,│
 │                │        │ issues tokens          │
 └────────────────┘        └────────────────────────┘
@@ -217,7 +217,7 @@ POST /oauth/token
 - **Granular scopes**: `read:invoices` instead of full account access
 - **Revocable and expiring**: compromised tokens die fast; refresh tokens can be revoked server-side
 - **Separation of concerns**: authentication is centralized at the authorization server; APIs just validate tokens
-- **Massive ecosystem**: every language, every provider, battle-tested libraries and hosted services (Auth0, Okta, Cognito, Entra)
+- **Massive ecosystem**: every language, every provider, battle-tested libraries and hosted services (Auth0, Cognito, Entra)
 - **Extensible for new worlds**: token exchange, CIBA, and device grant map cleanly onto AI-agent and IoT scenarios
 - **OIDC discovery**: one URL bootstraps full interoperability between independent implementations
 
@@ -233,7 +233,7 @@ POST /oauth/token
 
 ## Use Cases
 
-- **Social and enterprise login**: "Sign in with Google/GitHub/Okta" via OIDC
+- **Social and enterprise login**: "Sign in with Google/GitHub" and enterprise IdP login via OIDC
 - **First-party app login**: mobile and SPA authentication against your own identity provider
 - **Third-party API delegation**: a scheduling app reading your calendar with `calendar.read` only
 - **Machine-to-machine**: microservices authenticating with client credentials

@@ -6,7 +6,7 @@ Agent identity is the discipline of giving AI agents a real place in the identit
 
 ## Who created it? When?
 
-**MCP (Model Context Protocol)** was released by **Anthropic in November 2024** as an open standard for connecting AI applications to tools and data. Its **authorization specification** landed in the **2025-03-26 revision** (OAuth 2.1 based) and was significantly reworked in the **2025-06-18 revision**, which made MCP servers plain OAuth **resource servers** (using RFC 9728 Protected Resource Metadata) after industry feedback — **Auth0/Okta engineers were among the main contributors** to that redesign. **A2A (Agent2Agent)** was announced by **Google in April 2025** with 50+ partners and donated to the **Linux Foundation in June 2025**; Auth0 published joint guidance with Google on securing it. **Auth for GenAI** was incubated by the **Auth0Lab team** and launched in **2025**, packaging user authentication, token vault, async human approval, and fine-grained authorization for RAG into SDKs for agent frameworks (LangChain, LlamaIndex, Vercel AI). The underlying standards are older: **Token Exchange (RFC 8693, 2020)**, **CIBA (OpenID Foundation, 2021)**, **Dynamic Client Registration (RFC 7591, 2015)**.
+**MCP (Model Context Protocol)** was released by **Anthropic in November 2024** as an open standard for connecting AI applications to tools and data. Its **authorization specification** landed in the **2025-03-26 revision** (OAuth 2.1 based) and was significantly reworked in the **2025-06-18 revision**, which made MCP servers plain OAuth **resource servers** (using RFC 9728 Protected Resource Metadata) after industry feedback from identity-provider engineers and standards contributors. **A2A (Agent2Agent)** was announced by **Google in April 2025** with 50+ partners and donated to the **Linux Foundation in June 2025**. **Auth for GenAI** was incubated by the **Auth0Lab team** and launched in **2025**, packaging user authentication, token vault, async human approval, and fine-grained authorization for RAG into SDKs for agent frameworks (LangChain, LlamaIndex, Vercel AI). The underlying standards are older: **Token Exchange (RFC 8693, 2020)**, **CIBA (OpenID Foundation, 2021)**, **Dynamic Client Registration (RFC 7591, 2015)**.
 
 ## How it works?
 
@@ -51,7 +51,7 @@ Rule zero: **the agent must never have more power than the user it acts for**, a
 
 ### MCP Authorization (2025-06-18 spec)
 
-The key architectural decision: the MCP server is **just an OAuth 2.1 resource server**. It does not issue tokens; it points clients at an external authorization server (Auth0, Okta, Keycloak) and validates the access tokens it receives.
+The key architectural decision: the MCP server is **just an OAuth 2.1 resource server**. It does not issue tokens; it points clients at an external authorization server (Auth0, Keycloak, Entra) and validates the access tokens it receives.
 
 ```
 ┌────────────┐                                   ┌─────────────────┐
@@ -151,7 +151,7 @@ The `binding_message` shows the human precisely what they authorize — the iden
 │                │ server + PKCE + DCR │ OpenAPI-style       │ vault, CIBA, FGA   │
 │                │ + resource indicator│ security schemes    │                    │
 ├────────────────┼─────────────────────┼─────────────────────┼────────────────────┤
-│ Steward        │ Anthropic (open)    │ Linux Foundation    │ Auth0/Okta product │
+│ Steward        │ Anthropic (open)    │ Linux Foundation    │ Identity platform  │
 ├────────────────┼─────────────────────┼─────────────────────┼────────────────────┤
 │ Hard problem   │ no token            │ user identity across│ least privilege for│
 │                │ passthrough         │ agent chains        │ autonomous actions │
