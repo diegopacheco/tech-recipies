@@ -1,0 +1,22 @@
+tech-notes/sec/index.html
+  s_2ccf8297efe92e::t_2f9719e718d930 756-759,766-770,778-780,784-810
+  s_2ccf8297efe92e::t_6b7da9263cd6c0 1009
+  s_2ccf8297efe92e::t_55d455a87a177d 841,1771-1800,1804-1813
+  s_2ccf8297efe92e::t_42ca4430f6b609 821-822,836-840
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f3e3fa2332e6a9016e17e6e80e96a190f4fa1fae",
+  "prompts": {},
+  "sessions": {
+    "s_2ccf8297efe92e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4a662d7-3fb4-412b-a1fe-9a998d3150cd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
