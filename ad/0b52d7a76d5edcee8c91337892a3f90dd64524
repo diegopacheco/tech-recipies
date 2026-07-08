@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/sdk.md
+  s_12689a5f23ad3c::t_ccd549d72436f7 1-356
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ad0b52d7a76d5edcee8c91337892a3f90dd64524",
+  "prompts": {},
+  "sessions": {
+    "s_12689a5f23ad3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b330cc76-57b5-4656-a289-0a24451b3ab3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
