@@ -1,0 +1,19 @@
+tech-notes/.claude/settings.json
+  s_714401727d5aa5::t_e64ac07bd6a329 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "95bd5d9eb23f0e4e88aa44612497d01c5f5402d9",
+  "prompts": {},
+  "sessions": {
+    "s_714401727d5aa5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da8322ac-b159-45f2-8336-6f77ca91264c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
