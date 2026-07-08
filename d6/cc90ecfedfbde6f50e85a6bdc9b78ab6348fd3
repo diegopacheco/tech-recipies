@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/aws-IAM.md
+  s_6d96a766a5eb48::t_0453ce72a24e24 1-293
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d6cc90ecfedfbde6f50e85a6bdc9b78ab6348fd3",
+  "prompts": {},
+  "sessions": {
+    "s_6d96a766a5eb48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6cdd6fc0-dab5-4a0c-8896-5c39dbbac94e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
