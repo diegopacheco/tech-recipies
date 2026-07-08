@@ -1,0 +1,25 @@
+tech-notes/sec/index.html
+  s_1d6dde65edab71::t_80b1074eec57c4 1366-1378
+  s_1d6dde65edab71::t_0a635f2f38618f 1160-1166
+  s_1d6dde65edab71::t_1832e31be9343d 728-813
+  s_1d6dde65edab71::t_bc6bbfc3233539 1648-1654,1659-1742
+  s_1d6dde65edab71::t_fb732d9d7b605f 1159
+tech-notes/sec/ciba.md
+  s_1d6dde65edab71::t_2b6b43947259ee 1-224
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1474d7f0c82e4496b8203d24fce2d8eea6c6fb0b",
+  "prompts": {},
+  "sessions": {
+    "s_1d6dde65edab71": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "08f65c19-75ce-411d-a740-e7fd28966275",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
