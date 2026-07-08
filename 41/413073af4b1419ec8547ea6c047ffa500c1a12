@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/inverted-index.md
+  s_ec63439194d0eb::t_6cccd84bb5336c 1-196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "41413073af4b1419ec8547ea6c047ffa500c1a12",
+  "prompts": {},
+  "sessions": {
+    "s_ec63439194d0eb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "acf94024-f64c-46a6-8bd3-85ec053d7720",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
