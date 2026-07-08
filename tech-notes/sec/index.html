@@ -725,6 +725,92 @@
       font-weight: 900;
     }
 
+    .md-reader-panel {
+      grid-column: 1 / -1;
+      margin-top: 16px;
+    }
+
+    .md-reader-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .md-reader-head h3 {
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+    }
+
+    .md-reader-head .modal-link {
+      margin-top: 0;
+    }
+
+    .md-content {
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .md-content .md-h1 { font-size: 22px; margin: 4px 0 12px; }
+    .md-content .md-h2 {
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 17px;
+      margin: 22px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    .md-content .md-h3 {
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 14px;
+      margin: 16px 0 8px;
+    }
+
+    .md-content p { margin: 0 0 12px; }
+
+    .md-content .md-ul {
+      margin: 0 0 12px;
+      padding-left: 20px;
+    }
+    .md-content .md-ul li { margin-bottom: 6px; }
+
+    .md-content code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    .md-content .md-pre {
+      width: 100%;
+      margin: 0 0 14px;
+      overflow: auto;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      background: #f5f6f1;
+      color: #263038;
+      padding: 14px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.22;
+      white-space: pre;
+    }
+
+    .md-content a {
+      color: var(--blue);
+      word-break: break-word;
+    }
+
+    .md-loading,
+    .md-error {
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
     .matrix {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1071,6 +1157,14 @@
         tags: ["MCP", "A2A", "CIBA", "Token vault", "Delegation"]
       },
       {
+        title: "CIBA in A2A Context",
+        file: "ciba.md",
+        category: "agent",
+        focus: "Async human approval for agents",
+        summary: "CIBA is a decoupled OAuth/OIDC flow with no browser redirect: the client runs on one device, the user approves on another. The note covers the backchannel request, auth_req_id, poll/ping/push delivery, the binding_message, and why this is the async human-in-the-loop approval primitive for autonomous and A2A agents.",
+        tags: ["CIBA", "A2A", "Async approval", "Decoupled auth", "Human-in-the-loop"]
+      },
+      {
         title: "Agent Identity Trends",
         file: "agent-identity-trends.md",
         category: "agent",
@@ -1268,6 +1362,19 @@ Approval ◄── sensitive action ──► API or MCP server`,
         flow: ["User authenticates to the agent app.", "Agent obtains scoped, audience-bound tokens for the tool or API.", "Sensitive actions pause for async human approval.", "Every tool call records agent, user, scope, resource, and decision."],
         watch: ["God-mode service accounts, token passthrough, prompt-stored secrets, unfiltered RAG, and multi-hop identity laundering.", "Spec churn requires explicit version tracking."],
         apply: ["Never give an agent more reach than the user.", "Use token exchange instead of forwarding incoming tokens.", "Use FGA before retrieval results reach the model.", "Put payments, deletes, sends, and trades behind CIBA-style approval."]
+      },
+      "ciba.md": {
+        core: "CIBA is a decoupled OAuth/OIDC flow: the client runs on one device and the user approves on another, with no browser redirect. The client posts a backchannel request, gets an auth_req_id, and waits while the authorization server pushes an approval to the user's phone. It is the async human-in-the-loop primitive for autonomous and A2A agents.",
+        diagram: `Agent ─POST /bc-authorize──► Auth Server
+  ▲   (login_hint, binding_message)  │
+  │                                  │ push "Approve?"
+  │ poll /token (auth_req_id)        ▼
+  │                            User's phone
+  └──── tokens (once approved) ──── approves`,
+        scheme: ["Consumption device and authentication device are deliberately separate.", "The client is confidential and identifies the user with a login_hint.", "Poll, ping, and push modes deliver the result differently.", "The binding_message ties approval to one concrete, human-readable action."],
+        flow: ["Client POSTs the backchannel request and receives an auth_req_id.", "Authorization server pushes an approval prompt to the user's device.", "Client polls the token endpoint, seeing authorization_pending until the user acts.", "On approval a scoped, action-bound token is issued to the client."],
+        watch: ["Generic binding_message trains blind approval.", "Push mode to weak client endpoints leaks tokens and is FAPI-forbidden.", "Over-broad scopes defeat least privilege.", "One approval authorizes one action, not a standing session."],
+        apply: ["Put payments, deletes, sends, and trades behind CIBA approval.", "Write a concrete binding_message naming the real action.", "Require acr_values MFA on high-risk operations.", "Scope the issued token to exactly the approved action."]
       },
       "agent-identity-trends.md": {
         core: "Identity is expanding from employees and customers into machines, workloads, and agents. The market is moving toward platforms that can govern non-human identities, delegated agent access, continuous signals, and protocol-level control points.",
@@ -1532,17 +1639,107 @@ Thousands of downstream builds and runtimes`,
         <section class="learn-panel">
           <h3>Practical Controls</h3>
           <ul class="learn-list">${listItems(detail.apply)}</ul>
-          <a class="modal-link" href="${topic.file}">Open markdown file</a>
         </section>
         <section class="learn-panel">
           <h3>Keywords</h3>
           <div class="tags">${topic.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
           <p>${escapeHtml(topic.summary)}</p>
         </section>
+        <section class="learn-panel md-reader-panel">
+          <div class="md-reader-head">
+            <h3>Full Note — ${escapeHtml(topic.file)}</h3>
+            <a class="modal-link" href="${topic.file}" target="_blank" rel="noopener">Open raw</a>
+          </div>
+          <div class="md-content" id="mdContent"></div>
+        </section>
       </div>`;
       topicModal.classList.add("open");
       document.body.style.overflow = "hidden";
       modalClose.focus();
+      loadNote(topic.file, document.getElementById("mdContent"));
+    }
+
+    function mdFormat(text) {
+      return text
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/(https?:\/\/[^\s<)]+)/g, "<a href=\"$1\" target=\"_blank\" rel=\"noopener\">$1</a>");
+    }
+
+    function mdInline(text) {
+      return text.split("`").map((part, index) =>
+        index % 2 === 1 ? `<code>${part}</code>` : mdFormat(part)
+      ).join("");
+    }
+
+    function renderMarkdown(md) {
+      const lines = md.replace(/\r\n/g, "\n").split("\n");
+      let html = "";
+      let listOpen = false;
+      let index = 0;
+      const closeList = () => {
+        if (listOpen) {
+          html += "</ul>";
+          listOpen = false;
+        }
+      };
+      while (index < lines.length) {
+        const line = lines[index];
+        if (line.startsWith("```")) {
+          closeList();
+          index++;
+          const code = [];
+          while (index < lines.length && !lines[index].startsWith("```")) {
+            code.push(escapeHtml(lines[index]));
+            index++;
+          }
+          index++;
+          html += `<pre class="md-pre">${code.join("\n")}</pre>`;
+          continue;
+        }
+        const heading = line.match(/^(#{1,6})\s+(.*)$/);
+        if (heading) {
+          closeList();
+          const level = heading[1].length;
+          html += `<h${level} class="md-h${level}">${mdInline(escapeHtml(heading[2]))}</h${level}>`;
+          index++;
+          continue;
+        }
+        if (/^\s*[-*]\s+/.test(line)) {
+          if (!listOpen) {
+            html += "<ul class=\"md-ul\">";
+            listOpen = true;
+          }
+          html += `<li>${mdInline(escapeHtml(line.replace(/^\s*[-*]\s+/, "")))}</li>`;
+          index++;
+          continue;
+        }
+        if (line.trim() === "") {
+          closeList();
+          index++;
+          continue;
+        }
+        closeList();
+        html += `<p>${mdInline(escapeHtml(line))}</p>`;
+        index++;
+      }
+      closeList();
+      return html;
+    }
+
+    async function loadNote(file, container) {
+      if (!container) {
+        return;
+      }
+      container.innerHTML = "<p class=\"md-loading\">Loading note…</p>";
+      try {
+        const response = await fetch(file);
+        if (!response.ok) {
+          throw new Error(String(response.status));
+        }
+        container.innerHTML = renderMarkdown(await response.text());
+      } catch (error) {
+        container.innerHTML = `<p class="md-error">Could not load <code>${escapeHtml(file)}</code> from the browser. Serve this page over HTTP (for example <code>python3 -m http.server</code>) to render it inline, or use "Open raw" above.</p>`;
+      }
     }
 
     function closeTopic() {
