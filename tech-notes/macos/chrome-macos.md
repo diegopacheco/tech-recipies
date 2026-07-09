@@ -19,6 +19,7 @@
 | Zoom In | Command + + |
 | Zoom Out | Command + - |
 | Reset Zoom | Command + 0 |
+| Open Read Mode | Command + Option + r |
 
 ## Render Page as Mobile App
 
