@@ -1,0 +1,14 @@
+tech-notes/macos/chrome-macos.md
+  h_8e2c3875396153 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ed4fc687d013fa83bbf42332324c02359366cefe",
+  "prompts": {},
+  "humans": {
+    "h_8e2c3875396153": {
+      "author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
