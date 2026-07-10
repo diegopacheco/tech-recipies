@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/webrtc.md
+  s_bef2cdf8f3a7c1::t_f08f3eb73a63d3 1-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "b750dc547ac3e805b43b8f6bcb601f5cad115872",
+  "prompts": {},
+  "sessions": {
+    "s_bef2cdf8f3a7c1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c533da6a-9907-40e4-b8d7-f98093b24f21",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
