@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/request-polling.md
+  s_7ea59ac13df345::t_ad5947f60e33d3 1-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "55058f63e629188e4dec4bf47cf0979f987cd94f",
+  "prompts": {},
+  "sessions": {
+    "s_7ea59ac13df345": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3c1e2605-745d-48cf-8548-6d9eb6eeb004",
+        "model": "unknown"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
