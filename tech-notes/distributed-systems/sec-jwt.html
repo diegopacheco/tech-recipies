@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An interactive sequence diagram explaining JWT authentication and verification.">
+  <title>JWT Authentication Sequence</title>
+  <style>
+    :root {
+      --paper: #f5f1e8;
+      --panel: #fffdf7;
+      --panel-raised: #f8f3e8;
+      --ink: #172328;
+      --muted: #5d6a6f;
+      --grid: rgba(23, 35, 40, .07);
+      --line: #aeb8b5;
+      --mint: #087b5b;
+      --amber: #a95f00;
+      --coral: #c9433b;
+      --blue: #176a9e;
+      --header: #c9433b;
+      --payload: #7548a5;
+      --signature: #176a9e;
+      --shadow: 0 24px 60px rgba(48, 55, 51, .13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 36px 36px,
+        radial-gradient(circle at 82% 8%, rgba(23, 106, 158, .1), transparent 28%),
+        radial-gradient(circle at 10% 42%, rgba(8, 123, 91, .08), transparent 25%),
+        var(--paper);
+      color: var(--ink);
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 28px clamp(16px, 3vw, 48px) 72px;
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 32px;
+      align-items: end;
+      padding: clamp(40px, 8vw, 100px) 0 42px;
+    }
+
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--mint);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .kicker::before {
+      width: 30px;
+      height: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: clamp(58px, 10vw, 148px);
+      font-weight: 900;
+      letter-spacing: -.025em;
+      line-height: .8;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      max-width: 750px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.55;
+    }
+
+    .intro strong {
+      color: var(--ink);
+    }
+
+    .status-card {
+      width: 230px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: rgba(255, 253, 247, .9);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .status-card span {
+      display: block;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .status-card strong {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 9px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 14px;
+    }
+
+    .status-card strong::before {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 18px var(--mint);
+      content: "";
+    }
+
+    .token-strip {
+      display: grid;
+      grid-template-columns: .72fr 1.28fr 1fr;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      margin-bottom: 24px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    .token-part {
+      min-width: 0;
+      padding: 17px 20px;
+      border-right: 1px solid var(--line);
+    }
+
+    .token-part:last-child {
+      border-right: 0;
+    }
+
+    .token-part span {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .token-part code {
+      display: block;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .token-part.header span {
+      color: var(--header);
+    }
+
+    .token-part.payload span {
+      color: var(--payload);
+    }
+
+    .token-part.signature span {
+      color: var(--signature);
+    }
+
+    .diagram-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: rgba(255, 253, 247, .96);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 62px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #e9efeb;
+    }
+
+    .toolbar-title {
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .replay {
+      border: 1px solid var(--mint);
+      border-radius: 2px;
+      background: transparent;
+      color: var(--mint);
+      cursor: pointer;
+      padding: 9px 13px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: background .18s ease, color .18s ease;
+    }
+
+    .replay:hover,
+    .replay:focus-visible {
+      background: var(--mint);
+      color: var(--paper);
+      outline: 0;
+    }
+
+    .diagram-scroll {
+      overflow-x: auto;
+      padding: 28px 20px 36px;
+    }
+
+    .sequence {
+      position: relative;
+      min-width: 930px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
+      grid-template-rows: auto repeat(9, minmax(68px, auto));
+      column-gap: 38px;
+    }
+
+    .actor {
+      position: relative;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      min-height: 82px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--actor-color);
+      background: var(--panel-raised);
+      padding: 12px;
+      text-align: center;
+    }
+
+    .actor b {
+      display: block;
+      font-size: 15px;
+      letter-spacing: .02em;
+    }
+
+    .actor span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .actor.client {
+      --actor-color: var(--amber);
+      grid-column: 1;
+    }
+
+    .actor.auth {
+      --actor-color: var(--coral);
+      grid-column: 2;
+    }
+
+    .actor.keys {
+      --actor-color: var(--payload);
+      grid-column: 3;
+    }
+
+    .actor.api {
+      --actor-color: var(--blue);
+      grid-column: 4;
+    }
+
+    .lifeline {
+      z-index: 0;
+      width: 1px;
+      margin: 0 auto;
+      border-left: 1px dashed var(--line);
+      grid-row: 2 / -1;
+    }
+
+    .lifeline.one {
+      grid-column: 1;
+    }
+
+    .lifeline.two {
+      grid-column: 2;
+    }
+
+    .lifeline.three {
+      grid-column: 3;
+    }
+
+    .lifeline.four {
+      grid-column: 4;
+    }
+
+    .phase {
+      z-index: 1;
+      align-self: start;
+      width: fit-content;
+      margin-top: 17px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      background: var(--paper);
+      color: var(--muted);
+      padding: 5px 10px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      grid-column: 1 / -1;
+    }
+
+    .exchange {
+      --step-color: var(--mint);
+      position: relative;
+      z-index: 2;
+      align-self: center;
+      min-height: 46px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      padding: 0 22px;
+      text-align: center;
+      opacity: .38;
+      transform: translateY(8px);
+      transition: opacity .32s ease, transform .32s ease;
+    }
+
+    .exchange.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .exchange::before {
+      position: absolute;
+      top: 27px;
+      right: 10px;
+      left: 10px;
+      height: 2px;
+      background: var(--step-color);
+      content: "";
+    }
+
+    .exchange.forward::after {
+      position: absolute;
+      top: 22px;
+      right: 7px;
+      border-width: 6px 0 6px 9px;
+      border-style: solid;
+      border-color: transparent transparent transparent var(--step-color);
+      content: "";
+    }
+
+    .exchange.return::after {
+      position: absolute;
+      top: 22px;
+      left: 7px;
+      border-width: 6px 9px 6px 0;
+      border-style: solid;
+      border-color: transparent var(--step-color) transparent transparent;
+      content: "";
+    }
+
+    .exchange .message {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--panel);
+      padding: 0 8px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .exchange .number {
+      display: inline-grid;
+      place-items: center;
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      background: var(--step-color);
+      color: var(--paper);
+      font-size: 10px;
+    }
+
+    .exchange:hover .message,
+    .exchange:focus-visible .message,
+    .exchange.active .message {
+      color: var(--step-color);
+    }
+
+    .exchange:focus-visible {
+      outline: 1px solid var(--step-color);
+      outline-offset: 5px;
+    }
+
+    .exchange.auth-flow {
+      --step-color: var(--amber);
+    }
+
+    .exchange.token-flow {
+      --step-color: var(--mint);
+    }
+
+    .exchange.validation-flow {
+      --step-color: var(--blue);
+    }
+
+    .phase.login {
+      grid-row: 2;
+    }
+
+    .credentials {
+      grid-column: 1 / 3;
+      grid-row: 3;
+    }
+
+    .key-read {
+      grid-column: 2 / 4;
+      grid-row: 4;
+    }
+
+    .signed-token {
+      grid-column: 1 / 3;
+      grid-row: 5;
+    }
+
+    .phase.access {
+      grid-row: 6;
+    }
+
+    .bearer {
+      grid-column: 1 / 5;
+      grid-row: 7;
+    }
+
+    .public-key {
+      grid-column: 3 / 5;
+      grid-row: 8;
+    }
+
+    .decision {
+      z-index: 2;
+      align-self: center;
+      border: 1px solid var(--blue);
+      background: var(--panel);
+      color: var(--ink);
+      padding: 11px 14px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.55;
+      grid-column: 4;
+      grid-row: 9;
+    }
+
+    .decision b {
+      color: var(--blue);
+    }
+
+    .success {
+      grid-column: 1 / 5;
+      grid-row: 10;
+    }
+
+    .detail-panel {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      min-height: 112px;
+      border-top: 1px solid var(--line);
+      background: #edf1eb;
+      padding: 20px 24px;
+    }
+
+    .detail-number {
+      color: var(--mint);
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 56px;
+      line-height: 1;
+    }
+
+    .detail-copy h2 {
+      margin: 0 0 5px;
+      font-size: 17px;
+    }
+
+    .detail-copy p {
+      max-width: 780px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .detail-tag {
+      border: 1px solid var(--line);
+      color: var(--muted);
+      padding: 7px 9px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .notes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: 24px;
+      border: 1px solid var(--line);
+      background: var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .note {
+      min-height: 180px;
+      background: var(--panel);
+      padding: 25px;
+    }
+
+    .note-label {
+      display: block;
+      margin-bottom: 25px;
+      color: var(--mint);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .note h2 {
+      margin: 0 0 10px;
+      font-size: 19px;
+    }
+
+    .note p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .note strong {
+      color: var(--ink);
+    }
+
+    @media (max-width: 800px) {
+      .masthead {
+        grid-template-columns: 1fr;
+      }
+
+      .status-card {
+        width: 100%;
+      }
+
+      .token-strip,
+      .notes {
+        grid-template-columns: 1fr;
+      }
+
+      .token-part {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .token-part:last-child {
+        border-bottom: 0;
+      }
+
+      .detail-panel {
+        grid-template-columns: 55px 1fr;
+      }
+
+      .detail-tag {
+        display: none;
+      }
+
+      .note {
+        min-height: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="kicker">Security sequence 01</p>
+        <h1>How JWT works</h1>
+        <p class="intro">A JSON Web Token is a <strong>signed credential</strong>. The client obtains it once, sends it with later requests, and the API verifies it without asking the authentication server about every request.</p>
+      </div>
+      <aside class="status-card" aria-label="Token model status">
+        <span>Trust model</span>
+        <strong>Stateless verification</strong>
+      </aside>
+    </header>
+
+    <section class="token-strip" aria-label="The three parts of a JSON Web Token">
+      <div class="token-part header">
+        <span>Header</span>
+        <code>{ "alg": "RS256", "typ": "JWT" }</code>
+      </div>
+      <div class="token-part payload">
+        <span>Payload</span>
+        <code>{ "sub": "42", "role": "admin", "exp": 1783200000 }</code>
+      </div>
+      <div class="token-part signature">
+        <span>Signature</span>
+        <code>Sign(base64url(header) + "." + base64url(payload), privateKey)</code>
+      </div>
+    </section>
+
+    <section class="diagram-card" aria-labelledby="sequence-title">
+      <div class="toolbar">
+        <span class="toolbar-title" id="sequence-title">Authentication and access sequence</span>
+        <button class="replay" id="replay" type="button">Replay sequence</button>
+      </div>
+
+      <div class="diagram-scroll">
+        <div class="sequence" aria-label="JWT sequence diagram">
+          <div class="actor client"><div><b>Client</b><span>Browser or app</span></div></div>
+          <div class="actor auth"><div><b>Auth server</b><span>Identity issuer</span></div></div>
+          <div class="actor keys"><div><b>Key store</b><span>Signing keys</span></div></div>
+          <div class="actor api"><div><b>Protected API</b><span>Resource server</span></div></div>
+
+          <div class="lifeline one" aria-hidden="true"></div>
+          <div class="lifeline two" aria-hidden="true"></div>
+          <div class="lifeline three" aria-hidden="true"></div>
+          <div class="lifeline four" aria-hidden="true"></div>
+
+          <div class="phase login">Phase A · issue a token</div>
+
+          <button class="exchange forward auth-flow credentials" type="button" data-step="1" data-title="The client proves identity" data-copy="The client sends credentials over TLS. This may be a password, passkey, authorization code, or another accepted proof." data-tag="Authentication">
+            <span class="message"><span class="number">1</span>POST /login + credentials</span>
+          </button>
+
+          <button class="exchange forward auth-flow key-read" type="button" data-step="2" data-title="The issuer signs claims" data-copy="After validating the identity, the authentication server creates claims and signs the encoded header and payload with its private key." data-tag="Issuance">
+            <span class="message"><span class="number">2</span>Read private signing key</span>
+          </button>
+
+          <button class="exchange return token-flow signed-token" type="button" data-step="3" data-title="The client receives the JWT" data-copy="The compact token returns as header.payload.signature. Its contents are readable, but changing them breaks the signature." data-tag="Token response">
+            <span class="message"><span class="number">3</span>200 OK + signed JWT</span>
+          </button>
+
+          <div class="phase access">Phase B · access a protected resource</div>
+
+          <button class="exchange forward token-flow bearer" type="button" data-step="4" data-title="The token travels with the request" data-copy="The client sends the JWT in the Authorization header using the Bearer scheme. TLS protects the token while it travels over the network." data-tag="Authorization">
+            <span class="message"><span class="number">4</span>GET /orders · Authorization: Bearer &lt;JWT&gt;</span>
+          </button>
+
+          <button class="exchange return validation-flow public-key" type="button" data-step="5" data-title="The API obtains a verification key" data-copy="With asymmetric signing, the API uses the issuer's public key. It can cache published keys and select the right one using the token header's key ID." data-tag="Key lookup">
+            <span class="message"><span class="number">5</span>Resolve public key by kid</span>
+          </button>
+
+          <div class="decision" tabindex="0"><b>6 · VERIFY LOCALLY</b><br>signature · issuer · audience<br>expiry · not-before · permissions</div>
+
+          <button class="exchange return validation-flow success" type="button" data-step="7" data-title="The API accepts or rejects the request" data-copy="A valid signature and valid claims allow the request to continue. A failed check returns 401 Unauthorized or 403 Forbidden, depending on the failure." data-tag="Decision">
+            <span class="message"><span class="number">7</span>200 OK + resource · or · 401 / 403</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="detail-panel" aria-live="polite">
+        <div class="detail-number" id="detail-number">01</div>
+        <div class="detail-copy">
+          <h2 id="detail-title">The client proves identity</h2>
+          <p id="detail-copy">The client sends credentials over TLS. This may be a password, passkey, authorization code, or another accepted proof.</p>
+        </div>
+        <span class="detail-tag" id="detail-tag">Authentication</span>
+      </div>
+    </section>
+
+    <section class="notes" aria-label="JWT security notes">
+      <article class="note">
+        <span class="note-label">Rule 01</span>
+        <h2>Signed is not encrypted</h2>
+        <p>Anyone holding a JWT can decode its header and payload. <strong>Never put secrets or sensitive personal data in its claims.</strong></p>
+      </article>
+      <article class="note">
+        <span class="note-label">Rule 02</span>
+        <h2>Claims still need checks</h2>
+        <p>A correct signature is only one gate. The API must also validate <strong>issuer, audience, expiration, and required permissions.</strong></p>
+      </article>
+      <article class="note">
+        <span class="note-label">Rule 03</span>
+        <h2>Keep access short-lived</h2>
+        <p>Short expiration limits exposure after theft. Use a controlled refresh flow when sessions need to last longer than an access token.</p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const exchanges = [...document.querySelectorAll(".exchange")]
+    const detailNumber = document.getElementById("detail-number")
+    const detailTitle = document.getElementById("detail-title")
+    const detailCopy = document.getElementById("detail-copy")
+    const detailTag = document.getElementById("detail-tag")
+    const replay = document.getElementById("replay")
+
+    const selectExchange = exchange => {
+      exchanges.forEach(item => item.classList.toggle("active", item === exchange))
+      detailNumber.textContent = exchange.dataset.step.padStart(2, "0")
+      detailTitle.textContent = exchange.dataset.title
+      detailCopy.textContent = exchange.dataset.copy
+      detailTag.textContent = exchange.dataset.tag
+    }
+
+    const play = () => {
+      exchanges.forEach(item => item.classList.remove("visible", "active"))
+      exchanges.forEach((exchange, index) => {
+        window.setTimeout(() => {
+          exchange.classList.add("visible")
+          if (index === exchanges.length - 1) {
+            selectExchange(exchanges[0])
+          }
+        }, index * 180)
+      })
+    }
+
+    exchanges.forEach(exchange => exchange.addEventListener("click", () => selectExchange(exchange)))
+    replay.addEventListener("click", play)
+    play()
+  </script>
+</body>
+</html>
