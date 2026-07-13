@@ -1,0 +1,29 @@
+tech-notes/distributed-systems/sec-jwt.html
+  s_01bf6fc75f2c9c::t_d1aa8f9dff0a42 717-718,720-737,739
+  s_01bf6fc75f2c9c::t_ad58889edd8861 444,494-497,554-576,802-813,843-846
+  s_01bf6fc75f2c9c::t_da95d301f3433a 93
+  s_01bf6fc75f2c9c::t_353e20e466a81c 779-780,793-794
+  s_01bf6fc75f2c9c::t_6364072a335558 297-298,343,436-443,508,522,527,541,550
+  s_01bf6fc75f2c9c::t_acaf27018adbf0 59-62,64-65,112-114,121-134,137,142-161,163-168,171-181,183,663,667-668
+  s_01bf6fc75f2c9c::t_3fb8e8ae036f0a 783-784
+  s_01bf6fc75f2c9c::t_44f70af039540e 445
+  s_01bf6fc75f2c9c::t_e3d1e9ee430fd1 577
+  s_01bf6fc75f2c9c::t_0daf309aaa15df 847
+  s_01bf6fc75f2c9c::t_7a74212d733ba9 621,759
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "7e20ce7c13663dceed9cd87b2965de4b1f2c42ff",
+  "prompts": {},
+  "sessions": {
+    "s_01bf6fc75f2c9c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5d60-09eb-7b53-a034-b30c33866c79",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
