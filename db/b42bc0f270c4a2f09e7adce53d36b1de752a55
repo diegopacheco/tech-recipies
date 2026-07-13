@@ -1,0 +1,21 @@
+tech-notes/distributed-systems/sec-jwt.html
+  s_01bf6fc75f2c9c::t_7129ef832f14d5 10-24,40-42,113,201,213,242,340,424,514
+  s_01bf6fc75f2c9c::t_ad58889edd8861 256,550,649,674
+  s_01bf6fc75f2c9c::t_f680d5b5bce21a 1-9,25-39,43-112,114-200,202-212,214-241,243-255,257-339,341-423,425-513,515-549,551-648,650-673,675-784
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "dbb42bc0f270c4a2f09e7adce53d36b1de752a55",
+  "prompts": {},
+  "sessions": {
+    "s_01bf6fc75f2c9c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5d60-09eb-7b53-a034-b30c33866c79",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
