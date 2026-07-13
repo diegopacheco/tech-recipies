@@ -56,11 +56,14 @@
     }
 
     .masthead {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 32px;
-      align-items: end;
       padding: clamp(40px, 8vw, 100px) 0 42px;
+    }
+
+    .title-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(420px, .65fr);
+      gap: clamp(24px, 4vw, 58px);
+      align-items: end;
     }
 
     .kicker {
@@ -87,7 +90,7 @@
       max-width: 900px;
       margin: 0;
       font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-      font-size: clamp(58px, 10vw, 148px);
+      font-size: clamp(58px, 8.5vw, 132px);
       font-weight: 900;
       letter-spacing: -.025em;
       line-height: .8;
@@ -106,39 +109,78 @@
       color: var(--ink);
     }
 
-    .status-card {
-      width: 230px;
+    .tradeoff-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       border: 1px solid var(--line);
       border-radius: 3px;
       background: rgba(255, 253, 247, .9);
       box-shadow: var(--shadow);
-      padding: 18px;
     }
 
-    .status-card span {
-      display: block;
-      color: var(--muted);
+    .tradeoff-group {
+      padding: 17px 18px 16px;
+    }
+
+    .tradeoff-group + .tradeoff-group {
+      border-left: 1px solid var(--line);
+    }
+
+    .tradeoff-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 13px;
       font-family: "SFMono-Regular", Consolas, monospace;
       font-size: 11px;
+      font-weight: 900;
       letter-spacing: .1em;
       text-transform: uppercase;
     }
 
-    .status-card strong {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      margin-top: 9px;
-      font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: 14px;
+    .tradeoff-group.pros .tradeoff-heading {
+      color: var(--mint);
     }
 
-    .status-card strong::before {
-      width: 9px;
-      height: 9px;
+    .tradeoff-group.cons .tradeoff-heading {
+      color: var(--coral);
+    }
+
+    .tradeoff-count {
+      display: inline-grid;
+      place-items: center;
+      width: 23px;
+      height: 23px;
+      border: 1px solid currentColor;
       border-radius: 50%;
-      background: var(--mint);
-      box-shadow: 0 0 18px var(--mint);
+      font-size: 10px;
+    }
+
+    .tradeoff-list {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      list-style: none;
+    }
+
+    .tradeoff-list li {
+      position: relative;
+      padding-left: 12px;
+    }
+
+    .tradeoff-list li::before {
+      position: absolute;
+      top: .55em;
+      left: 0;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
       content: "";
     }
 
@@ -252,8 +294,8 @@
       position: relative;
       min-width: 930px;
       display: grid;
-      grid-template-columns: repeat(4, minmax(170px, 1fr));
-      grid-template-rows: auto repeat(9, minmax(68px, auto));
+      grid-template-columns: repeat(3, minmax(210px, 1fr));
+      grid-template-rows: auto repeat(13, minmax(68px, auto));
       column-gap: 38px;
     }
 
@@ -296,14 +338,9 @@
       grid-column: 2;
     }
 
-    .actor.keys {
-      --actor-color: var(--payload);
-      grid-column: 3;
-    }
-
     .actor.api {
       --actor-color: var(--blue);
-      grid-column: 4;
+      grid-column: 3;
     }
 
     .lifeline {
@@ -324,10 +361,6 @@
 
     .lifeline.three {
       grid-column: 3;
-    }
-
-    .lifeline.four {
-      grid-column: 4;
     }
 
     .phase {
@@ -400,6 +433,16 @@
       content: "";
     }
 
+    .exchange.self::before,
+    .exchange.self::after {
+      display: none;
+    }
+
+    .exchange.self .message {
+      border: 1px solid var(--step-color);
+      padding: 9px 12px;
+    }
+
     .exchange .message {
       position: relative;
       z-index: 1;
@@ -448,6 +491,10 @@
       --step-color: var(--blue);
     }
 
+    .exchange.refresh-flow {
+      --step-color: var(--coral);
+    }
+
     .phase.login {
       grid-row: 2;
     }
@@ -458,7 +505,7 @@
     }
 
     .key-read {
-      grid-column: 2 / 4;
+      grid-column: 2;
       grid-row: 4;
     }
 
@@ -472,12 +519,12 @@
     }
 
     .bearer {
-      grid-column: 1 / 5;
+      grid-column: 1 / 4;
       grid-row: 7;
     }
 
     .public-key {
-      grid-column: 3 / 5;
+      grid-column: 2 / 4;
       grid-row: 8;
     }
 
@@ -491,7 +538,7 @@
       font-family: "SFMono-Regular", Consolas, monospace;
       font-size: 11px;
       line-height: 1.55;
-      grid-column: 4;
+      grid-column: 3;
       grid-row: 9;
     }
 
@@ -500,8 +547,32 @@
     }
 
     .success {
-      grid-column: 1 / 5;
+      grid-column: 1 / 4;
       grid-row: 10;
+    }
+
+    .phase.refresh {
+      grid-row: 11;
+    }
+
+    .refresh-request {
+      grid-column: 1 / 3;
+      grid-row: 12;
+    }
+
+    .refresh-decision {
+      border-color: var(--coral);
+      grid-column: 2;
+      grid-row: 13;
+    }
+
+    .refresh-decision b {
+      color: var(--coral);
+    }
+
+    .refreshed-token {
+      grid-column: 1 / 3;
+      grid-row: 14;
     }
 
     .detail-panel {
@@ -547,7 +618,7 @@
 
     .notes {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1px;
       margin-top: 24px;
       border: 1px solid var(--line);
@@ -589,12 +660,12 @@
     }
 
     @media (max-width: 800px) {
-      .masthead {
+      .title-row {
         grid-template-columns: 1fr;
       }
 
-      .status-card {
-        width: 100%;
+      .tradeoff-card {
+        max-width: 560px;
       }
 
       .token-strip,
@@ -643,15 +714,29 @@
 <body>
   <main class="shell">
     <header class="masthead">
-      <div>
-        <p class="kicker">Security sequence 01</p>
+      <p class="kicker">Security sequence 01</p>
+      <div class="title-row">
         <h1>How JWT works</h1>
-        <p class="intro">A JSON Web Token is a <strong>signed credential</strong>. The client obtains it once, sends it with later requests, and the API verifies it without asking the authentication server about every request.</p>
+        <aside class="tradeoff-card" aria-label="Three advantages and three tradeoffs of JWT">
+          <section class="tradeoff-group pros">
+            <h2 class="tradeoff-heading">Pros <span class="tradeoff-count">3</span></h2>
+            <ul class="tradeoff-list">
+              <li>Reduces backend calls</li>
+              <li>Scales across services</li>
+              <li>Carries portable claims</li>
+            </ul>
+          </section>
+          <section class="tradeoff-group cons">
+            <h2 class="tradeoff-heading">Cons <span class="tradeoff-count">3</span></h2>
+            <ul class="tradeoff-list">
+              <li>Revocation is harder</li>
+              <li>Theft lasts until expiry</li>
+              <li>Payload remains readable</li>
+            </ul>
+          </section>
+        </aside>
       </div>
-      <aside class="status-card" aria-label="Token model status">
-        <span>Trust model</span>
-        <strong>Stateless verification</strong>
-      </aside>
+      <p class="intro">A JSON Web Token is a <strong>signed credential</strong>. The client obtains it after authentication, sends it with later requests, and the API verifies it without asking the authentication server about every request.</p>
     </header>
 
     <section class="token-strip" aria-label="The three parts of a JSON Web Token">
@@ -671,7 +756,7 @@
 
     <section class="diagram-card" aria-labelledby="sequence-title">
       <div class="toolbar">
-        <span class="toolbar-title" id="sequence-title">Authentication and access sequence</span>
+        <span class="toolbar-title" id="sequence-title">Authentication, access, and refresh sequence</span>
         <button class="replay" id="replay" type="button">Replay sequence</button>
       </div>
 
@@ -679,13 +764,11 @@
         <div class="sequence" aria-label="JWT sequence diagram">
           <div class="actor client"><div><b>Client</b><span>Browser or app</span></div></div>
           <div class="actor auth"><div><b>Auth server</b><span>Identity issuer</span></div></div>
-          <div class="actor keys"><div><b>Key store</b><span>Signing keys</span></div></div>
           <div class="actor api"><div><b>Protected API</b><span>Resource server</span></div></div>
 
           <div class="lifeline one" aria-hidden="true"></div>
           <div class="lifeline two" aria-hidden="true"></div>
           <div class="lifeline three" aria-hidden="true"></div>
-          <div class="lifeline four" aria-hidden="true"></div>
 
           <div class="phase login">Phase A · issue a token</div>
 
@@ -693,12 +776,12 @@
             <span class="message"><span class="number">1</span>POST /login + credentials</span>
           </button>
 
-          <button class="exchange forward auth-flow key-read" type="button" data-step="2" data-title="The issuer signs claims" data-copy="After validating the identity, the authentication server creates claims and signs the encoded header and payload with its private key." data-tag="Issuance">
-            <span class="message"><span class="number">2</span>Read private signing key</span>
+          <button class="exchange self auth-flow key-read" type="button" data-step="2" data-title="The issuer signs claims" data-copy="After validating the identity, the authentication server creates claims and signs the encoded header and payload with its private key." data-tag="Issuance">
+            <span class="message"><span class="number">2</span>Create claims + sign JWT</span>
           </button>
 
-          <button class="exchange return token-flow signed-token" type="button" data-step="3" data-title="The client receives the JWT" data-copy="The compact token returns as header.payload.signature. Its contents are readable, but changing them breaks the signature." data-tag="Token response">
-            <span class="message"><span class="number">3</span>200 OK + signed JWT</span>
+          <button class="exchange return token-flow signed-token" type="button" data-step="3" data-title="The client receives access and refresh tokens" data-copy="The access JWT returns as header.payload.signature alongside a longer-lived refresh token. The JWT contents are readable, but changing them breaks the signature." data-tag="Token response">
+            <span class="message"><span class="number">3</span>200 OK + access JWT + refresh token</span>
           </button>
 
           <div class="phase access">Phase B · access a protected resource</div>
@@ -707,14 +790,26 @@
             <span class="message"><span class="number">4</span>GET /orders · Authorization: Bearer &lt;JWT&gt;</span>
           </button>
 
-          <button class="exchange return validation-flow public-key" type="button" data-step="5" data-title="The API obtains a verification key" data-copy="With asymmetric signing, the API uses the issuer's public key. It can cache published keys and select the right one using the token header's key ID." data-tag="Key lookup">
-            <span class="message"><span class="number">5</span>Resolve public key by kid</span>
+          <button class="exchange return validation-flow public-key" type="button" data-step="5" data-title="The API obtains a verification key" data-copy="With asymmetric signing, the API fetches the issuer's public key from the authentication server, caches it, and selects the right one using the token header's key ID." data-tag="Key lookup">
+            <span class="message"><span class="number">5</span>Fetch or use cached public key by kid</span>
           </button>
 
           <div class="decision" tabindex="0"><b>6 · VERIFY LOCALLY</b><br>signature · issuer · audience<br>expiry · not-before · permissions</div>
 
           <button class="exchange return validation-flow success" type="button" data-step="7" data-title="The API accepts or rejects the request" data-copy="A valid signature and valid claims allow the request to continue. A failed check returns 401 Unauthorized or 403 Forbidden, depending on the failure." data-tag="Decision">
             <span class="message"><span class="number">7</span>200 OK + resource · or · 401 / 403</span>
+          </button>
+
+          <div class="phase refresh">Phase C · refresh an expired access token</div>
+
+          <button class="exchange forward refresh-flow refresh-request" type="button" data-step="8" data-title="The client requests a new access token" data-copy="When the access token expires, the client sends its refresh token only to the authentication server over TLS. The refresh token is never sent to the protected API." data-tag="Refresh request">
+            <span class="message"><span class="number">8</span>POST /token + refresh_token</span>
+          </button>
+
+          <div class="decision refresh-decision" tabindex="0"><b>9 · VALIDATE + ROTATE</b><br>active · unexpired · client match<br>revoke old refresh token</div>
+
+          <button class="exchange return refresh-flow refreshed-token" type="button" data-step="10" data-title="The server issues replacement tokens" data-copy="After validation, the authentication server returns a new short-lived access token and usually rotates the refresh token. Reuse of the old refresh token can then signal theft." data-tag="Token rotation">
+            <span class="message"><span class="number">10</span>200 OK + new access and refresh tokens</span>
           </button>
         </div>
       </div>
@@ -744,6 +839,11 @@
         <span class="note-label">Rule 03</span>
         <h2>Keep access short-lived</h2>
         <p>Short expiration limits exposure after theft. Use a controlled refresh flow when sessions need to last longer than an access token.</p>
+      </article>
+      <article class="note">
+        <span class="note-label">Rule 04</span>
+        <h2>Protect refresh tokens</h2>
+        <p>Send them only to the authentication server. <strong>Rotate them after use and revoke the token family when reuse is detected.</strong></p>
       </article>
     </section>
   </main>
