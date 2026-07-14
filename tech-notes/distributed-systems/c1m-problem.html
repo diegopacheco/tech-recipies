@@ -6,15 +6,15 @@
     <title>C1M Problem</title>
     <style>
         :root {
-            --night: #101719;
-            --panel: #182225;
-            --panel-high: #202e31;
-            --text: #edf3ed;
-            --muted: #a8b7b2;
-            --line: #3a4a4c;
-            --cyan: #67d9cf;
-            --lime: #d0e769;
-            --orange: #f09a55;
+            --paper: #f4f1e8;
+            --panel: #fffdf8;
+            --panel-high: #e3ece6;
+            --text: #17211d;
+            --muted: #59675f;
+            --line: #b9c7bf;
+            --teal: #087f75;
+            --olive: #687b16;
+            --orange: #b8531b;
         }
 
         * {
@@ -28,7 +28,7 @@
         body {
             margin: 0;
             color: var(--text);
-            background: var(--night);
+            background: var(--paper);
             font-family: "Palatino Linotype", Palatino, Georgia, serif;
             line-height: 1.65;
         }
@@ -38,11 +38,13 @@
             inset: 0;
             z-index: -1;
             content: "";
-            background: radial-gradient(circle at 80% 5%, rgba(103, 217, 207, .14), transparent 31rem), radial-gradient(circle at 5% 70%, rgba(208, 231, 105, .07), transparent 35rem);
+            opacity: .48;
+            background-image: linear-gradient(rgba(23, 33, 29, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(23, 33, 29, .07) 1px, transparent 1px), radial-gradient(circle at 80% 5%, rgba(8, 127, 117, .18), transparent 31rem), radial-gradient(circle at 5% 70%, rgba(104, 123, 22, .1), transparent 35rem);
+            background-size: 36px 36px, 36px 36px, auto, auto;
         }
 
         a {
-            color: var(--cyan);
+            color: var(--teal);
             text-underline-offset: 4px;
         }
 
@@ -66,14 +68,14 @@
 
         .topbar a {
             padding: 8px 12px;
-            border: 1px solid var(--cyan);
+            border: 1px solid var(--teal);
             text-decoration: none;
             transition: background .2s ease, color .2s ease;
         }
 
         .topbar a:hover {
-            color: var(--night);
-            background: var(--cyan);
+            color: var(--panel);
+            background: var(--teal);
         }
 
         header {
@@ -94,15 +96,15 @@
             width: 340px;
             height: 340px;
             content: "";
-            opacity: .32;
-            border: 1px solid var(--cyan);
+            opacity: .48;
+            border: 1px solid var(--teal);
             border-radius: 50%;
-            box-shadow: 0 0 0 45px var(--night), 0 0 0 46px var(--line), 0 0 0 90px var(--night), 0 0 0 91px var(--line);
+            box-shadow: 0 0 0 45px var(--paper), 0 0 0 46px var(--line), 0 0 0 90px var(--paper), 0 0 0 91px var(--line);
         }
 
         .eyebrow {
             margin: 0 0 14px;
-            color: var(--lime);
+            color: var(--olive);
             font-family: "Courier New", monospace;
             font-size: .82rem;
             font-weight: 700;
@@ -145,12 +147,12 @@
 
         .counter div {
             padding: 20px;
-            background: rgba(24, 34, 37, .96);
+            background: rgba(255, 253, 248, .96);
         }
 
         .counter strong {
             display: block;
-            color: var(--cyan);
+            color: var(--teal);
             font-size: 1.5rem;
             line-height: 1.2;
         }
@@ -179,7 +181,7 @@
 
         h3 {
             margin-bottom: 10px;
-            color: var(--cyan);
+            color: var(--teal);
             font-family: "Courier New", monospace;
             font-size: 1rem;
             text-transform: uppercase;
@@ -207,7 +209,7 @@
 
         .scale-strip strong {
             display: block;
-            color: var(--lime);
+            color: var(--olive);
             font-family: "Courier New", monospace;
             font-size: 1.25rem;
         }
@@ -222,7 +224,7 @@
             padding: 26px;
             border: 1px solid var(--line);
             background: var(--panel);
-            box-shadow: 16px 16px 0 rgba(103, 217, 207, .1);
+            box-shadow: 16px 16px 0 rgba(8, 127, 117, .13);
         }
 
         .diagram-shell svg {
@@ -234,7 +236,7 @@
 
         .diagram-shell .actor {
             fill: var(--panel-high);
-            stroke: var(--cyan);
+            stroke: var(--teal);
         }
 
         .diagram-shell .actor-label {
@@ -246,17 +248,17 @@
         }
 
         .diagram-shell .lifeline {
-            stroke: #4b5b5d;
+            stroke: #87958d;
             stroke-dasharray: 6 7;
         }
 
         .diagram-shell .message {
-            stroke: var(--cyan);
+            stroke: var(--teal);
             stroke-width: 2;
         }
 
         .diagram-shell .response {
-            stroke: var(--lime);
+            stroke: var(--olive);
             stroke-width: 2;
         }
 
@@ -302,6 +304,16 @@
             font-size: .87rem;
         }
 
+        .table-shell {
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            background: var(--panel);
+        }
+
+        .table-shell table {
+            min-width: 980px;
+        }
+
         th,
         td {
             padding: 16px;
@@ -311,7 +323,7 @@
         }
 
         th {
-            color: var(--lime);
+            color: var(--olive);
             background: var(--panel-high);
         }
 
@@ -324,10 +336,97 @@
             color: var(--text);
         }
 
+        .mode {
+            display: inline-block;
+            padding: 3px 7px;
+            border: 1px solid currentColor;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .mode.non-blocking {
+            color: var(--teal);
+        }
+
+        .mode.blocking {
+            color: var(--orange);
+        }
+
+        .mode.mixed {
+            color: var(--olive);
+        }
+
+        .mode.unavailable {
+            color: var(--muted);
+        }
+
+        .baseline {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            margin: 32px 0;
+            border: 1px solid var(--line);
+            background: var(--line);
+        }
+
+        .baseline div {
+            padding: 22px;
+            background: var(--panel);
+        }
+
+        .baseline strong {
+            display: block;
+            color: var(--teal);
+            font-family: "Courier New", monospace;
+            font-size: 1.1rem;
+        }
+
+        .baseline span {
+            color: var(--muted);
+            font-size: .84rem;
+        }
+
+        .capacity-notes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-top: 30px;
+        }
+
+        .capacity-note {
+            padding: 24px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+        }
+
+        .capacity-note p,
+        .capacity-note ul {
+            margin-bottom: 0;
+            color: var(--muted);
+        }
+
+        .sources {
+            margin-top: 32px;
+            padding: 22px 26px;
+            border-left: 4px solid var(--teal);
+            background: var(--panel);
+        }
+
+        .sources p {
+            margin-bottom: 8px;
+        }
+
+        .sources p:last-child {
+            margin-bottom: 0;
+        }
+
         .formula {
             margin-top: 32px;
             padding: 26px;
-            border-left: 4px solid var(--lime);
+            border-left: 4px solid var(--olive);
             color: var(--text);
             background: var(--panel);
             font-family: "Courier New", monospace;
@@ -375,13 +474,13 @@
             gap: 34px;
             align-items: center;
             padding: 38px;
-            border: 1px solid var(--cyan);
-            background: linear-gradient(120deg, rgba(103, 217, 207, .1), transparent 70%);
+            border: 1px solid var(--teal);
+            background: linear-gradient(120deg, rgba(8, 127, 117, .12), rgba(255, 253, 248, .82) 70%);
         }
 
         .back a {
             padding: 15px 20px;
-            border: 1px solid var(--cyan);
+            border: 1px solid var(--teal);
             font-family: "Courier New", monospace;
             text-decoration: none;
             white-space: nowrap;
@@ -418,7 +517,9 @@
             }
 
             .scale-strip,
-            .principles {
+            .principles,
+            .baseline,
+            .capacity-notes {
                 grid-template-columns: 1fr 1fr;
             }
 
@@ -433,7 +534,9 @@
 
         @media (max-width: 520px) {
             .scale-strip,
-            .principles {
+            .principles,
+            .baseline,
+            .capacity-notes {
                 grid-template-columns: 1fr;
             }
 
@@ -503,8 +606,8 @@
                         <title id="diagram-title">C1M sharded connection sequence</title>
                         <desc id="diagram-desc">A client connection receives stable load-balancer routing. The kernel assigns it to a core event loop, compact state stays in one shard, backend concurrency remains bounded, and writes are batched.</desc>
                         <defs>
-                            <marker id="cyan-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#67d9cf"/></marker>
-                            <marker id="lime-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#d0e769"/></marker>
+                            <marker id="cyan-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#087f75"/></marker>
+                            <marker id="lime-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#687b16"/></marker>
                         </defs>
                         <rect class="actor" x="20" y="20" width="180" height="48" rx="3"/><text class="actor-label" x="110" y="50">CLIENT</text>
                         <rect class="actor" x="265" y="20" width="180" height="48" rx="3"/><text class="actor-label" x="355" y="50">L4 BALANCER</text>
@@ -599,6 +702,101 @@
                         <h2>C1M begins with the C10K model.</h2>
                         <p>Non-blocking I/O, compact state machines, bounded work, and backpressure are the foundation. C1M adds strict per-connection budgets, core-local sharding, infrastructure capacity, reconnect control, and failure headroom.</p>
                     </div>
+                </div>
+            </section>
+
+            <section>
+                <p class="eyebrow">Per-server capacity</p>
+                <h2>RPS and DAU planning on common AWS hardware</h2>
+                <p>These are conservative planning ranges, not guaranteed limits. They estimate a small stateless JSON API with a 1 KiB response, keep-alive enabled, TLS terminated at the load balancer, no database or cache call, production logging, and enough load-generator capacity. The target is sustained traffic below roughly 70% CPU so the server retains latency and failure headroom.</p>
+
+                <div class="baseline" aria-label="AWS capacity baseline">
+                    <div><strong>EC2 m7i.2xlarge</strong><span>general-purpose x86-64 instance</span></div>
+                    <div><strong>8 vCPUs</strong><span>Intel Xeon Scalable processor</span></div>
+                    <div><strong>32 GiB RAM</strong><span>EBS-only storage</span></div>
+                    <div><strong>Up to 12.5 Gbps</strong><span>network bandwidth</span></div>
+                </div>
+
+                <div class="table-shell">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Stack</th>
+                                <th>Request model</th>
+                                <th>Safe sustained RPS</th>
+                                <th>Estimated DAU</th>
+                                <th>C1M connection fit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Rust + Tokio + Actix Web</td>
+                                <td><span class="mode non-blocking">Non-blocking</span><br>Event-driven async tasks across workers. Blocking work must leave the event loop.</td>
+                                <td>45,000–90,000</td>
+                                <td>7.8M–15.6M</td>
+                                <td>Strong fit when connection state, buffers, timers, and queues stay compact and bounded.</td>
+                            </tr>
+                            <tr>
+                                <td>Python 3 + Django</td>
+                                <td><span class="mode blocking">Blocking by default</span><br>Typical Gunicorn WSGI workers block per request. ASGI is mixed and becomes non-blocking only when views, middleware, and dependencies are async end to end.</td>
+                                <td>2,500–6,000</td>
+                                <td>430K–1.0M</td>
+                                <td>WSGI is a weak fit for long-lived C1M connections. ASGI improves socket concurrency but does not remove Python, ORM, or sync middleware limits.</td>
+                            </tr>
+                            <tr>
+                                <td>Spring Boot 4.x + Spring MVC + Tomcat 11</td>
+                                <td><span class="mode blocking">Blocking handlers</span><br>Tomcat can use NIO for sockets, but a Spring MVC request normally occupies a worker thread while application I/O waits.</td>
+                                <td>12,000–28,000</td>
+                                <td>2.1M–4.8M</td>
+                                <td>Good for conventional request-response APIs. Less suitable for one million active long-lived streams per host.</td>
+                            </tr>
+                            <tr>
+                                <td>Spring Boot 4.x + WebFlux + Reactor Netty</td>
+                                <td><span class="mode non-blocking">Non-blocking</span><br>Event-loop model with reactive backpressure. Blocking JDBC or SDK calls must run outside the event loop.</td>
+                                <td>25,000–55,000</td>
+                                <td>4.3M–9.5M</td>
+                                <td>Strong Java fit for high connection counts when the entire request path remains reactive.</td>
+                            </tr>
+                            <tr>
+                                <td>Spring Boot 4.x + Undertow</td>
+                                <td><span class="mode unavailable">Unavailable in Boot 4</span><br>Its transport is non-blocking, while typical Servlet handlers are blocking. Spring Boot 4.x removed embedded Undertow support because its Servlet baseline is 6.1.</td>
+                                <td>15,000–35,000<br><small>Spring Boot 3.5.x compatibility proxy</small></td>
+                                <td>2.6M–6.0M<br><small>Spring Boot 3.5.x compatibility proxy</small></td>
+                                <td>Reasonable estimate from the latest compatible Spring Boot line. Undertow has an efficient socket layer, but blocking Spring MVC handlers still constrain active request concurrency.</td>
+                            </tr>
+                            <tr>
+                                <td>Go + net/http</td>
+                                <td><span class="mode non-blocking">Non-blocking network I/O</span><br>A service goroutine handles each connection. Network waits use the Go runtime poller, so a goroutine does not imply one operating-system thread.</td>
+                                <td>35,000–75,000</td>
+                                <td>6.0M–13.0M</td>
+                                <td>Strong fit with small goroutine stacks, bounded handlers, controlled buffers, and tuned file-descriptor limits.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="capacity-notes">
+                    <article class="capacity-note">
+                        <h3>DAU conversion</h3>
+                        <p>The estimate assumes 50 dynamic API requests per DAU per day and a peak-to-average traffic factor of 10. Therefore:</p>
+                        <div class="formula">DAU ≈ safe RPS × 86,400 ÷ 50 ÷ 10<br>DAU ≈ safe RPS × 172.8</div>
+                    </article>
+                    <article class="capacity-note">
+                        <h3>What changes the result</h3>
+                        <ul>
+                            <li>A database query, remote API, template render, large payload, or synchronous log can reduce RPS by several times.</li>
+                            <li>DAU is a product traffic calculation, not a server property. More requests per user or a sharper peak lowers supported DAU directly.</li>
+                            <li>Run at least two instances for availability and size the fleet for one-instance loss.</li>
+                            <li>Measure p99 latency, CPU, memory, queue depth, errors, and connection churn with the real endpoint before setting capacity.</li>
+                        </ul>
+                    </article>
+                </div>
+
+                <div class="sources">
+                    <h3>Primary references</h3>
+                    <p><a href="https://aws.amazon.com/ec2/instance-types/general-purpose/">AWS general-purpose EC2 specifications</a> for the m7i.2xlarge hardware baseline.</p>
+                    <p><a href="https://docs.spring.io/spring-boot/system-requirements.html">Spring Boot system requirements</a>, <a href="https://docs.spring.io/spring-boot/4.0/reference/using/build-systems.html">Spring Boot web starters</a>, and the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide">Spring Boot 4 migration guide</a> for Tomcat, Reactor Netty, and Undertow status.</p>
+                    <p><a href="https://docs.djangoproject.com/en/6.0/topics/async/">Django asynchronous support</a>, <a href="https://tokio.rs/tokio/tutorial">Tokio runtime guidance</a>, and <a href="https://pkg.go.dev/net/http#Serve">Go net/http server documentation</a> for concurrency models.</p>
                 </div>
             </section>
         </main>
