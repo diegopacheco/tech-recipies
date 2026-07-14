@@ -1,0 +1,1021 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A visual sequence diagram explaining the Hibernate N+1 query problem and its fixes.">
+  <title>Hibernate N+1 Query Problem</title>
+  <style>
+    :root {
+      --paper: #f7f4ec;
+      --sheet: #fffdf8;
+      --ink: #182321;
+      --muted: #63706d;
+      --line: #cbd2cb;
+      --grid: rgba(24, 35, 33, .055);
+      --red: #c54435;
+      --red-soft: #f8e7e2;
+      --green: #21745c;
+      --green-soft: #e3f0e9;
+      --gold: #aa6d12;
+      --blue: #236a91;
+      --shadow: 0 24px 70px rgba(35, 43, 39, .12);
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --body: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      --display: Baskerville, "Iowan Old Style", Palatino, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 32px 32px,
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 32px 32px,
+        radial-gradient(circle at 82% 4%, rgba(35, 106, 145, .1), transparent 27%),
+        radial-gradient(circle at 4% 38%, rgba(170, 109, 18, .08), transparent 25%),
+        var(--paper);
+      color: var(--ink);
+      font-family: var(--body);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1380px, 100%);
+      margin: 0 auto;
+      padding: 28px clamp(16px, 4vw, 56px) 80px;
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, .55fr);
+      gap: clamp(30px, 6vw, 88px);
+      align-items: end;
+      padding: clamp(48px, 9vw, 120px) 0 54px;
+    }
+
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 18px;
+      color: var(--red);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .kicker::before {
+      width: 36px;
+      height: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(62px, 10vw, 148px);
+      font-weight: 700;
+      letter-spacing: -.055em;
+      line-height: .76;
+    }
+
+    h1 span {
+      display: block;
+      margin-top: .18em;
+      color: var(--red);
+      font-family: var(--mono);
+      font-size: .25em;
+      font-weight: 900;
+      letter-spacing: .08em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      margin: 0;
+      color: var(--muted);
+      font-family: var(--display);
+      font-size: clamp(20px, 2.1vw, 28px);
+      line-height: 1.45;
+    }
+
+    .intro strong {
+      color: var(--ink);
+    }
+
+    .equation {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      box-shadow: 8px 8px 0 rgba(24, 35, 33, .12);
+    }
+
+    .equation-part {
+      min-width: 0;
+      padding: 18px 12px;
+      text-align: center;
+    }
+
+    .equation-part strong {
+      display: block;
+      font-family: var(--display);
+      font-size: clamp(28px, 4vw, 50px);
+      line-height: 1;
+    }
+
+    .equation-part span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .equation-sign {
+      color: var(--red);
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid var(--ink);
+      background: rgba(255, 253, 248, .96);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--ink);
+      background: #eee9dc;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 0 4px rgba(197, 68, 53, .13);
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      padding: 3px;
+    }
+
+    .mode-button {
+      min-height: 34px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 7px 13px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      cursor: pointer;
+    }
+
+    .mode-button[aria-pressed="true"] {
+      background: var(--ink);
+      color: white;
+    }
+
+    .diagram-wrap {
+      overflow-x: auto;
+      padding: 28px clamp(14px, 4vw, 48px) 38px;
+    }
+
+    .diagram {
+      position: relative;
+      min-width: 820px;
+    }
+
+    .actors {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 13%;
+      position: relative;
+      z-index: 2;
+    }
+
+    .actor {
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      padding: 13px;
+      text-align: center;
+      box-shadow: 4px 4px 0 rgba(24, 35, 33, .1);
+    }
+
+    .actor strong {
+      display: block;
+      font-family: var(--display);
+      font-size: 19px;
+    }
+
+    .actor span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .sequence {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      min-height: 470px;
+      padding: 32px 0 8px;
+    }
+
+    .lifelines {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 13%;
+      pointer-events: none;
+    }
+
+    .lifeline {
+      width: 1px;
+      height: 100%;
+      margin: 0 auto;
+      border-left: 1px dashed #a6afa9;
+    }
+
+    .message {
+      position: relative;
+      z-index: 1;
+      width: 33.5%;
+      min-height: 42px;
+      border-top: 2px solid currentColor;
+      color: var(--blue);
+    }
+
+    .message::after {
+      position: absolute;
+      top: -6px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      content: "";
+    }
+
+    .message span {
+      display: inline-block;
+      max-width: 100%;
+      margin-top: 7px;
+      padding: 3px 7px;
+      background: var(--sheet);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .message.one-two {
+      margin-left: 16.5%;
+    }
+
+    .message.two-three {
+      margin-left: 50%;
+    }
+
+    .message.left::after {
+      left: -1px;
+      border-right: 8px solid currentColor;
+    }
+
+    .message.right::after {
+      right: -1px;
+      border-left: 8px solid currentColor;
+    }
+
+    .message.danger {
+      color: var(--red);
+    }
+
+    .message.safe {
+      color: var(--green);
+    }
+
+    .loop {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 12px;
+      width: 57%;
+      margin-left: 42.8%;
+      border: 1px solid var(--red);
+      background: rgba(248, 231, 226, .68);
+      padding: 28px 8px 10px;
+    }
+
+    .loop-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-right: 1px solid var(--red);
+      border-bottom: 1px solid var(--red);
+      background: var(--red);
+      color: white;
+      padding: 4px 9px;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .loop .message {
+      width: 87%;
+      margin-left: 12%;
+    }
+
+    .query-total {
+      position: absolute;
+      right: 8px;
+      bottom: 10px;
+      z-index: 3;
+      border: 1px solid currentColor;
+      background: var(--sheet);
+      color: var(--red);
+      padding: 10px 13px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      box-shadow: 4px 4px 0 rgba(197, 68, 53, .14);
+    }
+
+    .query-total strong {
+      display: block;
+      font-family: var(--display);
+      font-size: 30px;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .fixed-sequence {
+      display: none;
+    }
+
+    .panel[data-mode="fixed"] .problem-sequence {
+      display: none;
+    }
+
+    .panel[data-mode="fixed"] .fixed-sequence {
+      display: grid;
+    }
+
+    .panel[data-mode="fixed"] .status-dot {
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(33, 116, 92, .13);
+    }
+
+    .panel[data-mode="fixed"] .query-total {
+      color: var(--green);
+      box-shadow: 4px 4px 0 rgba(33, 116, 92, .14);
+    }
+
+    .explanation-grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: clamp(18px, 3vw, 34px);
+      margin-top: 34px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: rgba(255, 253, 248, .9);
+      padding: clamp(22px, 3vw, 34px);
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-family: var(--display);
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .card p + p {
+      margin-top: 14px;
+    }
+
+    .cause-list {
+      display: grid;
+      gap: 11px;
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .cause-list li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .cause-list strong {
+      display: grid;
+      place-items: center;
+      width: 25px;
+      height: 25px;
+      border: 1px solid var(--red);
+      color: var(--red);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .code-card {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: #f6f3e9;
+    }
+
+    .code-card h2 {
+      color: white;
+    }
+
+    .code-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 22px 0 8px;
+      color: #b9c5c0;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .badge {
+      border: 1px solid currentColor;
+      padding: 3px 6px;
+    }
+
+    .badge.bad {
+      color: #ff8d7e;
+    }
+
+    .badge.good {
+      color: #70d3ae;
+    }
+
+    pre {
+      overflow-x: auto;
+      margin: 0;
+      border: 1px solid #4f5d58;
+      background: #101816;
+      padding: 15px;
+      color: #dce5df;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.65;
+      white-space: pre;
+    }
+
+    .qa-card {
+      display: grid;
+      grid-template-columns: minmax(280px, .72fr) minmax(0, 1.28fr);
+      margin-top: 34px;
+      border: 1px solid var(--blue);
+      background: #e8f2f6;
+      box-shadow: 10px 10px 0 rgba(35, 106, 145, .12);
+    }
+
+    .qa-question {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+      min-width: 0;
+      border-right: 1px solid var(--blue);
+      padding: clamp(24px, 4vw, 44px);
+    }
+
+    .qa-label {
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .qa-question h2 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(34px, 4vw, 56px);
+      letter-spacing: -.03em;
+      line-height: 1.03;
+      overflow-wrap: anywhere;
+    }
+
+    .verdict {
+      width: fit-content;
+      border: 1px solid var(--blue);
+      background: var(--sheet);
+      color: var(--blue);
+      padding: 8px 11px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .qa-answer {
+      padding: clamp(24px, 4vw, 44px);
+    }
+
+    .qa-answer > p {
+      margin: 0;
+      color: #3e5b66;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .qa-answer > p strong {
+      color: var(--ink);
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .case {
+      border: 1px solid #9bb5c0;
+      background: rgba(255, 255, 255, .58);
+      padding: 16px;
+    }
+
+    .case strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .case p {
+      margin: 0;
+      color: #4e6872;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .qa-code {
+      margin-top: 22px;
+    }
+
+    .qa-code pre {
+      border-color: #527889;
+    }
+
+    .sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-top: 18px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .sources a {
+      color: var(--blue);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .keyword {
+      color: #f2b35d;
+    }
+
+    .string {
+      color: #79c7a8;
+    }
+
+    .method {
+      color: #78bce3;
+    }
+
+    .fixes {
+      margin-top: 34px;
+      padding: clamp(28px, 5vw, 58px);
+      border: 1px solid var(--green);
+      background: var(--green-soft);
+    }
+
+    .fixes-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(250px, .45fr);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .fixes h2 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(38px, 5vw, 66px);
+      letter-spacing: -.03em;
+      line-height: .95;
+    }
+
+    .fixes-head p {
+      margin: 0;
+      color: #3f6156;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .fix-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--green);
+      border-left: 1px solid var(--green);
+    }
+
+    .fix {
+      min-height: 190px;
+      border-right: 1px solid var(--green);
+      border-bottom: 1px solid var(--green);
+      background: rgba(255, 255, 255, .38);
+      padding: 22px;
+    }
+
+    .fix-number {
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .fix h3 {
+      margin: 28px 0 10px;
+      font-family: var(--display);
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .fix p {
+      margin: 0;
+      color: #48675e;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .rule {
+      margin: 34px 0 0;
+      border-left: 7px solid var(--gold);
+      background: #fff8e8;
+      padding: 20px 22px;
+      color: #604613;
+      font-family: var(--display);
+      font-size: clamp(20px, 2.5vw, 30px);
+      line-height: 1.35;
+    }
+
+    .rule code {
+      font-family: var(--mono);
+      font-size: .75em;
+      font-weight: 800;
+    }
+
+    @media (max-width: 900px) {
+      .masthead,
+      .explanation-grid,
+      .qa-card,
+      .fixes-head {
+        grid-template-columns: 1fr;
+      }
+
+      .masthead {
+        padding-top: 64px;
+      }
+
+      .equation {
+        max-width: 520px;
+      }
+
+      .fix-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .qa-question {
+        border-right: 0;
+        border-bottom: 1px solid var(--blue);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        padding-inline: 12px;
+      }
+
+      .panel-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .mode-toggle {
+        width: 100%;
+      }
+
+      .mode-button {
+        flex: 1;
+      }
+
+      .case-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .equation-part {
+        padding: 14px 6px;
+      }
+
+      .equation-part span {
+        font-size: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .masthead > *,
+      .panel,
+      .explanation-grid,
+      .qa-card,
+      .fixes,
+      .rule {
+        animation: rise .65s both;
+      }
+
+      .masthead > :nth-child(2) {
+        animation-delay: .08s;
+      }
+
+      .panel {
+        animation-delay: .14s;
+      }
+
+      .explanation-grid {
+        animation-delay: .2s;
+      }
+
+      .qa-card {
+        animation-delay: .23s;
+      }
+
+      .fixes {
+        animation-delay: .26s;
+      }
+
+      .rule {
+        animation-delay: .32s;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="kicker">Hibernate performance pathology</p>
+        <h1>N + 1<span>One innocent loop. Many database trips.</span></h1>
+      </div>
+      <div>
+        <p class="intro"><strong>The N+1 problem</strong> appears when Hibernate loads one list, then lazily runs one additional query for every row as related data is accessed.</p>
+        <div class="equation" aria-label="One initial query plus N relationship queries equals N plus one total queries">
+          <div class="equation-part"><strong>1</strong><span>parent query</span></div>
+          <div class="equation-sign">+</div>
+          <div class="equation-part"><strong>N</strong><span>child queries</span></div>
+          <div class="equation-sign">=</div>
+          <div class="equation-part"><strong>N+1</strong><span>round trips</span></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="panel" id="sequence-panel" data-mode="problem" aria-labelledby="sequence-title">
+      <div class="panel-head">
+        <h2 class="panel-title" id="sequence-title"><span class="status-dot"></span><span id="mode-title">Sequence · N+1 path</span></h2>
+        <div class="mode-toggle" aria-label="Sequence mode">
+          <button class="mode-button" type="button" data-mode-button="problem" aria-pressed="true">N+1 path</button>
+          <button class="mode-button" type="button" data-mode-button="fixed" aria-pressed="false">Join fetch path</button>
+        </div>
+      </div>
+      <div class="diagram-wrap">
+        <div class="diagram">
+          <div class="actors">
+            <div class="actor"><strong>Application</strong><span>service layer</span></div>
+            <div class="actor"><strong>Hibernate</strong><span>ORM session</span></div>
+            <div class="actor"><strong>Database</strong><span>SQL engine</span></div>
+          </div>
+
+          <div class="sequence problem-sequence">
+            <div class="lifelines" aria-hidden="true"><div class="lifeline"></div><div class="lifeline"></div><div class="lifeline"></div></div>
+            <div class="message one-two right"><span>findAllAuthors()</span></div>
+            <div class="message two-three right"><span>SELECT * FROM author</span></div>
+            <div class="message two-three left"><span>N authors returned</span></div>
+            <div class="message one-two left"><span>Authors with lazy books proxies</span></div>
+            <div class="loop">
+              <span class="loop-label">Loop · for every author</span>
+              <div class="message danger right"><span>SELECT * FROM book WHERE author_id = ?</span></div>
+              <div class="message danger left"><span>Books for one author</span></div>
+            </div>
+            <div class="query-total"><strong>N+1</strong>queries</div>
+          </div>
+
+          <div class="sequence fixed-sequence">
+            <div class="lifelines" aria-hidden="true"><div class="lifeline"></div><div class="lifeline"></div><div class="lifeline"></div></div>
+            <div class="message one-two safe right"><span>findAuthorsWithBooks()</span></div>
+            <div class="message two-three safe right"><span>SELECT DISTINCT a, b FROM author a LEFT JOIN book b</span></div>
+            <div class="message two-three safe left"><span>Authors and books returned together</span></div>
+            <div class="message one-two safe left"><span>Initialized object graph</span></div>
+            <div class="query-total"><strong>1</strong>query</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="explanation-grid" aria-label="Cause and code comparison">
+      <article class="card">
+        <h2>Why it happens</h2>
+        <p>A lazy association is a placeholder. Fetching the parent does not fetch the children. The first call to <code>author.getBooks()</code> initializes that author's collection with a new SQL query.</p>
+        <p>The loop hides the cost because the Java code looks like ordinary object traversal while database traffic multiplies behind it.</p>
+        <ol class="cause-list">
+          <li><strong>1</strong><span>Hibernate loads every <code>Author</code> with one query.</span></li>
+          <li><strong>2</strong><span>Each <code>books</code> collection remains lazy and uninitialized.</span></li>
+          <li><strong>3</strong><span>Touching each collection triggers one query per author.</span></li>
+          <li><strong>4</strong><span>100 authors become 101 database round trips.</span></li>
+        </ol>
+      </article>
+
+      <article class="card code-card">
+        <h2>The code shape</h2>
+        <div class="code-label"><span>Hidden query multiplication</span><span class="badge bad">N+1</span></div>
+        <pre><span class="keyword">var</span> authors = repository.<span class="method">findAll</span>();
+
+<span class="keyword">for</span> (<span class="keyword">var</span> author : authors) {
+  author.<span class="method">getBooks</span>().<span class="method">size</span>();
+}</pre>
+        <div class="code-label"><span>Fetch the required graph</span><span class="badge good">1 query</span></div>
+        <pre><span class="keyword">select distinct</span> a
+<span class="keyword">from</span> Author a
+<span class="keyword">left join fetch</span> a.books</pre>
+      </article>
+    </section>
+
+    <section class="qa-card" aria-labelledby="findall-question">
+      <div class="qa-question">
+        <span class="qa-label">Spring Boot 4.1.0</span>
+        <h2 id="findall-question">Does repository.<wbr>findAll() create N+1?</h2>
+        <span class="verdict">It can, but not always</span>
+      </div>
+      <div class="qa-answer">
+        <p><strong><code>findAll()</code> normally starts with one query for the root entities.</strong> N+1 depends on the entity mappings, fetch plan, and which relationships are used. Spring Boot 4.1.0 does not automatically remove this risk.</p>
+        <div class="case-grid">
+          <article class="case">
+            <strong>Lazy relationship</strong>
+            <p>The repository call can finish with one query. A later loop, mapper, or JSON serializer that touches the relationship can trigger one additional query per entity.</p>
+          </article>
+          <article class="case">
+            <strong>Eager relationship</strong>
+            <p>Hibernate must initialize it. Depending on the query and fetch mapping, it may use joins or secondary selects, so N+1 can occur while <code>findAll()</code> runs.</p>
+          </article>
+        </div>
+        <div class="qa-code">
+          <div class="code-label"><span>Repository fetch plan</span><span class="badge good">Explicit</span></div>
+          <pre><span class="keyword">public interface</span> AuthorRepository
+    <span class="keyword">extends</span> JpaRepository&lt;Author, Long&gt; {
+
+  <span class="keyword">@Override</span>
+  <span class="keyword">@EntityGraph</span>(attributePaths = <span class="string">"books"</span>)
+  List&lt;Author&gt; <span class="method">findAll</span>();
+}</pre>
+        </div>
+        <nav class="sources" aria-label="Official documentation">
+          <a href="https://docs.spring.io/spring-boot/reference/">Spring Boot 4.1 reference</a>
+          <a href="https://docs.spring.io/spring-data/jpa/docs/current/api/org/springframework/data/jpa/repository/EntityGraph.html">Spring Data EntityGraph</a>
+          <a href="https://docs.hibernate.org/orm/7.2/javadocs/org/hibernate/annotations/FetchMode.html">Hibernate fetch modes</a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="fixes" aria-labelledby="fix-title">
+      <div class="fixes-head">
+        <h2 id="fix-title">Choose the fetch plan intentionally.</h2>
+        <p>The best option depends on the use case. Fetch only the relationships the current operation actually needs.</p>
+      </div>
+      <div class="fix-grid">
+        <article class="fix">
+          <span class="fix-number">01 / DIRECT</span>
+          <h3>JOIN FETCH</h3>
+          <p>Load the parent and required relationship in the same query. Clear and effective for a known access path.</p>
+        </article>
+        <article class="fix">
+          <span class="fix-number">02 / DECLARATIVE</span>
+          <h3>EntityGraph</h3>
+          <p>Describe which attributes should be loaded without embedding a fetch join in the query text.</p>
+        </article>
+        <article class="fix">
+          <span class="fix-number">03 / BATCHED</span>
+          <h3>Batch fetching</h3>
+          <p>Use <code>@BatchSize</code> or <code>hibernate.default_batch_fetch_size</code> to load multiple lazy collections per query.</p>
+        </article>
+      </div>
+    </section>
+
+    <p class="rule">If code iterates over entities and touches a lazy relationship, inspect the SQL. The useful unit is not “objects loaded”; it is <code>database round trips</code>.</p>
+  </main>
+
+  <script>
+    const panel = document.querySelector("#sequence-panel");
+    const title = document.querySelector("#mode-title");
+    const buttons = document.querySelectorAll("[data-mode-button]");
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const mode = button.dataset.modeButton;
+        panel.dataset.mode = mode;
+        title.textContent = mode === "problem" ? "Sequence · N+1 path" : "Sequence · join fetch path";
+        buttons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      });
+    });
+  </script>
+</body>
+</html>
