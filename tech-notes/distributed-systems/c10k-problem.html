@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>C10K Problem</title>
+    <style>
+        :root {
+            --paper: #f2efe6;
+            --ink: #17211d;
+            --muted: #5e6963;
+            --line: #c9cec3;
+            --panel: #fffdf7;
+            --green: #176b4d;
+            --amber: #dc7b22;
+            --soft-green: #dcebe2;
+            --soft-amber: #f8e5d1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif;
+            line-height: 1.65;
+        }
+
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            content: "";
+            opacity: .32;
+            background-image: linear-gradient(rgba(23, 33, 29, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(23, 33, 29, .08) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        a {
+            color: var(--green);
+            text-underline-offset: 4px;
+        }
+
+        .page {
+            width: min(1120px, calc(100% - 40px));
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 22px 0;
+            border-bottom: 1px solid var(--line);
+            font-family: "Courier New", monospace;
+            font-size: .78rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .topbar a {
+            padding: 8px 12px;
+            border: 1px solid var(--green);
+            text-decoration: none;
+            transition: background .2s ease, color .2s ease;
+        }
+
+        .topbar a:hover {
+            background: var(--green);
+            color: var(--panel);
+        }
+
+        header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 280px;
+            gap: 72px;
+            align-items: end;
+            padding: 88px 0 76px;
+        }
+
+        .eyebrow {
+            margin: 0 0 14px;
+            color: var(--amber);
+            font-family: "Courier New", monospace;
+            font-size: .82rem;
+            font-weight: 700;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            max-width: 760px;
+            margin-bottom: 24px;
+            font-size: clamp(4rem, 11vw, 8.5rem);
+            font-weight: 400;
+            letter-spacing: -.075em;
+            line-height: .8;
+        }
+
+        .lede {
+            max-width: 720px;
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: clamp(1.15rem, 2vw, 1.45rem);
+        }
+
+        .metric {
+            padding: 24px;
+            border-left: 5px solid var(--amber);
+            background: var(--panel);
+            box-shadow: 12px 12px 0 var(--soft-amber);
+        }
+
+        .metric strong {
+            display: block;
+            font-family: "Courier New", monospace;
+            font-size: 2.3rem;
+            line-height: 1;
+        }
+
+        .metric span {
+            color: var(--muted);
+            font-size: .92rem;
+        }
+
+        main {
+            padding-bottom: 90px;
+        }
+
+        section {
+            padding: 64px 0;
+            border-top: 1px solid var(--line);
+        }
+
+        h2 {
+            margin-bottom: 28px;
+            font-size: clamp(2rem, 4vw, 3.3rem);
+            font-weight: 400;
+            letter-spacing: -.04em;
+            line-height: 1;
+        }
+
+        h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 56px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .card {
+            padding: 24px;
+            border: 1px solid var(--line);
+            background: rgba(255, 253, 247, .78);
+        }
+
+        .card:nth-child(2n) {
+            transform: translateY(16px);
+        }
+
+        .card p {
+            margin-bottom: 0;
+            color: var(--muted);
+        }
+
+        .diagram-shell {
+            overflow-x: auto;
+            padding: 26px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            box-shadow: 14px 14px 0 var(--soft-green);
+        }
+
+        .diagram-shell svg {
+            display: block;
+            min-width: 900px;
+            width: 100%;
+            height: auto;
+        }
+
+        .diagram-shell .actor {
+            fill: var(--ink);
+        }
+
+        .diagram-shell .actor-label {
+            fill: var(--panel);
+            font-family: "Courier New", monospace;
+            font-size: 15px;
+            font-weight: 700;
+            text-anchor: middle;
+        }
+
+        .diagram-shell .lifeline {
+            stroke: #aab1aa;
+            stroke-dasharray: 6 7;
+        }
+
+        .diagram-shell .message {
+            stroke: var(--green);
+            stroke-width: 2;
+        }
+
+        .diagram-shell .response {
+            stroke: var(--amber);
+            stroke-width: 2;
+        }
+
+        .diagram-shell .message-label {
+            fill: var(--ink);
+            font-family: "Courier New", monospace;
+            font-size: 13px;
+            text-anchor: middle;
+        }
+
+        .flow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            margin-top: 32px;
+            border: 1px solid var(--ink);
+        }
+
+        .flow div {
+            position: relative;
+            padding: 24px 20px;
+            background: var(--panel);
+            font-family: "Courier New", monospace;
+            font-size: .86rem;
+            text-align: center;
+        }
+
+        .flow div + div {
+            border-left: 1px solid var(--ink);
+        }
+
+        .flow div + div::before {
+            position: absolute;
+            top: 50%;
+            left: -8px;
+            width: 14px;
+            height: 14px;
+            content: "";
+            background: var(--panel);
+            border-top: 1px solid var(--ink);
+            border-right: 1px solid var(--ink);
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .budget {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            overflow: hidden;
+            border: 1px solid var(--ink);
+            background: var(--ink);
+        }
+
+        .budget div {
+            padding: 28px;
+            background: var(--panel);
+        }
+
+        .budget strong {
+            display: block;
+            color: var(--green);
+            font-family: "Courier New", monospace;
+            font-size: 1.6rem;
+        }
+
+        ul {
+            padding-left: 1.2rem;
+        }
+
+        li {
+            margin-bottom: 9px;
+        }
+
+        .next {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+            padding: 38px;
+            color: var(--panel);
+            background: var(--ink);
+        }
+
+        .next h2 {
+            margin-bottom: 10px;
+        }
+
+        .next p {
+            max-width: 700px;
+            margin-bottom: 0;
+            color: #cad4ce;
+        }
+
+        .next a {
+            padding: 15px 20px;
+            border: 1px solid var(--amber);
+            color: var(--panel);
+            font-family: "Courier New", monospace;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 760px) {
+            .page {
+                width: min(100% - 24px, 1120px);
+            }
+
+            header,
+            .two-column,
+            .next {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                gap: 36px;
+                padding: 58px 0;
+            }
+
+            .cards,
+            .budget,
+            .flow {
+                grid-template-columns: 1fr;
+            }
+
+            .card:nth-child(2n) {
+                transform: none;
+            }
+
+            .flow div + div {
+                border-top: 1px solid var(--ink);
+                border-left: 0;
+            }
+
+            .flow div + div::before {
+                top: -8px;
+                left: 50%;
+                transform: translateX(-50%) rotate(135deg);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            * {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <nav class="topbar" aria-label="Topic navigation">
+            <span>Distributed systems field notes</span>
+            <a href="c1m-problem.html">Continue to C1M →</a>
+        </nav>
+
+        <header>
+            <div>
+                <p class="eyebrow">Concurrency threshold 01</p>
+                <h1>C10K</h1>
+                <p class="lede">The challenge of keeping 10,000 client connections open without losing the server to thread stacks, context switches, blocking calls, or unbounded queues.</p>
+            </div>
+            <aside class="metric">
+                <strong>10,000</strong>
+                <span>concurrent connections, not requests per second</span>
+            </aside>
+        </header>
+
+        <main>
+            <section>
+                <div class="two-column">
+                    <div>
+                        <p class="eyebrow">The problem</p>
+                        <h2>Idle clients should not consume active threads.</h2>
+                    </div>
+                    <div>
+                        <p>A blocking server commonly assigns one thread or process to each connection. At 10,000 connections, thread memory, scheduler overhead, lock contention, file descriptors, and kernel socket state become a capacity wall.</p>
+                        <p>C10K concerns concurrent connections. Many may be idle or send data infrequently, but the server must remain responsive when any of them becomes active.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <p class="eyebrow">Pressure points</p>
+                <h2>Where the blocking model breaks</h2>
+                <div class="cards">
+                    <article class="card"><h3>Thread memory</h3><p>Each thread carries a stack and runtime metadata even while its connection waits.</p></article>
+                    <article class="card"><h3>Context switching</h3><p>The scheduler moves between thousands of threads and repeatedly displaces useful CPU-cache data.</p></article>
+                    <article class="card"><h3>Blocking work</h3><p>A slow client, database, DNS lookup, or file operation holds a thread without useful progress.</p></article>
+                    <article class="card"><h3>Kernel state</h3><p>Every socket consumes a descriptor, TCP structures, and send and receive buffer capacity.</p></article>
+                    <article class="card"><h3>Shared locks</h3><p>Queues, allocators, and shared application state turn into synchronization bottlenecks.</p></article>
+                    <article class="card"><h3>Connection churn</h3><p>Handshakes and disconnect storms add accept, allocation, cleanup, and TLS work.</p></article>
+                </div>
+            </section>
+
+            <section>
+                <p class="eyebrow">Connection lifecycle</p>
+                <h2>Sequence diagram</h2>
+                <div class="diagram-shell">
+                    <svg viewBox="0 0 1000 570" role="img" aria-labelledby="diagram-title diagram-desc">
+                        <title id="diagram-title">C10K non-blocking connection sequence</title>
+                        <desc id="diagram-desc">A client connects through the kernel. An event loop accepts and reads only ready sockets, delegates bounded work, and writes the response without reserving a thread for the connection.</desc>
+                        <defs>
+                            <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#176b4d"/></marker>
+                            <marker id="amber-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc7b22"/></marker>
+                        </defs>
+                        <rect class="actor" x="35" y="20" width="180" height="48" rx="3"/><text class="actor-label" x="125" y="50">CLIENT</text>
+                        <rect class="actor" x="285" y="20" width="180" height="48" rx="3"/><text class="actor-label" x="375" y="50">OS KERNEL</text>
+                        <rect class="actor" x="535" y="20" width="180" height="48" rx="3"/><text class="actor-label" x="625" y="50">EVENT LOOP</text>
+                        <rect class="actor" x="785" y="20" width="180" height="48" rx="3"/><text class="actor-label" x="875" y="50">WORKER POOL</text>
+                        <line class="lifeline" x1="125" y1="68" x2="125" y2="540"/><line class="lifeline" x1="375" y1="68" x2="375" y2="540"/><line class="lifeline" x1="625" y1="68" x2="625" y2="540"/><line class="lifeline" x1="875" y1="68" x2="875" y2="540"/>
+                        <text class="message-label" x="250" y="112">TCP connection</text><line class="message" x1="125" y1="122" x2="368" y2="122" marker-end="url(#green-arrow)"/>
+                        <text class="message-label" x="500" y="162">ready to accept</text><line class="response" x1="375" y1="172" x2="618" y2="172" marker-end="url(#amber-arrow)"/>
+                        <text class="message-label" x="500" y="212">accept non-blocking</text><line class="message" x1="625" y1="222" x2="382" y2="222" marker-end="url(#green-arrow)"/>
+                        <text class="message-label" x="250" y="262">request bytes</text><line class="message" x1="125" y1="272" x2="368" y2="272" marker-end="url(#green-arrow)"/>
+                        <text class="message-label" x="500" y="312">socket ready to read</text><line class="response" x1="375" y1="322" x2="618" y2="322" marker-end="url(#amber-arrow)"/>
+                        <text class="message-label" x="750" y="362">bounded CPU work</text><line class="message" x1="625" y1="372" x2="868" y2="372" marker-end="url(#green-arrow)"/>
+                        <text class="message-label" x="750" y="412">response ready</text><line class="response" x1="875" y1="422" x2="632" y2="422" marker-end="url(#amber-arrow)"/>
+                        <text class="message-label" x="500" y="462">non-blocking write</text><line class="message" x1="625" y1="472" x2="382" y2="472" marker-end="url(#green-arrow)"/>
+                        <text class="message-label" x="250" y="512">response</text><line class="response" x1="375" y1="522" x2="132" y2="522" marker-end="url(#amber-arrow)"/>
+                    </svg>
+                </div>
+            </section>
+
+            <section>
+                <div class="two-column">
+                    <div>
+                        <p class="eyebrow">The scalable model</p>
+                        <h2>React only when a socket can make progress.</h2>
+                        <p>The operating system reports ready sockets through `epoll`, `kqueue`, IOCP, or `io_uring`. A small event-loop pool processes those sockets and moves on immediately when a read or write would block.</p>
+                    </div>
+                    <div>
+                        <ul>
+                            <li>Non-blocking sockets prevent idle clients from occupying threads.</li>
+                            <li>Compact state machines preserve protocol progress per connection.</li>
+                            <li>Bounded worker pools isolate CPU-heavy or unavoidable blocking work.</li>
+                            <li>Bounded buffers stop slow readers from consuming unlimited memory.</li>
+                            <li>Backpressure protects the event loop and downstream services.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="flow" aria-label="C10K processing flow">
+                    <div>10K sockets</div><div>OS readiness</div><div>event-loop pool</div><div>bounded work</div>
+                </div>
+            </section>
+
+            <section>
+                <p class="eyebrow">Capacity model</p>
+                <h2>Small allocations multiply quickly.</h2>
+                <div class="budget">
+                    <div><strong>80 MB</strong><span>10,000 × 8 KB</span></div>
+                    <div><strong>640 MB</strong><span>10,000 × 64 KB</span></div>
+                    <div><strong>10 GB</strong><span>10,000 × 1 MB</span></div>
+                </div>
+                <div class="two-column" style="margin-top: 44px">
+                    <div>
+                        <h3>Count every layer</h3>
+                        <p>Application state, parser state, input and output buffers, TLS state, kernel socket structures, and TCP buffers all contribute to the real connection cost.</p>
+                    </div>
+                    <div>
+                        <h3>Tune the whole host</h3>
+                        <p>File-descriptor limits, accept queues, TCP memory, idle timeouts, firewalls, load balancers, and outbound port capacity must agree with the target.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="two-column">
+                    <div>
+                        <p class="eyebrow">Validation</p>
+                        <h2>Opening sockets is only the first checkpoint.</h2>
+                    </div>
+                    <div>
+                        <ul>
+                            <li>Hold at least 10,000 real connections.</li>
+                            <li>Measure p50, p95, p99, and maximum latency.</li>
+                            <li>Track CPU, context switches, memory, descriptors, and event-loop delay.</li>
+                            <li>Mix idle clients, active clients, slow readers, and slow writers.</li>
+                            <li>Exercise connection storms, abrupt disconnects, and slow dependencies.</li>
+                            <li>Verify recovery after the load returns to normal.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="next">
+                    <div>
+                        <p class="eyebrow">Concurrency threshold 02</p>
+                        <h2>C10K establishes the pattern. C1M exposes every hidden cost.</h2>
+                        <p>The next threshold adds strict memory density, core-local sharding, network connection state, reconnect control, and fleet-level failure planning.</p>
+                    </div>
+                    <a href="c1m-problem.html">Read C1M →</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
