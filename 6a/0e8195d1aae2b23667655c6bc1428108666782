@@ -1,0 +1,25 @@
+tech-notes/sec/sso.md
+  s_a7965eddeade22::t_d441e1f655186c 1-206
+tech-notes/sec/passwordless-passkeys.md
+  s_a7965eddeade22::t_bed6c116560701 242
+  s_a7965eddeade22::t_c566dbdf0132d8 1-241,243-246
+tech-notes/sec/mfa.md
+  s_a7965eddeade22::t_e082900fa2c51f 1-239,242-248
+  s_a7965eddeade22::t_bed6c116560701 240-241
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6a0e8195d1aae2b23667655c6bc1428108666782",
+  "prompts": {},
+  "sessions": {
+    "s_a7965eddeade22": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6244-577d-7b23-a396-5cde8f49eea7",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
