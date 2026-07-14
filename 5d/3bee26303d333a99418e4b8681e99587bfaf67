@@ -1,0 +1,19 @@
+tech-notes/crypto/blockhain.html
+  s_d9e7a6c1b127c5::t_3f3e2123c0ca64 1-1846
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "5d3bee26303d333a99418e4b8681e99587bfaf67",
+  "prompts": {},
+  "sessions": {
+    "s_d9e7a6c1b127c5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5e90-045c-7bf0-8ff8-f195ea96232b",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
