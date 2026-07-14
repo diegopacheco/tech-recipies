@@ -1,0 +1,22 @@
+tech-notes/distributed-systems/n-plus-1.html
+  s_cb35c99fdad227::t_8418f007ddcc6a 534-547,549-567,569-654,753,768-772,794-797,811,827-830,941-945,947-976
+  s_cb35c99fdad227::t_8737d37981c4bc 1-533,655-752,754-767,773-793,798-810,812-826,831-917,919-940,977-1021
+  s_cb35c99fdad227::t_790963dcc41d69 918
+  s_cb35c99fdad227::t_66fb0afb167bfa 548,568,946
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "864c31c97073bd21a393e927f76da71007f88862",
+  "prompts": {},
+  "sessions": {
+    "s_cb35c99fdad227": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5e3a-2aba-7580-957c-a5ebf830b938",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
