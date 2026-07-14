@@ -1,0 +1,24 @@
+tech-notes/distributed-systems/c1m-problem.html
+  s_0b684ce833e467::t_fc896f5fc525a8 763-765
+  s_0b684ce833e467::t_c2cf6317e8c7e9 769
+  s_0b684ce833e467::t_c7065b02050efd 762
+  s_0b684ce833e467::t_e0338cf217630f 9-17,31,41-43,47,71,77-78,99-100,102,107,150,155,184,212,227,239,251,256,261,326,429,477-478,483,609-610
+  s_0b684ce833e467::t_e91d77c132efb7 307-316,339-425,520-522,537-539,707-761,766-768,770-800
+  s_0b684ce833e467::t_ac0fb0ca154e5d 801
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "fc59e4b76837c82d64a6cc9d56d43f4df73f32f9",
+  "prompts": {},
+  "sessions": {
+    "s_0b684ce833e467": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5e7a-9ca2-76f2-ace4-937f196970cf",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
