@@ -1,0 +1,19 @@
+tech-notes/sec/cli-vs-mcp.md
+  s_ba58741ac9bc6c::t_958b8e731d439a 1-345
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1d9b56f6a61155f1cab320f51ecf37323878ee0f",
+  "prompts": {},
+  "sessions": {
+    "s_ba58741ac9bc6c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46391989-75c1-4af6-a1ba-d014aed6cfa5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
