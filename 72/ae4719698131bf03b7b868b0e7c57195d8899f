@@ -1,0 +1,19 @@
+tech-notes/sec/macaroon.md
+  s_941f766dc9d05a::t_14c897724700a2 1-319
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "72ae4719698131bf03b7b868b0e7c57195d8899f",
+  "prompts": {},
+  "sessions": {
+    "s_941f766dc9d05a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6363-27cd-71f2-9f3a-5c05c7433231",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
