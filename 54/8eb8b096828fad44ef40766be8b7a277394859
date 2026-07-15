@@ -1,0 +1,20 @@
+tech-notes/ai-transformation/ai-software-factories.md
+  s_2f1fa10cfe39e4::t_67110d9f0cd100 1-32,34-79,81-353,355-359,361-375
+  s_2f1fa10cfe39e4::t_77a0ea7ef584a9 33,80,354,360
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "548eb8b096828fad44ef40766be8b7a277394859",
+  "prompts": {},
+  "sessions": {
+    "s_2f1fa10cfe39e4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f66ac-506e-7133-8060-6fe09fedda08",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
