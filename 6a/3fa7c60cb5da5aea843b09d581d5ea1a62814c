@@ -1,0 +1,83 @@
+tech-notes/languages/java.md
+  s_88254ccaaf7aa8::t_868debf75e784c 9,38-42,46-48,288-291
+  s_88254ccaaf7aa8::t_62891208364200 1-8,10-37,43-45,49-287,292-332
+tech-notes/languages/typescript.md
+  s_88254ccaaf7aa8::t_eab438581689d3 1-342
+  s_88254ccaaf7aa8::t_f7637621676a66 343
+tech-notes/languages/zig.md
+  s_88254ccaaf7aa8::t_27324f2dae9e85 1-310
+tech-notes/languages/clojure.md
+  s_88254ccaaf7aa8::t_7cbe9e7d651c60 152
+  s_88254ccaaf7aa8::t_be1191380f12a3 1-68,71-72,75-151,153-322
+  s_88254ccaaf7aa8::t_fc90ec4ea12cb0 69-70,73-74
+tech-notes/languages/scala3.md
+  s_70cc8b6153e2d1::t_31c4f3bee088e6 253,256-261,264,268-270,274-276,280,295
+  s_70cc8b6153e2d1::t_595c567dcbbb10 288
+  s_70cc8b6153e2d1::t_ded66c89d92b07 1-252,254-255,262-263,265-267,271-273,277-279,281-287,289-294
+tech-notes/languages/python.md
+  s_f916a2d22f7691::t_2f116125df2dbe 1-181
+tech-notes/languages/rust.md
+  s_957b5c73715e27::t_517f089ec6cf94 1-401
+tech-notes/languages/cpp.md
+  s_88254ccaaf7aa8::t_a77e0a2d45d1bb 1-373
+tech-notes/languages/kotlin.md
+  s_e96ec35270b66f::t_6014d10e4385ba 1-291
+tech-notes/languages/go.md
+  s_7b9e631db7d25d::t_6470a97a84d8b7 1-413
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6a3fa7c60cb5da5aea843b09d581d5ea1a62814c",
+  "prompts": {},
+  "sessions": {
+    "s_70cc8b6153e2d1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6750-b5e6-7d81-be12-36ce3e7c72e5",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    },
+    "s_7b9e631db7d25d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6751-4ec7-7743-af62-80ce276748bc",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    },
+    "s_88254ccaaf7aa8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f675d-d02d-7da1-8cba-2aaa3fe2da9e",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    },
+    "s_957b5c73715e27": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6750-e8dc-7ea2-96d0-4178ce448756",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    },
+    "s_e96ec35270b66f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f674f-f68d-7f60-990f-f07c6ef58ba9",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    },
+    "s_f916a2d22f7691": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6751-1637-7922-aaed-7d00641c8044",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
