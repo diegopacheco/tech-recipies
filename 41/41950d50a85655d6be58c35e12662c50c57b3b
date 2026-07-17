@@ -1,0 +1,20 @@
+tech-notes/databases/db-isolation-levels.html
+  s_6ef87c372ea59e::t_e5cac97c10b4c8 1-7,9-80,82,85-113
+  s_6ef87c372ea59e::t_4d1f1681e031da 8,81,83-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4141950d50a85655d6be58c35e12662c50c57b3b",
+  "prompts": {},
+  "sessions": {
+    "s_6ef87c372ea59e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6dd9-a687-74a2-88ff-50207e39c72a",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
