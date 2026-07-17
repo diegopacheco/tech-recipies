@@ -1,0 +1,19 @@
+tech-notes/audio-video/streaming-protocols.md
+  s_8f4ce8bbaa14f3::t_7474684c1ac55d 1-245
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c0855c21a93f29b749ca8f876086ad2516af48e1",
+  "prompts": {},
+  "sessions": {
+    "s_8f4ce8bbaa14f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4fbe7cdb-0aaa-415e-b47d-f92117b089d3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
