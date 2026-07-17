@@ -1,0 +1,25 @@
+tech-notes/audio-video/how-video-compression-works.md
+  s_e49e5da62c9e5f::t_43147dea0a18de 1-144
+tech-notes/audio-video/audio-codecs.md
+  s_e49e5da62c9e5f::t_51d29667441cd9 1-135
+tech-notes/audio-video/video-codecs.md
+  s_e49e5da62c9e5f::t_a1540f35c156ba 1-146
+tech-notes/audio-video/latency-in-streaming.md
+  s_e49e5da62c9e5f::t_4a9f83d92f99b3 1-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c3af9b450c78a002538b6e6c4c64a73d80583fc9",
+  "prompts": {},
+  "sessions": {
+    "s_e49e5da62c9e5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4adcd30a-536f-4a8b-ae4b-f56e1e56e6a8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
