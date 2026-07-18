@@ -1,0 +1,19 @@
+tech-notes/ai-transformation/private-evals.md
+  s_d068b0164fbd45::t_965eb231197c3d 1-218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ba381cd2cbc15c7fba756c82366c512c33024458",
+  "prompts": {},
+  "sessions": {
+    "s_d068b0164fbd45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7e0da84e-781c-46a8-99d2-cdddf3ca76e0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
