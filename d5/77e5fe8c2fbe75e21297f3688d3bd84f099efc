@@ -1,0 +1,37 @@
+tech-notes/audio-video/index.html
+  s_2693e7132b35a8::t_c4e88208425e6c 1-1417
+tech-notes/languages/index.html
+  s_2693e7132b35a8::t_c4e88208425e6c 1-1498
+tech-notes/distributed-systems/index.html
+  s_2693e7132b35a8::t_c4e88208425e6c 1278-1322,1517-1518
+  s_2693e7132b35a8::t_b3a71cde8c73e8 987,995
+tech-notes/ai-transformation/index.html
+  s_2693e7132b35a8::t_b3a71cde8c73e8 992,999
+  s_2693e7132b35a8::t_c4e88208425e6c 1488-1558,1753-1757
+tech-notes/index.html
+  s_2693e7132b35a8::t_1bdec761f8679d 1159-1184
+  s_2693e7132b35a8::t_d636bad52d980b 1265
+  s_2693e7132b35a8::t_c7d89befa876eb 994
+  s_2693e7132b35a8::t_1419a32f5bdac0 1150
+  s_2693e7132b35a8::t_581b0f4aac26f8 1001-1002
+  s_2693e7132b35a8::t_4ceccaec8d7ef0 1070
+tech-notes/sec/index.html
+  s_2693e7132b35a8::t_c4e88208425e6c 1296-1349,1826-1831
+  s_2693e7132b35a8::t_b3a71cde8c73e8 1026,1034
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "d577e5fe8c2fbe75e21297f3688d3bd84f099efc",
+  "prompts": {},
+  "sessions": {
+    "s_2693e7132b35a8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c40bec70-e755-495f-97c7-07266553e05c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
