@@ -1,0 +1,19 @@
+tech-notes/sv/cash-flow.md
+  s_7fe1d51ad6465c::t_ddc248e60bac6e 1-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "3b08bf5eaca6883f1f5825280fd588f5da9ca3ab",
+  "prompts": {},
+  "sessions": {
+    "s_7fe1d51ad6465c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7aa4c352-11ed-4288-abc7-b9e1d38272bb",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
