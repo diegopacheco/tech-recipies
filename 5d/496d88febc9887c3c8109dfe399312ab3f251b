@@ -1,0 +1,19 @@
+tech-notes/databases/db-modeling-created-at-updated-at.md
+  s_f68312cedb2fd2::t_6bb1ae8755861e 1-171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "5d496d88febc9887c3c8109dfe399312ab3f251b",
+  "prompts": {},
+  "sessions": {
+    "s_f68312cedb2fd2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "771bce42-c3cc-4105-8972-f2bfb4060a2d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
