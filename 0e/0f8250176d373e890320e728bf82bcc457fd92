@@ -1,0 +1,19 @@
+tech-notes/ai-transformation/benchmarks.md
+  s_f4fff1ee2988cc::t_aa511573c01d22 1-222
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "0e0f8250176d373e890320e728bf82bcc457fd92",
+  "prompts": {},
+  "sessions": {
+    "s_f4fff1ee2988cc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "535ee3b6-f50f-4911-9d40-d6ec784e1be9",
+        "model": "unknown"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
