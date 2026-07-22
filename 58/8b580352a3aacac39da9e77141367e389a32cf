@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/negative-cache.md
+  s_c6317ed8d72e9a::t_54a6395a1a910c 1-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "588b580352a3aacac39da9e77141367e389a32cf",
+  "prompts": {},
+  "sessions": {
+    "s_c6317ed8d72e9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a4666f9e-9beb-4c84-8797-97c7b631268d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
