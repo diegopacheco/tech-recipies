@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/OR-vs-CRDT.md
+  s_e8995fb4206e94::t_9dee2bb235c5ee 1-244
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "b91a94757f4399fca930b6b03757055d6b474ad6",
+  "prompts": {},
+  "sessions": {
+    "s_e8995fb4206e94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1cc066bb-e048-4cdf-bd69-8c4a3acb4009",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
