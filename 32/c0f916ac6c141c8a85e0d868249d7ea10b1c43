@@ -1,0 +1,29 @@
+tech-notes/distributed-systems/rate-limiting-sim.html
+  s_30626eb640349d::t_4e409e70865bed 287
+  s_30626eb640349d::t_c6a3468bc06341 323-324
+  s_30626eb640349d::t_fa5dcca7a05e63 298,303-305,308
+tech-notes/distributed-systems/index.html
+  s_30626eb640349d::t_03985efab7a6f4 524-554
+  s_30626eb640349d::t_61fa07f338f829 1179
+  s_30626eb640349d::t_0dcf197968e2ee 1262
+  s_30626eb640349d::t_dcb2a91b7d7a46 1160
+  s_30626eb640349d::t_851f77fbd101cc 1189
+  s_30626eb640349d::t_15f5880333ba03 1421
+  s_30626eb640349d::t_32549fabd4cf56 1465
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "32c0f916ac6c141c8a85e0d868249d7ea10b1c43",
+  "prompts": {},
+  "sessions": {
+    "s_30626eb640349d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90251d9e-44c9-44dc-9535-435bd1818a9e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
