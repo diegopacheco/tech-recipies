@@ -1,0 +1,24 @@
+tech-notes/sv/bonus.md
+  s_ecca26f84a2971::t_fad437249d1977 108
+  s_ecca26f84a2971::t_19cd799422299d 1-107,109-147
+tech-notes/sv/RSUs.md
+  s_ecca26f84a2971::t_88ca55ad19c686 1-141
+tech-notes/sv/stock-options.md
+  s_ecca26f84a2971::t_391f3a014bd56b 1-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "02465c10a567d57dbf93492a58eea7e9f75cc1e5",
+  "prompts": {},
+  "sessions": {
+    "s_ecca26f84a2971": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2434e9b-8e0a-475a-b9ad-633cb9bc4bee",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
