@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/rate-limiting-sim.html
+  s_30626eb640349d::t_2c59ebca1930d1 296-328
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "18710ab827f828ae991519d6409e9763c0470022",
+  "prompts": {},
+  "sessions": {
+    "s_30626eb640349d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90251d9e-44c9-44dc-9535-435bd1818a9e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
