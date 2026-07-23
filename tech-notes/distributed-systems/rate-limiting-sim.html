@@ -284,7 +284,7 @@ const ALGOS = {
     gcra: {
         name: 'GCRA',
         params: ['rate','burst'],
-        desc: 'Generic Cell Rate Algorithm. Tracks one <b>theoretical arrival time (TAT)</b>. Emission interval T = 1/R, burst tolerance τ = (B−1)·T. Deny if now < TAT − τ; else TAT = max(TAT, now) + T. Rate + burst in a single value — Stripe\'s choice.',
+        desc: 'Generic Cell Rate Algorithm. Tracks one <b>theoretical arrival time (TAT)</b>. Emission interval T = 1/R, burst tolerance τ = (B−1)·T. Deny if now < TAT − τ; else TAT = max(TAT, now) + T. Rate + burst in a single value — used by redis-cell.',
         T() { return 1 / R; },
         tau() { return (B - 1) / R; },
         init() { return { tat: now() }; },
@@ -295,17 +295,17 @@ const ALGOS = {
 
 const META = {
     tokenBucket: {
-        burst: 'yes', burstNote: 'Admits a full bucket (up to B) instantly, so it can grant B requests faster than the R/s budget the client is entitled to.',
+        burst: 'some', burstNote: 'By design: a full bucket admits up to B requests instantly and forwards them downstream, bounded by the bucket size B above the steady R/s rate.',
         pros: ['O(1) time and space — two numbers per client', 'Burst-friendly: absorbs legitimate spikes up to B', 'No background timer; tokens refill lazily on read'],
         cons: ['A burst can hit downstream with B requests at once', 'Tuning B trades burst tolerance against protection', 'Average-rate only — no smoothing of the output stream']
     },
     leakyBucket: {
-        burst: 'no', burstNote: 'Output is capped at a steady R/s no matter the input, so it never grants more than the configured rate — bursts are queued or dropped.',
-        pros: ['Smooths bursty input into a constant output rate', 'Protects a downstream with a hard steady cap', 'Simple, predictable, O(1) state'],
-        cons: ['Adds queueing latency to requests', 'A full queue drops requests with no burst credit', 'No allowance for legitimate short spikes']
+        burst: 'no', burstNote: 'Up to B requests are buffered in the queue, but they drain at a steady R/s, so downstream never exceeds the configured rate — no boundary excess. (Token bucket forwards the burst; leaky bucket smooths it.)',
+        pros: ['Smooths bursty input into a constant output rate', 'Protects a fragile downstream with a hard steady cap', 'Buffers a burst up to B instead of rejecting it outright'],
+        cons: ['Adds queueing latency — requests wait to drain', 'A full bucket drops the overflow', 'Extra buffering vs a plain token bucket meter']
     },
     fixedWindow: {
-        burst: 'yes', burstNote: 'The boundary bug: a client can spend the full limit at the end of one window and again at the start of the next — up to 2× the rate across the seam.',
+        burst: 'yes', burstNote: 'The boundary bug (unintended): a client can spend the full limit at the end of one window and again at the start of the next — up to 2× the rate across the seam.',
         pros: ['Dead simple, O(1) time and space', 'Trivial to reason about and to store', 'One counter + one timestamp per client'],
         cons: ['Boundary burst lets through up to 2× the limit', 'Sharp reset causes synchronized traffic spikes', 'Only approximate over any sliding interval']
     },
@@ -320,8 +320,8 @@ const META = {
         cons: ['Approximate — small error vs the exact log', 'Assumes even distribution within a window', 'Can slightly over- or under-count at the edge']
     },
     gcra: {
-        burst: 'some', burstNote: 'Burst tolerance τ = (B−1)/R is explicit: it permits a bounded burst up to B, then paces strictly — rate and burst controlled by one value.',
-        pros: ['Rate + burst enforced with a single timestamp', 'Ideal for distributed limiters (one atomic value)', 'Precise, no background refill loop (Stripe, redis-cell)'],
+        burst: 'some', burstNote: 'By design, strictly bounded: burst tolerance τ = (B−1)/R permits a burst up to B, then paces exactly — rate and burst controlled by one value.',
+        pros: ['Rate + burst enforced with a single timestamp', 'Ideal for distributed limiters (one atomic value)', 'Precise, no background refill loop (redis-cell / Redis)'],
         cons: ['Less intuitive than token/leaky bucket', 'Clock skew across nodes affects correctness', 'Burst tolerance τ must be tuned deliberately']
     }
 };

@@ -521,6 +521,37 @@
       cursor: pointer;
     }
 
+    .source .sim-link {
+      margin-left: auto;
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      background: var(--green);
+      color: var(--white);
+      padding: 8px 10px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .source .sim-link:hover {
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .modal-link.sim {
+      background: var(--green);
+      border-color: var(--green);
+      margin-left: 8px;
+      text-decoration: none;
+    }
+
+    .modal-link.sim:hover {
+      background: var(--amber);
+      border-color: var(--amber);
+    }
+
     .matrix {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1126,6 +1157,7 @@
       {
         title: "Consistent Hashing",
         file: "consistent-hashing.md",
+        sim: "consistent-hashing-sim.html",
         category: "foundations",
         focus: "Stable partition ownership",
         summary: "Explains hash rings, virtual nodes, Jump Consistent Hashing, Rendezvous Hashing, Maglev Hashing, movement cost, and use cases.",
@@ -1144,6 +1176,7 @@
       {
         title: "LSM-Trees vs B-Trees",
         file: "lsm-tree-vs-b-tree.md",
+        sim: "lsm-vs-btree-paths.html",
         category: "data",
         focus: "Storage engine tradeoffs",
         summary: "Compares B-tree and LSM-tree writes, reads, compaction, bloom filters, amplification tradeoffs, and database use cases.",
@@ -1153,6 +1186,7 @@
       {
         title: "Bloom Filters and Probabilistic Data Structures",
         file: "bloom-filters.md",
+        sim: "bloom-filter-sim.html",
         category: "data",
         focus: "Fast approximate membership",
         summary: "Explains bloom filters, false positives, sizing math, counting bloom filters, cuckoo filters, Count-Min Sketch, HyperLogLog, and related structures.",
@@ -1225,6 +1259,7 @@
       {
         title: "Rate Limiting",
         file: "rate-limiting.md",
+        sim: "rate-limiting-sim.html",
         category: "resilience",
         focus: "Bound request volume",
         summary: "Covers token bucket, leaky bucket, fixed windows, sliding windows, GCRA, distributed limiting, response semantics, and concurrency limits.",
@@ -1383,7 +1418,7 @@
             <h3><button type="button" data-topic="${topic.file}">${escapeHtml(topic.title)}</button></h3>
             <p>${escapeHtml(topic.summary)}</p>
             <div class="tags">${topic.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
-            <div class="source"><a href="${topic.file}"><span>${escapeHtml(topic.file)}</span><strong>Open file</strong></a><button type="button" data-topic="${topic.file}">Study</button></div>
+            <div class="source"><a href="${topic.file}"><span>${escapeHtml(topic.file)}</span><strong>Open file</strong></a>${topic.sim ? `<a class="sim-link" href="${topic.sim}" title="Interactive simulation">▶ Simulation</a>` : ""}<button type="button" data-topic="${topic.file}">Study</button></div>
           </div>
         </article>`;
       }).join("");
@@ -1427,6 +1462,7 @@
             <li>${escapeHtml(topic.tags.join(", "))}</li>
           </ul>
           <a class="modal-link" href="${topic.file}">Open markdown file</a>
+          ${topic.sim ? `<a class="modal-link sim" href="${topic.sim}" target="_blank" rel="noopener">▶ Launch interactive simulation</a>` : ""}
         </section>
         <section class="learn-panel">
           <h3>System Sketch</h3>
