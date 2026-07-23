@@ -351,7 +351,19 @@ function selectAlgo(key) {
     document.getElementById('algoDesc').innerHTML = ALGOS[key].desc;
     buildAlgoBar();
     updateParamDim();
+    renderInfo(key);
     renderTimeline(); renderStats();
+}
+
+function renderInfo(key) {
+    const m = META[key];
+    const badge = document.getElementById('burstBadge');
+    const labels = { yes: 'Yes — over-admits', some: 'Bounded', no: 'None' };
+    badge.className = 'burstbadge ' + m.burst;
+    badge.textContent = labels[m.burst];
+    document.getElementById('burstNote').textContent = m.burstNote;
+    document.getElementById('prosList').innerHTML = m.pros.map(p => `<li>${p}</li>`).join('');
+    document.getElementById('consList').innerHTML = m.cons.map(c => `<li>${c}</li>`).join('');
 }
 
 function updateParamDim() {
