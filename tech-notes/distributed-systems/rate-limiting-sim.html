@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rate Limiting Simulation</title>
+    <style>
+        :root {
+            --paper: #f2efe6;
+            --ink: #17211d;
+            --muted: #5e6963;
+            --line: #c9cec3;
+            --panel: #fffdf7;
+            --green: #176b4d;
+            --amber: #dc7b22;
+            --red: #b23a3a;
+            --blue: #2f6690;
+            --purple: #7a4f9e;
+            --soft-green: #dcebe2;
+            --soft-amber: #f8e5d1;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--paper); color: var(--ink); font-family: Georgia, "Times New Roman", serif; line-height: 1.6; }
+        body::before {
+            position: fixed; inset: 0; z-index: -1; content: ""; opacity: .32;
+            background-image: linear-gradient(rgba(23,33,29,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(23,33,29,.08) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .page { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0;
+            border-bottom: 1px solid var(--line); font-family: "Courier New", monospace; font-size: .74rem;
+            letter-spacing: .08em; text-transform: uppercase;
+        }
+        .topbar a { padding: 7px 12px; border: 1px solid var(--green); color: var(--green); text-decoration: none; transition: background .2s, color .2s; }
+        .topbar a:hover { background: var(--green); color: var(--panel); }
+        header { padding: 56px 0 40px; }
+        .eyebrow { margin: 0 0 14px; color: var(--amber); font-family: "Courier New", monospace; font-size: .8rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+        h1 { margin: 0 0 20px; font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 400; letter-spacing: -.04em; line-height: .92; }
+        .lede { max-width: 760px; margin: 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.3rem); }
+
+        .algobar { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 24px; }
+        .algo {
+            font-family: "Courier New", monospace; font-size: .78rem; padding: 9px 14px; border: 1px solid var(--line);
+            background: var(--panel); color: var(--muted); border-radius: 999px; cursor: pointer; transition: all .15s;
+        }
+        .algo:hover { border-color: var(--ink); color: var(--ink); }
+        .algo.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+        .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; padding-bottom: 60px; }
+        @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+        .panel h2 { margin: 0 0 4px; font-size: 1.05rem; font-family: "Courier New", monospace; text-transform: uppercase; letter-spacing: .06em; }
+        .panel .hint { margin: 0 0 16px; font-size: .82rem; color: var(--muted); }
+
+        .controls { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 16px; }
+        .btn {
+            font-family: "Courier New", monospace; font-size: .82rem; letter-spacing: .04em; padding: 10px 14px;
+            border: 1px solid var(--ink); background: var(--panel); color: var(--ink); border-radius: 7px; cursor: pointer;
+            text-align: left; transition: transform .1s, background .15s, color .15s; width: 100%;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn.green { border-color: var(--green); color: var(--green); }
+        .btn.green:hover { background: var(--green); color: var(--panel); }
+        .btn.amber { border-color: var(--amber); color: var(--amber); }
+        .btn.amber:hover { background: var(--amber); color: var(--panel); }
+        .btn.red { border-color: var(--red); color: var(--red); }
+        .btn.red:hover { background: var(--red); color: var(--panel); }
+        .btn.blue { border-color: var(--blue); color: var(--blue); }
+        .btn.blue:hover { background: var(--blue); color: var(--panel); }
+        .btn.on { background: var(--green); color: var(--panel); }
+        .row { display: flex; gap: 8px; }
+
+        .field { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; color: var(--muted); }
+        .field input[type=range] { width: 100%; accent-color: var(--green); }
+        .field.dim { opacity: .35; }
+        .sep { height: 1px; background: var(--line); margin: 6px 0; }
+
+        .stagewrap { display: flex; flex-direction: column; gap: 20px; }
+        canvas { width: 100%; height: 320px; display: block; border-radius: 8px; background: var(--paper); border: 1px solid var(--line); }
+
+        .desc { font-size: .92rem; color: var(--muted); }
+        .desc b { color: var(--ink); }
+
+        .timeline { display: flex; gap: 2px; height: 44px; align-items: flex-end; overflow: hidden; }
+        .tick { flex: 0 0 5px; border-radius: 2px 2px 0 0; }
+        .tick.allow { background: var(--green); }
+        .tick.deny { background: var(--red); }
+
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+        .stat { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; text-align: center; }
+        .stat .num { font-family: "Courier New", monospace; font-size: 1.4rem; }
+        .stat .num.g { color: var(--green); }
+        .stat .num.r { color: var(--red); }
+        .stat .lbl { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+
+        .legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: "Courier New", monospace; font-size: .74rem; color: var(--muted); }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+        footer { padding: 30px 0 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+        code { font-family: "Courier New", monospace; background: var(--soft-green); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="topbar">
+        <span>Distributed Systems / Simulation</span>
+        <a href="rate-limiting.md">Read the notes →</a>
+    </div>
+
+    <header>
+        <p class="eyebrow">Interactive · Admission Control</p>
+        <h1>Rate Limiting</h1>
+        <p class="lede">Six classic algorithms, one live traffic stream. Send requests by hand, fire a burst, or turn on auto-traffic — then watch each algorithm decide <b>allow</b> or <b>deny</b> in real time, and see exactly why.</p>
+    </header>
+
+    <div class="algobar" id="algobar"></div>
+
+    <div class="layout">
+        <aside>
+            <div class="controls">
+                <div class="panel">
+                    <h2>Traffic</h2>
+                    <p class="hint">Drive requests into the limiter.</p>
+                    <button class="btn green" onclick="sendOne()">→ Send 1 request</button>
+                    <div style="height:8px"></div>
+                    <button class="btn amber" onclick="sendBurst(12)">⇉ Burst 12 at once</button>
+                    <div style="height:8px"></div>
+                    <button class="btn blue" id="autoBtn" onclick="toggleAuto()">▶ Auto-traffic: off</button>
+                    <div class="sep"></div>
+                    <div class="field" id="autoRateField">
+                        <label>Auto rate: <b id="autoRateVal">8</b> req/s</label>
+                        <input type="range" id="autoRate" min="1" max="30" value="8" oninput="autoRateVal.textContent=this.value">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Limits</h2>
+                    <p class="hint">Greyed params don't apply to the selected algorithm.</p>
+                    <div class="field" id="fRate">
+                        <label>Rate R: <b id="rateVal">5</b> tokens/s</label>
+                        <input type="range" id="rate" min="1" max="20" value="5" oninput="setParam()">
+                    </div>
+                    <div style="height:12px"></div>
+                    <div class="field" id="fBurst">
+                        <label>Capacity / burst B: <b id="burstVal">8</b></label>
+                        <input type="range" id="burst" min="1" max="20" value="8" oninput="setParam()">
+                    </div>
+                    <div style="height:12px"></div>
+                    <div class="field" id="fWindow">
+                        <label>Window W: <b id="windowVal">3</b> s</label>
+                        <input type="range" id="window" min="1" max="8" value="3" oninput="setParam()">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <button class="btn red" onclick="resetSim()">↺ Reset</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="stagewrap">
+            <div class="panel">
+                <h2 id="algoTitle">Token Bucket</h2>
+                <p class="desc" id="algoDesc"></p>
+                <canvas id="cv" width="900" height="320"></canvas>
+                <div style="height:14px"></div>
+                <div class="legend">
+                    <span><i class="swatch" style="background:var(--green)"></i> allowed</span>
+                    <span><i class="swatch" style="background:var(--red)"></i> denied (429)</span>
+                    <span><i class="swatch" style="background:var(--amber)"></i> token / queued</span>
+                    <span><i class="swatch" style="background:var(--blue)"></i> now marker</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Decisions over time</h2>
+                <p class="hint">Newest on the right. Green admitted, red rejected.</p>
+                <div class="timeline" id="timeline"></div>
+            </div>
+
+            <div class="panel">
+                <h2>Stats</h2>
+                <div class="stats" id="stats"></div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        Token bucket permits bursts; leaky bucket smooths them; fixed window is cheap but has the boundary bug; sliding-window log is exact but O(n); sliding-window counter is the pragmatic default; <code>GCRA</code> enforces rate + burst with a single timestamp. See the <a href="rate-limiting.md">notes</a>.
+    </footer>
+</div>
+
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const C = { paper:'#f2efe6', ink:'#17211d', muted:'#5e6963', line:'#c9cec3', panel:'#fffdf7',
+    green:'#176b4d', amber:'#dc7b22', red:'#b23a3a', blue:'#2f6690', purple:'#7a4f9e',
+    softGreen:'#dcebe2', softAmber:'#f8e5d1' };
+
+let R = 5, B = 8, W = 3;
+let allowed = 0, denied = 0;
+let particles = [];
+let ticks = [];
+let auto = false, lastAuto = 0;
+
+const ALGOS = {
+    tokenBucket: {
+        name: 'Token Bucket',
+        params: ['rate','burst'],
+        desc: 'A bucket holds up to <b>B</b> tokens and refills at <b>R</b>/s. Each request spends one token; empty bucket → deny. Permits bursts up to B while holding the average at R.',
+        init() { return { tokens: B, last: now() }; },
+        refill(s) { s.tokens = Math.min(B, s.tokens + (now() - s.last) * R); s.last = now(); },
+        tryReq(s) { this.refill(s); if (s.tokens >= 1) { s.tokens -= 1; return true; } return false; },
+        draw(s) { this.refill(s); drawBucket(s.tokens, B, 'refills at ' + R + '/s'); }
+    },
+    leakyBucket: {
+        name: 'Leaky Bucket',
+        params: ['rate','burst'],
+        desc: 'Requests join a queue of capacity <b>B</b> that drains at a steady <b>R</b>/s. A full queue overflows → deny. Absorbs bursts and emits a smooth, constant output rate.',
+        init() { return { level: 0, last: now() }; },
+        leak(s) { s.level = Math.max(0, s.level - (now() - s.last) * R); s.last = now(); },
+        tryReq(s) { this.leak(s); if (s.level < B) { s.level += 1; return true; } return false; },
+        draw(s) { this.leak(s); drawLeaky(s.level, B); }
+    },
+    fixedWindow: {
+        name: 'Fixed Window Counter',
+        params: ['rate','window'],
+        desc: 'Count requests per fixed <b>W</b>-second window, limit = R·W. O(1), but a client can fire the limit at the end of one window and again at the start of the next — the <b>boundary burst</b> (up to 2×).',
+        limit() { return Math.max(1, Math.round(R * W)); },
+        init() { return { start: now(), count: 0 }; },
+        roll(s) { const L = W; while (now() >= s.start + L) { s.start += L; s.count = 0; } },
+        tryReq(s) { this.roll(s); if (s.count < this.limit()) { s.count += 1; return true; } return false; },
+        draw(s) { this.roll(s); drawFixed(s.count, this.limit(), s.start); }
+    },
+    slidingLog: {
+        name: 'Sliding Window Log',
+        params: ['rate','window'],
+        desc: 'Store the timestamp of every request; drop those older than <b>W</b> and count the rest. Exact, no boundary bug — but O(n) memory per client. limit = R·W.',
+        limit() { return Math.max(1, Math.round(R * W)); },
+        init() { return { log: [] }; },
+        prune(s) { const cut = now() - W; while (s.log.length && s.log[0] < cut) s.log.shift(); },
+        tryReq(s) { this.prune(s); if (s.log.length < this.limit()) { s.log.push(now()); return true; } return false; },
+        draw(s) { this.prune(s); drawLog(s.log, this.limit()); }
+    },
+    slidingCounter: {
+        name: 'Sliding Window Counter',
+        params: ['rate','window'],
+        desc: 'Weight the previous window\'s count by how much it still overlaps the sliding window and add the current count: <code>prev·overlap + cur</code>. O(1), no hard boundary. The pragmatic default (Cloudflare).',
+        limit() { return Math.max(1, Math.round(R * W)); },
+        init() { return { start: now(), cur: 0, prev: 0 }; },
+        roll(s) { let rolled = false; while (now() >= s.start + W) { s.prev = s.cur; s.cur = 0; s.start += W; rolled = true; if (now() - s.start > W) { s.prev = 0; } } return rolled; },
+        weighted(s) { const overlap = 1 - (now() - s.start) / W; return s.prev * Math.max(0, overlap) + s.cur; },
+        tryReq(s) { this.roll(s); if (this.weighted(s) < this.limit()) { s.cur += 1; return true; } return false; },
+        draw(s) { this.roll(s); drawSlidingCounter(s, this.limit()); }
+    },
+    gcra: {
+        name: 'GCRA',
+        params: ['rate','burst'],
+        desc: 'Generic Cell Rate Algorithm. Tracks one <b>theoretical arrival time (TAT)</b>. Emission interval T = 1/R, burst tolerance τ = (B−1)·T. Deny if now < TAT − τ; else TAT = max(TAT, now) + T. Rate + burst in a single value — Stripe\'s choice.',
+        T() { return 1 / R; },
+        tau() { return (B - 1) / R; },
+        init() { return { tat: now() }; },
+        tryReq(s) { const t = now(); if (t < s.tat - this.tau()) return false; s.tat = Math.max(s.tat, t) + this.T(); return true; },
+        draw(s) { drawGCRA(s); }
+    }
+};
+
+let current = 'tokenBucket';
+let state = ALGOS[current].init();
+
+function now() { return performance.now() / 1000; }
+
+function buildAlgoBar() {
+    const bar = document.getElementById('algobar');
+    bar.innerHTML = '';
+    Object.keys(ALGOS).forEach(key => {
+        const b = document.createElement('button');
+        b.className = 'algo' + (key === current ? ' active' : '');
+        b.textContent = ALGOS[key].name;
+        b.onclick = () => selectAlgo(key);
+        bar.appendChild(b);
+    });
+}
+
+function selectAlgo(key) {
+    current = key;
+    state = ALGOS[key].init();
+    allowed = 0; denied = 0; particles = []; ticks = [];
+    document.getElementById('algoTitle').textContent = ALGOS[key].name;
+    document.getElementById('algoDesc').innerHTML = ALGOS[key].desc;
+    buildAlgoBar();
+    updateParamDim();
+    renderTimeline(); renderStats();
+}
+
+function updateParamDim() {
+    const p = ALGOS[current].params;
+    document.getElementById('fRate').className = 'field' + (p.includes('rate') ? '' : ' dim');
+    document.getElementById('fBurst').className = 'field' + (p.includes('burst') ? '' : ' dim');
+    document.getElementById('fWindow').className = 'field' + (p.includes('window') ? '' : ' dim');
+}
+
+function setParam() {
+    R = +document.getElementById('rate').value;
+    B = +document.getElementById('burst').value;
+    W = +document.getElementById('window').value;
+    document.getElementById('rateVal').textContent = R;
+    document.getElementById('burstVal').textContent = B;
+    document.getElementById('windowVal').textContent = W;
+}
+
+function request() {
+    const ok = ALGOS[current].tryReq(state);
+    if (ok) allowed++; else denied++;
+    ticks.push(ok ? 'allow' : 'deny');
+    if (ticks.length > 90) ticks.shift();
+    spawnParticle(ok);
+    renderTimeline(); renderStats();
+}
+function sendOne() { request(); }
+function sendBurst(n) { for (let i = 0; i < n; i++) request(); }
+
+function toggleAuto() {
+    auto = !auto;
+    const btn = document.getElementById('autoBtn');
+    btn.textContent = auto ? '⏸ Auto-traffic: on' : '▶ Auto-traffic: off';
+    btn.classList.toggle('on', auto);
+    lastAuto = now();
+}
+
+function resetSim() {
+    state = ALGOS[current].init();
+    allowed = 0; denied = 0; particles = []; ticks = [];
+    renderTimeline(); renderStats();
+}
+
+function spawnParticle(ok) {
+    particles.push({ x: cv.width * 0.5 + (Math.random() - 0.5) * 40, y: -14, vy: 3 + Math.random() * 2, ok, life: 1 });
+}
+
+function renderTimeline() {
+    const el = document.getElementById('timeline');
+    el.innerHTML = ticks.map(t => `<div class="tick ${t}"></div>`).join('');
+}
+function renderStats() {
+    const total = allowed + denied;
+    const rate = total ? (allowed / total * 100) : 0;
+    document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="num">${total}</div><div class="lbl">Requests</div></div>
+        <div class="stat"><div class="num g">${allowed}</div><div class="lbl">Allowed</div></div>
+        <div class="stat"><div class="num r">${denied}</div><div class="lbl">Denied 429</div></div>
+        <div class="stat"><div class="num">${rate.toFixed(0)}%</div><div class="lbl">Allow rate</div></div>`;
+}
+
+function fitCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    const w = cv.clientWidth, h = cv.clientHeight;
+    if (cv.width !== w * ratio || cv.height !== h * ratio) {
+        cv.width = w * ratio; cv.height = h * ratio;
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+}
+function CW() { return cv.clientWidth; }
+function CH() { return cv.clientHeight; }
+
+function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+function label(text, x, y, color, size, align) {
+    ctx.fillStyle = color || C.muted;
+    ctx.font = (size || 12) + 'px "Courier New", monospace';
+    ctx.textAlign = align || 'left';
+    ctx.fillText(text, x, y);
+    ctx.textAlign = 'left';
+}
+
+function drawBucket(tokens, cap, sub) {
+    const w = CW(), h = CH();
+    const bx = w / 2 - 90, by = 60, bw = 180, bh = 190;
+    ctx.strokeStyle = C.line; ctx.lineWidth = 2;
+    roundRect(bx, by, bw, bh, 12); ctx.stroke();
+    const cols = Math.min(cap, 5);
+    const cellW = bw / cols;
+    const rows = Math.ceil(cap / cols);
+    const cellH = Math.min(28, (bh - 12) / rows);
+    let drawn = 0;
+    const full = Math.floor(tokens + 1e-6);
+    for (let i = 0; i < cap; i++) {
+        const r = Math.floor(i / cols), c = i % cols;
+        const cx = bx + c * cellW + cellW / 2;
+        const cy = by + bh - 14 - r * (cellH + 4) - cellH / 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, Math.min(10, cellH / 2 - 1), 0, Math.PI * 2);
+        if (i < full) { ctx.fillStyle = C.amber; ctx.fill(); }
+        else if (i < tokens) { ctx.fillStyle = C.softAmber; ctx.fill(); ctx.strokeStyle = C.amber; ctx.lineWidth = 1.5; ctx.stroke(); }
+        else { ctx.strokeStyle = C.line; ctx.lineWidth = 1.5; ctx.stroke(); }
+    }
+    label('capacity ' + cap, bx + bw / 2, by + bh + 22, C.muted, 12, 'center');
+    label(sub, bx + bw / 2, by - 16, C.green, 12, 'center');
+    label(tokens.toFixed(1) + ' tokens', bx + bw / 2, by + bh + 40, C.ink, 13, 'center');
+}
+
+function drawLeaky(level, cap) {
+    const w = CW(), h = CH();
+    const bx = w / 2 - 80, by = 40, bw = 160, bh = 180;
+    ctx.strokeStyle = C.line; ctx.lineWidth = 2;
+    roundRect(bx, by, bw, bh, 10); ctx.stroke();
+    const fillH = (level / cap) * (bh - 8);
+    ctx.fillStyle = level >= cap ? C.red : C.amber;
+    if (fillH > 0) { roundRect(bx + 4, by + bh - 4 - fillH, bw - 8, fillH, 6); ctx.fillStyle = level >= cap ? 'rgba(178,58,58,.55)' : 'rgba(220,123,34,.55)'; ctx.fill(); }
+    for (let i = 0; i < Math.ceil(level); i++) {
+        const per = 6; const r = Math.floor(i / (Math.floor((bw - 20) / 22) || 1));
+        const cols = Math.max(1, Math.floor((bw - 20) / 22));
+        const c = i % cols;
+        const cx = bx + 16 + c * 22;
+        const cy = by + bh - 16 - r * 20;
+        ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = i < level ? C.amber : C.softAmber; ctx.fill();
+        ctx.strokeStyle = C.panel; ctx.lineWidth = 1.5; ctx.stroke();
+    }
+    label('queue ' + level.toFixed(1) + ' / ' + cap, bx + bw / 2, by - 14, C.ink, 13, 'center');
+    const dy = (now() * R * 20) % 30;
+    ctx.beginPath(); ctx.arc(bx + bw / 2, by + bh + 14 + dy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = C.green; ctx.fill();
+    label('leaks at ' + R + '/s', bx + bw / 2, by + bh + 60, C.green, 12, 'center');
+}
+
+function drawWindowAxis(y, x0, x1) {
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+}
+
+function drawFixed(count, limit, start) {
+    const w = CW(), h = CH();
+    const remaining = Math.max(0, (start + W) - now());
+    const bx = 60, by = 70, bw = w - 120, bh = 44;
+    ctx.strokeStyle = C.line; ctx.lineWidth = 2; roundRect(bx, by, bw, bh, 8); ctx.stroke();
+    const fillW = Math.min(1, count / limit) * (bw - 6);
+    ctx.fillStyle = count >= limit ? C.red : C.green;
+    if (fillW > 0) { roundRect(bx + 3, by + 3, fillW, bh - 6, 6); ctx.fill(); }
+    label(count + ' / ' + limit + ' this window', bx, by - 14, C.ink, 13, 'left');
+    label('resets in ' + remaining.toFixed(1) + 's', bx + bw, by - 14, C.amber, 12, 'right');
+    const progW = (1 - remaining / W) * bw;
+    ctx.fillStyle = C.blue;
+    ctx.fillRect(bx, by + bh + 12, progW, 6);
+    ctx.strokeStyle = C.line; ctx.strokeRect(bx, by + bh + 12, bw, 6);
+    label('window clock', bx, by + bh + 40, C.muted, 12, 'left');
+    label('⚠ boundary burst: fill at reset edge, then again next window → up to 2× limit', bx, by + bh + 78, C.muted, 12, 'left');
+    label('limit = R·W = ' + R + '×' + W + ' = ' + limit, bx + bw, by + bh + 40, C.muted, 12, 'right');
+}
+
+function drawLog(log, limit) {
+    const w = CW(), h = CH();
+    const x0 = 60, x1 = w - 60, y = h / 2;
+    drawWindowAxis(y, x0, x1);
+    label('now − W', x0, y + 30, C.muted, 12, 'left');
+    label('now', x1, y + 30, C.blue, 12, 'right');
+    const t0 = now() - W;
+    log.forEach(ts => {
+        const fx = x0 + ((ts - t0) / W) * (x1 - x0);
+        ctx.beginPath(); ctx.arc(fx, y, 7, 0, Math.PI * 2);
+        ctx.fillStyle = C.amber; ctx.fill(); ctx.strokeStyle = C.panel; ctx.lineWidth = 1.5; ctx.stroke();
+    });
+    ctx.strokeStyle = C.blue; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x1, y - 40); ctx.lineTo(x1, y + 12); ctx.stroke();
+    label(log.length + ' / ' + limit + ' timestamps in window', (x0 + x1) / 2, y - 44, C.ink, 13, 'center');
+    label('each dot = one stored request timestamp (O(n) memory)', (x0 + x1) / 2, y + 60, C.muted, 12, 'center');
+}
+
+function drawSlidingCounter(s, limit) {
+    const w = CW(), h = CH();
+    const x0 = 60, x1 = w - 60, mid = (x0 + x1) / 2;
+    const y = 90;
+    const overlap = Math.max(0, 1 - (now() - s.start) / W);
+    ctx.fillStyle = C.softAmber; ctx.fillRect(x0, y, mid - x0, 40);
+    ctx.fillStyle = C.softGreen; ctx.fillRect(mid, y, x1 - mid, 40);
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1.5;
+    ctx.strokeRect(x0, y, mid - x0, 40); ctx.strokeRect(mid, y, x1 - mid, 40);
+    label('previous window', (x0 + mid) / 2, y - 12, C.amber, 12, 'center');
+    label('current window', (mid + x1) / 2, y - 12, C.green, 12, 'center');
+    label('count ' + s.prev, (x0 + mid) / 2, y + 24, C.ink, 13, 'center');
+    label('count ' + s.cur, (mid + x1) / 2, y + 24, C.ink, 13, 'center');
+    const shade = x0 + (1 - overlap) * (mid - x0);
+    ctx.fillStyle = 'rgba(94,105,99,.25)';
+    ctx.fillRect(x0, y, shade - x0, 40);
+    const weighted = s.prev * overlap + s.cur;
+    const by = y + 90, bw = x1 - x0, bh = 40;
+    ctx.strokeStyle = C.line; ctx.lineWidth = 2; roundRect(x0, by, bw, bh, 8); ctx.stroke();
+    const fillW = Math.min(1, weighted / limit) * (bw - 6);
+    ctx.fillStyle = weighted >= limit ? C.red : C.green;
+    if (fillW > 0) { roundRect(x0 + 3, by + 3, fillW, bh - 6, 6); ctx.fill(); }
+    label('estimate = prev·' + overlap.toFixed(2) + ' + cur = ' + weighted.toFixed(1) + ' / ' + limit, mid, by - 12, C.ink, 13, 'center');
+    label('overlap fraction shrinks as the current window advances', mid, by + bh + 34, C.muted, 12, 'center');
+}
+
+function drawGCRA(s) {
+    const w = CW(), h = CH();
+    const x0 = 70, x1 = w - 70, y = h / 2;
+    const span = Math.max(W, (B) / R) * 1.4 + 0.5;
+    const t = now();
+    function px(time) { return x0 + ((time - t) / span + 0.35) * (x1 - x0); }
+    drawWindowAxis(y, x0, x1);
+    const nowX = px(t);
+    ctx.strokeStyle = C.blue; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(nowX, y - 44); ctx.lineTo(nowX, y + 16); ctx.stroke();
+    label('now', nowX, y + 34, C.blue, 12, 'center');
+    const tatX = px(s.tat);
+    ctx.strokeStyle = C.amber; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(tatX, y - 30); ctx.lineTo(tatX, y + 16); ctx.stroke();
+    label('TAT', tatX, y - 36, C.amber, 12, 'center');
+    const allowX = px(s.tat - (B - 1) / R);
+    ctx.fillStyle = 'rgba(23,107,77,.15)';
+    ctx.fillRect(Math.min(allowX, x1), y - 12, Math.max(0, x1 - allowX), 24);
+    ctx.fillStyle = 'rgba(178,58,58,.15)';
+    ctx.fillRect(x0, y - 12, Math.max(0, allowX - x0), 24);
+    ctx.strokeStyle = C.red; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(allowX, y - 24); ctx.lineTo(allowX, y + 12); ctx.stroke();
+    label('TAT − τ (allow boundary)', allowX, y + 48, C.muted, 11, 'center');
+    const admit = t >= s.tat - (B - 1) / R;
+    label(admit ? 'now ≥ TAT − τ → next request ALLOWED' : 'now < TAT − τ → next request DENIED', (x0 + x1) / 2, y - 60, admit ? C.green : C.red, 13, 'center');
+    label('T = 1/R = ' + (1 / R).toFixed(2) + 's   τ = (B−1)/R = ' + ((B - 1) / R).toFixed(2) + 's', (x0 + x1) / 2, h - 24, C.muted, 12, 'center');
+}
+
+function drawParticles() {
+    particles.forEach(p => {
+        p.y += p.vy; p.vy += 0.35;
+        if (!p.ok && p.y > CH() * 0.32) { p.vy = -Math.abs(p.vy) * 0.5; p.bounced = (p.bounced || 0) + 1; }
+        if (p.y > CH() + 20 || (p.bounced || 0) > 2) p.life -= 0.06;
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = p.ok ? C.green : C.red; ctx.fill();
+        ctx.globalAlpha = 1;
+    });
+    particles = particles.filter(p => p.life > 0 && p.y < CH() + 40);
+}
+
+function frame() {
+    fitCanvas();
+    ctx.clearRect(0, 0, CW(), CH());
+    if (auto) {
+        const rate = +document.getElementById('autoRate').value;
+        const interval = 1 / rate;
+        if (now() - lastAuto >= interval) { request(); lastAuto = now(); }
+    }
+    ALGOS[current].draw(state);
+    drawParticles();
+    requestAnimationFrame(frame);
+}
+
+buildAlgoBar();
+setParam();
+selectAlgo('tokenBucket');
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

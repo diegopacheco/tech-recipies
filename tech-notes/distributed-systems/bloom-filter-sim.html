@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bloom Filter Simulation</title>
+    <style>
+        :root {
+            --paper: #f2efe6;
+            --ink: #17211d;
+            --muted: #5e6963;
+            --line: #c9cec3;
+            --panel: #fffdf7;
+            --green: #176b4d;
+            --amber: #dc7b22;
+            --red: #b23a3a;
+            --blue: #2f6690;
+            --purple: #7a4f9e;
+            --soft-green: #dcebe2;
+            --soft-amber: #f8e5d1;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; background: var(--paper); color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif; line-height: 1.6;
+        }
+        body::before {
+            position: fixed; inset: 0; z-index: -1; content: ""; opacity: .32;
+            background-image: linear-gradient(rgba(23, 33, 29, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(23, 33, 29, .08) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .page { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between; gap: 24px;
+            padding: 20px 0; border-bottom: 1px solid var(--line); font-family: "Courier New", monospace;
+            font-size: .74rem; letter-spacing: .08em; text-transform: uppercase;
+        }
+        .topbar a { padding: 7px 12px; border: 1px solid var(--green); color: var(--green); text-decoration: none; transition: background .2s, color .2s; }
+        .topbar a:hover { background: var(--green); color: var(--panel); }
+
+        header { padding: 56px 0 40px; }
+        .eyebrow { margin: 0 0 14px; color: var(--amber); font-family: "Courier New", monospace; font-size: .8rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+        h1 { margin: 0 0 20px; font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 400; letter-spacing: -.04em; line-height: .92; }
+        .lede { max-width: 740px; margin: 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.3rem); }
+
+        .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; padding-bottom: 60px; }
+        @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+        .panel h2 { margin: 0 0 4px; font-size: 1.05rem; font-family: "Courier New", monospace; text-transform: uppercase; letter-spacing: .06em; }
+        .panel .hint { margin: 0 0 16px; font-size: .82rem; color: var(--muted); }
+
+        .controls { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 16px; }
+        .btn {
+            font-family: "Courier New", monospace; font-size: .82rem; letter-spacing: .04em;
+            padding: 10px 14px; border: 1px solid var(--ink); background: var(--panel); color: var(--ink);
+            border-radius: 7px; cursor: pointer; text-align: left; transition: transform .1s, background .15s, color .15s; width: 100%;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn.green { border-color: var(--green); color: var(--green); }
+        .btn.green:hover { background: var(--green); color: var(--panel); }
+        .btn.amber { border-color: var(--amber); color: var(--amber); }
+        .btn.amber:hover { background: var(--amber); color: var(--panel); }
+        .btn.red { border-color: var(--red); color: var(--red); }
+        .btn.red:hover { background: var(--red); color: var(--panel); }
+        .btn.blue { border-color: var(--blue); color: var(--blue); }
+        .btn.blue:hover { background: var(--blue); color: var(--panel); }
+        .row { display: flex; gap: 8px; }
+
+        .field { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; color: var(--muted); }
+        .field input[type=text] { font-family: "Courier New", monospace; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font-size: .85rem; }
+        .field input[type=range] { width: 100%; accent-color: var(--green); }
+        .sep { height: 1px; background: var(--line); margin: 6px 0; }
+
+        .stagewrap { display: flex; flex-direction: column; gap: 20px; }
+
+        .bitgrid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 5px; }
+        .bit {
+            aspect-ratio: 1; border-radius: 5px; background: var(--paper); border: 1px solid var(--line);
+            display: grid; place-items: center; font-family: "Courier New", monospace; font-size: .62rem;
+            color: var(--muted); position: relative; transition: background .3s, transform .2s, border-color .3s;
+        }
+        .bit.set { background: var(--green); color: #fffdf7; border-color: var(--green); }
+        .bit.hit { animation: ping .8s ease-out; }
+        .bit.probe { outline: 2px solid var(--amber); outline-offset: 1px; z-index: 2; }
+        .bit.probe-miss { outline: 2px solid var(--red); outline-offset: 1px; z-index: 2; }
+        @keyframes ping { 0% { transform: scale(1.5); } 100% { transform: scale(1); } }
+        @media (max-width: 620px) { .bitgrid { grid-template-columns: repeat(10, 1fr); } }
+
+        .result {
+            padding: 14px 18px; border-radius: 8px; font-family: "Courier New", monospace; font-size: .95rem;
+            display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); background: var(--paper);
+            min-height: 54px; transition: background .3s;
+        }
+        .result.present { background: var(--soft-amber); border-color: var(--amber); }
+        .result.absent { background: var(--soft-green); border-color: var(--green); }
+        .result.fp { background: #f4dcdc; border-color: var(--red); }
+        .result .tag { font-weight: bold; letter-spacing: .04em; }
+        .result .detail { font-size: .78rem; color: var(--muted); }
+
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+        .stat { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; text-align: center; }
+        .stat .num { font-family: "Courier New", monospace; font-size: 1.4rem; color: var(--green); }
+        .stat .lbl { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { font-family: "Courier New", monospace; font-size: .74rem; padding: 5px 10px; border-radius: 999px; background: var(--soft-green); color: var(--green); border: 1px solid var(--green); }
+
+        .log { font-family: "Courier New", monospace; font-size: .76rem; color: var(--muted); max-height: 170px; overflow-y: auto; }
+        .log div { padding: 3px 0; border-bottom: 1px dashed var(--line); }
+        .log b { color: var(--ink); }
+        .log .no { color: var(--red); }
+        .log .yes { color: var(--amber); }
+        .log .safe { color: var(--green); }
+
+        footer { padding: 30px 0 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+        code { font-family: "Courier New", monospace; background: var(--soft-green); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="topbar">
+        <span>Distributed Systems / Simulation</span>
+        <a href="bloom-filters.md">Read the notes →</a>
+    </div>
+
+    <header>
+        <p class="eyebrow">Interactive · Probabilistic Set</p>
+        <h1>Bloom Filter</h1>
+        <p class="lede">A bit array plus <b>k</b> hash functions. Insert flips <b>k</b> bits on; lookup checks them. Any 0 means <b>definitely not present</b>. All 1s means <b>probably present</b> — and sometimes that's a false positive. Watch the bits light up.</p>
+    </header>
+
+    <div class="layout">
+        <aside>
+            <div class="controls">
+                <div class="panel">
+                    <h2>Operations</h2>
+                    <p class="hint">Insert and query elements.</p>
+                    <div class="field">
+                        <label for="elem">Element</label>
+                        <input type="text" id="elem" placeholder="apple" onkeydown="if(event.key==='Enter')insert()">
+                    </div>
+                    <div style="height:10px"></div>
+                    <button class="btn green" onclick="insert()">+ Insert element</button>
+                    <div style="height:8px"></div>
+                    <button class="btn amber" onclick="lookup()">? Look up element</button>
+                    <div style="height:8px"></div>
+                    <div class="row">
+                        <button class="btn green" onclick="insertRandom()">+ Random</button>
+                        <button class="btn amber" onclick="lookupRandomAbsent()">? Test miss</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Parameters</h2>
+                    <p class="hint">Resizing rebuilds the filter.</p>
+                    <div class="field">
+                        <label>Bit array size m: <b id="mVal">64</b></label>
+                        <input type="range" id="mRange" min="16" max="128" step="16" value="64" oninput="setM(this.value)">
+                    </div>
+                    <div style="height:12px"></div>
+                    <div class="field">
+                        <label>Hash functions k: <b id="kVal">3</b></label>
+                        <input type="range" id="kRange" min="1" max="8" value="3" oninput="setK(this.value)">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <button class="btn blue" onclick="reset()">↺ Reset filter</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="stagewrap">
+            <div class="panel">
+                <h2>Bit array</h2>
+                <p class="hint">Green = 1. During a lookup, probed bits are ringed: <b style="color:var(--amber)">amber</b> = the k positions checked, <b style="color:var(--red)">red</b> = the 0 that proves absence.</p>
+                <div class="bitgrid" id="bits"></div>
+            </div>
+
+            <div class="panel">
+                <h2>Last query</h2>
+                <p class="hint">The verdict, and why.</p>
+                <div class="result" id="result"><span class="detail">Insert some elements, then look one up.</span></div>
+            </div>
+
+            <div class="panel">
+                <h2>Filter stats</h2>
+                <div class="stats" id="stats"></div>
+                <div class="sep"></div>
+                <p class="hint" style="margin:0 0 8px">Inserted elements (not stored by the filter — tracked here only to detect true false positives):</p>
+                <div class="chips" id="chips"></div>
+            </div>
+
+            <div class="panel">
+                <h2>Event log</h2>
+                <div class="log" id="log"></div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        Bloom filter (Burton Bloom, 1970). False positive rate <code>p ≈ (1 − e^(−kn/m))^k</code>. Optimal <code>k = (m/n)·ln 2</code>. No false negatives, ever.
+    </footer>
+</div>
+
+<script>
+let m = 64, k = 3;
+let bitsArr = new Uint8Array(m);
+let inserted = new Set();
+let queries = 0, falsePositives = 0;
+
+function hashes(s) {
+    let h1 = 2166136261 >>> 0;
+    for (let i = 0; i < s.length; i++) { h1 ^= s.charCodeAt(i); h1 = Math.imul(h1, 16777619); }
+    let h2 = 5381 >>> 0;
+    for (let i = 0; i < s.length; i++) { h2 = (Math.imul(h2, 33) ^ s.charCodeAt(i)) >>> 0; }
+    const out = [];
+    for (let i = 0; i < k; i++) {
+        const combined = (h1 + Math.imul(i, h2) + Math.imul(i * i, 0x9e3779b1)) >>> 0;
+        out.push(combined % m);
+    }
+    return out;
+}
+
+function renderBits() {
+    const grid = document.getElementById('bits');
+    grid.innerHTML = '';
+    for (let i = 0; i < m; i++) {
+        const b = document.createElement('div');
+        b.className = 'bit' + (bitsArr[i] ? ' set' : '');
+        b.id = 'bit-' + i;
+        b.textContent = i;
+        grid.appendChild(b);
+    }
+}
+
+function clearProbes() {
+    document.querySelectorAll('.bit').forEach(b => b.classList.remove('probe', 'probe-miss', 'hit'));
+}
+
+async function insert() {
+    const val = document.getElementById('elem').value.trim();
+    if (!val) {
+        log('insert skipped — type an element first');
+        return;
+    }
+    doInsert(val);
+    document.getElementById('elem').select();
+}
+
+function doInsert(val) {
+    clearProbes();
+    const idx = hashes(val);
+    inserted.add(val);
+    idx.forEach((p, n) => {
+        setTimeout(() => {
+            bitsArr[p] = 1;
+            const b = document.getElementById('bit-' + p);
+            b.classList.add('set', 'hit');
+        }, n * 130);
+    });
+    log(`+ insert <b>${val}</b> → bits [${idx.join(', ')}] set`);
+    setTimeout(() => { renderStats(); renderChips(); }, idx.length * 130 + 100);
+}
+
+function insertRandom() {
+    const words = ['apple','banana','cherry','grape','mango','lemon','olive','peach','plum','kiwi','fig','date','pear','melon'];
+    const w = words[Math.floor(Math.random() * words.length)] + '-' + Math.floor(Math.random() * 90 + 10);
+    doInsert(w);
+}
+
+async function lookup() {
+    const val = document.getElementById('elem').value.trim();
+    if (!val) {
+        const res = document.getElementById('result');
+        res.className = 'result';
+        res.innerHTML = '<span class="detail">Type an element in the box above, then look it up (try "apple" or "ghost").</span>';
+        log('lookup skipped — type an element first');
+        return;
+    }
+    doLookup(val);
+}
+
+function doLookup(val) {
+    clearProbes();
+    queries++;
+    const idx = hashes(val);
+    let firstMiss = -1;
+    idx.forEach((p, n) => {
+        setTimeout(() => {
+            const b = document.getElementById('bit-' + p);
+            if (bitsArr[p]) { b.classList.add('probe'); }
+            else { b.classList.add('probe-miss'); if (firstMiss === -1) firstMiss = p; }
+        }, n * 200);
+    });
+
+    setTimeout(() => {
+        const allSet = idx.every(p => bitsArr[p]);
+        const res = document.getElementById('result');
+        const reallyIn = inserted.has(val);
+        if (!allSet) {
+            const zero = idx.find(p => !bitsArr[p]);
+            res.className = 'result absent';
+            res.innerHTML = `<span class="tag" style="color:var(--green)">DEFINITELY NOT IN SET</span>
+                <span class="detail">bit[${zero}] = 0 · checked [${idx.join(', ')}]</span>`;
+            log(`? lookup <b>${val}</b> → <span class="safe">NOT present</span> (bit ${zero} is 0)`);
+        } else if (reallyIn) {
+            res.className = 'result present';
+            res.innerHTML = `<span class="tag" style="color:var(--amber)">PROBABLY IN SET</span>
+                <span class="detail">all bits [${idx.join(', ')}] = 1 · truly inserted</span>`;
+            log(`? lookup <b>${val}</b> → <span class="yes">present</span> (true positive)`);
+        } else {
+            falsePositives++;
+            res.className = 'result fp';
+            res.innerHTML = `<span class="tag" style="color:var(--red)">FALSE POSITIVE</span>
+                <span class="detail">all bits [${idx.join(', ')}] = 1, but ${val} was never inserted!</span>`;
+            log(`? lookup <b>${val}</b> → <span class="no">FALSE POSITIVE</span> (all k bits collided)`);
+        }
+        renderStats();
+    }, idx.length * 200 + 150);
+}
+
+function lookupRandomAbsent() {
+    let val, tries = 0;
+    do { val = 'ghost-' + Math.floor(Math.random() * 100000); tries++; } while (inserted.has(val) && tries < 50);
+    document.getElementById('elem').value = val;
+    doLookup(val);
+}
+
+function estFPR() {
+    const n = inserted.size;
+    if (n === 0) return 0;
+    return Math.pow(1 - Math.exp(-k * n / m), k);
+}
+
+function renderStats() {
+    const setBits = bitsArr.reduce((a, b) => a + b, 0);
+    document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="num">${inserted.size}</div><div class="lbl">Elements (n)</div></div>
+        <div class="stat"><div class="num">${setBits}/${m}</div><div class="lbl">Bits set</div></div>
+        <div class="stat"><div class="num">${(setBits/m*100).toFixed(0)}%</div><div class="lbl">Fill ratio</div></div>
+        <div class="stat"><div class="num">${(estFPR()*100).toFixed(1)}%</div><div class="lbl">Est. FP rate</div></div>
+        <div class="stat"><div class="num">${queries}</div><div class="lbl">Lookups</div></div>
+        <div class="stat"><div class="num">${falsePositives}</div><div class="lbl">Observed FPs</div></div>`;
+}
+
+function renderChips() {
+    const c = document.getElementById('chips');
+    c.innerHTML = [...inserted].map(v => `<span class="chip">${v}</span>`).join('') || '<span class="hint" style="font-family:Georgia">nothing inserted yet</span>';
+}
+
+function log(msg) {
+    const el = document.getElementById('log');
+    const d = document.createElement('div');
+    d.innerHTML = msg;
+    el.prepend(d);
+    while (el.children.length > 50) el.removeChild(el.lastChild);
+}
+
+function rebuild() {
+    bitsArr = new Uint8Array(m);
+    [...inserted].forEach(v => hashes(v).forEach(p => bitsArr[p] = 1));
+    renderBits(); renderStats(); renderChips();
+}
+
+function setM(v) {
+    m = +v; document.getElementById('mVal').textContent = v;
+    rebuild(); clearProbes();
+    log(`m → <b>${v}</b> bits · filter rebuilt`);
+}
+function setK(v) {
+    k = +v; document.getElementById('kVal').textContent = v;
+    rebuild(); clearProbes();
+    log(`k → <b>${v}</b> hash functions · filter rebuilt`);
+}
+
+function reset() {
+    inserted = new Set(); queries = 0; falsePositives = 0;
+    bitsArr = new Uint8Array(m);
+    document.getElementById('log').innerHTML = '';
+    document.getElementById('result').className = 'result';
+    document.getElementById('result').innerHTML = '<span class="detail">Insert some elements, then look one up.</span>';
+    renderBits(); renderStats(); renderChips();
+    log('filter reset');
+    seed();
+}
+
+function seed() {
+    ['apple', 'banana', 'cherry'].forEach(w => { inserted.add(w); hashes(w).forEach(p => bitsArr[p] = 1); });
+    renderBits(); renderStats(); renderChips();
+    log('seeded with apple, banana, cherry');
+}
+
+renderBits();
+seed();
+</script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LSM-Tree vs B+Tree — Read/Write Paths</title>
+    <style>
+        :root {
+            --paper: #f2efe6;
+            --ink: #17211d;
+            --muted: #5e6963;
+            --line: #c9cec3;
+            --panel: #fffdf7;
+            --green: #176b4d;
+            --amber: #dc7b22;
+            --red: #b23a3a;
+            --blue: #2f6690;
+            --purple: #7a4f9e;
+            --soft-green: #dcebe2;
+            --soft-amber: #f8e5d1;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--paper); color: var(--ink); font-family: Georgia, "Times New Roman", serif; line-height: 1.6; }
+        body::before {
+            position: fixed; inset: 0; z-index: -1; content: ""; opacity: .32;
+            background-image: linear-gradient(rgba(23,33,29,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(23,33,29,.08) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .page { width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0;
+            border-bottom: 1px solid var(--line); font-family: "Courier New", monospace; font-size: .74rem;
+            letter-spacing: .08em; text-transform: uppercase;
+        }
+        .topbar a { padding: 7px 12px; border: 1px solid var(--green); color: var(--green); text-decoration: none; transition: background .2s, color .2s; }
+        .topbar a:hover { background: var(--green); color: var(--panel); }
+        header { padding: 52px 0 32px; }
+        .eyebrow { margin: 0 0 14px; color: var(--amber); font-family: "Courier New", monospace; font-size: .8rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+        h1 { margin: 0 0 20px; font-size: clamp(2.2rem, 6vw, 4.4rem); font-weight: 400; letter-spacing: -.04em; line-height: .95; }
+        .lede { max-width: 800px; margin: 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.28rem); }
+
+        .toolbar {
+            display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 18px 20px; margin-bottom: 24px;
+            background: var(--panel); border: 1px solid var(--line); border-radius: 10px; position: sticky; top: 10px; z-index: 5;
+        }
+        .btn {
+            font-family: "Courier New", monospace; font-size: .82rem; letter-spacing: .03em; padding: 10px 16px;
+            border: 1px solid var(--ink); background: var(--panel); color: var(--ink); border-radius: 7px; cursor: pointer;
+            transition: transform .1s, background .15s, color .15s;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+        .btn.green { border-color: var(--green); color: var(--green); }
+        .btn.green:hover:not(:disabled) { background: var(--green); color: var(--panel); }
+        .btn.blue { border-color: var(--blue); color: var(--blue); }
+        .btn.blue:hover:not(:disabled) { background: var(--blue); color: var(--panel); }
+        .btn.amber { border-color: var(--amber); color: var(--amber); }
+        .btn.amber:hover:not(:disabled) { background: var(--amber); color: var(--panel); }
+        .btn.purple { border-color: var(--purple); color: var(--purple); }
+        .btn.purple:hover:not(:disabled) { background: var(--purple); color: var(--panel); }
+        .btn.red { border-color: var(--red); color: var(--red); }
+        .btn.red:hover:not(:disabled) { background: var(--red); color: var(--panel); }
+        .spacer { flex: 1; }
+        .speed { display: inline-flex; align-items: center; gap: 8px; font-family: "Courier New", monospace; font-size: .76rem; color: var(--muted); }
+        .speed input { accent-color: var(--green); }
+
+        .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; padding-bottom: 26px; }
+        @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+        .panel .head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+        .panel h2 { margin: 0; font-size: 1.15rem; font-family: "Courier New", monospace; letter-spacing: .02em; }
+        .panel .who { font-family: "Courier New", monospace; font-size: .72rem; color: var(--muted); }
+        .panel .sub { margin: 0 0 12px; font-size: .82rem; color: var(--muted); }
+        svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+        .nodebox { transition: fill .25s, stroke .25s; }
+        .active > .nodebox { fill: var(--soft-amber); stroke: var(--amber); }
+        .read > .nodebox { fill: var(--soft-green); stroke: var(--green); }
+        .skip > .nodebox { fill: #eceae3; stroke: var(--line); }
+        .skip text { opacity: .45; }
+        .flash { animation: flash .7s ease; }
+        @keyframes flash { 0%,100% { fill: var(--panel); } 40% { fill: var(--soft-amber); } }
+
+        .log { font-family: "Courier New", monospace; font-size: .78rem; color: var(--muted); margin-top: 14px; min-height: 132px; max-height: 200px; overflow-y: auto; }
+        .log div { padding: 4px 0; border-bottom: 1px dashed var(--line); display: flex; gap: 8px; }
+        .log .io { flex: 0 0 84px; font-size: .68rem; padding: 1px 6px; border-radius: 4px; height: fit-content; text-align: center; }
+        .io-seq { background: var(--soft-green); color: var(--green); }
+        .io-rand { background: #f4dcdc; color: var(--red); }
+        .io-ram { background: #e2e8f2; color: var(--blue); }
+        .io-cpu { background: #ece2f2; color: var(--purple); }
+        .log b { color: var(--ink); }
+
+        .metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
+        .metric { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; text-align: center; }
+        .metric .n { font-family: "Courier New", monospace; font-size: 1.2rem; }
+        .metric .l { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+        .verdict { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px; margin-bottom: 40px; }
+        .verdict h2 { margin: 0 0 14px; font-size: 1.1rem; font-family: "Courier New", monospace; text-transform: uppercase; letter-spacing: .05em; }
+        .vgrid { display: grid; grid-template-columns: 160px 1fr 1fr; gap: 0; font-size: .9rem; }
+        .vgrid > div { padding: 9px 12px; border-bottom: 1px solid var(--line); }
+        .vgrid .h { font-family: "Courier New", monospace; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border-bottom: 2px solid var(--line); }
+        .vgrid .k { font-family: "Courier New", monospace; font-size: .78rem; color: var(--muted); }
+        @media (max-width: 620px) { .vgrid { grid-template-columns: 1fr; } .vgrid .k { margin-top: 8px; color: var(--ink); } }
+
+        footer { padding: 26px 0 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+        code { font-family: "Courier New", monospace; background: var(--soft-green); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+        .legend { display: flex; flex-wrap: wrap; gap: 12px; font-family: "Courier New", monospace; font-size: .7rem; color: var(--muted); margin-top: 10px; }
+        .legend span { display: inline-flex; align-items: center; gap: 5px; }
+        .sw { width: 26px; height: 12px; border-radius: 3px; display: inline-block; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="topbar">
+        <span>Distributed Systems / Storage Engines</span>
+        <a href="lsm-tree-vs-b-tree.md">Read the notes →</a>
+    </div>
+
+    <header>
+        <p class="eyebrow">Interactive · Read / Write Paths</p>
+        <h1>LSM-Tree vs B+Tree</h1>
+        <p class="lede">The same operation, side by side. On the left, a <b>B+tree</b> (PostgreSQL / MySQL-InnoDB) updates pages <b>in place</b> with random I/O. On the right, an <b>LSM-tree</b> (Cassandra / RocksDB) only ever <b>appends</b>, buffering in RAM and flushing immutable SSTables. Fire a write or a read and watch both paths light up.</p>
+    </header>
+
+    <div class="toolbar">
+        <button class="btn green" id="bWrite" onclick="doWrite()">✎ Write key</button>
+        <button class="btn blue" id="bReadHit" onclick="doRead(true)">🔍 Read (hit)</button>
+        <button class="btn amber" id="bReadMiss" onclick="doRead(false)">🔍 Read (miss)</button>
+        <button class="btn purple" id="bCompact" onclick="doCompact()">⇲ Compact (LSM)</button>
+        <button class="btn red" onclick="resetAll()">↺ Reset</button>
+        <span class="spacer"></span>
+        <label class="speed">slow <input type="range" id="speed" min="1" max="10" value="6"> fast</label>
+    </div>
+
+    <div class="cols">
+        <div class="panel">
+            <div class="head">
+                <h2>B+Tree</h2>
+                <span class="who">PostgreSQL · MySQL/InnoDB</span>
+            </div>
+            <p class="sub">In-place, balanced, read-optimized. One root-to-leaf path per lookup.</p>
+            <svg id="btSvg" viewBox="0 0 420 460" role="img" aria-label="B+Tree structure"></svg>
+            <div class="legend">
+                <span><i class="sw" style="background:var(--soft-amber)"></i> on write path</span>
+                <span><i class="sw" style="background:var(--soft-green)"></i> on read path</span>
+            </div>
+            <div class="metrics" id="btMetrics"></div>
+            <div class="log" id="btLog"></div>
+        </div>
+
+        <div class="panel">
+            <div class="head">
+                <h2>LSM-Tree</h2>
+                <span class="who">Cassandra · RocksDB</span>
+            </div>
+            <p class="sub">Append-only, immutable SSTables, write-optimized. Reads scan newest→oldest, bloom filters skip files.</p>
+            <svg id="lsmSvg" viewBox="0 0 420 460" role="img" aria-label="LSM-Tree structure"></svg>
+            <div class="legend">
+                <span><i class="sw" style="background:var(--soft-amber)"></i> on write path</span>
+                <span><i class="sw" style="background:var(--soft-green)"></i> read / bloom hit</span>
+                <span><i class="sw" style="background:#eceae3"></i> bloom skip</span>
+            </div>
+            <div class="metrics" id="lsmMetrics"></div>
+            <div class="log" id="lsmLog"></div>
+        </div>
+    </div>
+
+    <div class="verdict">
+        <h2>Why the paths differ</h2>
+        <div class="vgrid">
+            <div class="h k">Aspect</div><div class="h">B+Tree</div><div class="h">LSM-Tree</div>
+            <div class="k">Write</div><div>Locate leaf, overwrite page in place; split if full — <b>random I/O</b>, page-level write amplification.</div><div>Append to WAL + sorted memtable in RAM; flush whole memtable as an immutable SSTable — <b>sequential I/O</b>.</div>
+            <div class="k">Read</div><div>One path root→internal→leaf, ~3–4 page reads. Low, predictable latency.</div><div>Check memtable, then each SSTable newest→oldest; <b>bloom filters</b> skip files that can't hold the key. Higher read amplification.</div>
+            <div class="k">Delete</div><div>Remove the entry from the leaf page immediately.</div><div>Write a <b>tombstone</b>; the old value lingers until compaction.</div>
+            <div class="k">Background</div><div>None beyond checkpointing / vacuum.</div><div><b>Compaction</b> merges SSTables, drops overwritten keys and tombstones — costs CPU and can spike tail latency.</div>
+            <div class="k">Best for</div><div>Read-heavy OLTP, range scans over linked leaves.</div><div>Write-heavy ingest, logs, metrics, time-series.</div>
+        </div>
+    </div>
+
+    <footer>
+        Both use a <code>WAL</code> for durability and <code>bloom filters</code> to skip reads. The RUM conjecture: you optimize at most two of Read, Update, Memory — B+tree bets on reads, LSM bets on writes. See the <a href="lsm-tree-vs-b-tree.md">full notes</a>.
+    </footer>
+</div>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const C = { green:'#176b4d', amber:'#dc7b22', red:'#b23a3a', blue:'#2f6690', purple:'#7a4f9e', line:'#c9cec3', panel:'#fffdf7', ink:'#17211d', muted:'#5e6963' };
+let busy = false;
+let stats = { btReads:0, btWrites:0, btPages:0, lsmReads:0, lsmWrites:0, lsmSST:0, lsmSkips:0, lsmScans:0 };
+
+function speedMs(base) { const s = +document.getElementById('speed').value; return base * (11 - s) / 6; }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function el(tag, a) { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); return e; }
+
+function node(svg, id, x, y, w, h, title, sub, opts) {
+    opts = opts || {};
+    const g = el('g', { id, transform: `translate(${x},${y})` });
+    const rect = el('rect', { class: 'nodebox', x: 0, y: 0, width: w, height: h, rx: 8, fill: opts.fill || C.panel, stroke: opts.stroke || C.line, 'stroke-width': 1.6 });
+    g.appendChild(rect);
+    const t = el('text', { x: w / 2, y: sub ? h / 2 - 3 : h / 2 + 4, 'text-anchor': 'middle', 'font-family': 'Courier New, monospace', 'font-size': opts.fs || 12, 'font-weight': opts.bold ? 'bold' : 'normal', fill: opts.tc || C.ink });
+    t.textContent = title;
+    g.appendChild(t);
+    if (sub) {
+        const s = el('text', { x: w / 2, y: h / 2 + 12, 'text-anchor': 'middle', 'font-family': 'Courier New, monospace', 'font-size': 8.5, fill: C.muted });
+        s.textContent = sub;
+        g.appendChild(s);
+    }
+    g._rect = rect; g._cx = x + w / 2; g._cy = y + h / 2;
+    svg.appendChild(g);
+    return g;
+}
+function line(svg, x1, y1, x2, y2, dash) {
+    svg.insertBefore(el('line', { x1, y1, x2, y2, stroke: C.line, 'stroke-width': 1.4, 'stroke-dasharray': dash || 'none' }), svg.firstChild);
+}
+function sectionLabel(svg, x, y, text, color) {
+    const t = el('text', { x, y, 'font-family': 'Courier New, monospace', 'font-size': 9, fill: color || C.muted, 'letter-spacing': '.05em' });
+    t.textContent = text; svg.appendChild(t);
+}
+
+const btSvg = document.getElementById('btSvg');
+const lsmSvg = document.getElementById('lsmSvg');
+let bt = {};
+let lsm = { memKeys: 0, memCap: 4, l0: 0, l1: 0, l2: 0, dot: null };
+
+function buildBT() {
+    btSvg.innerHTML = '';
+    sectionLabel(btSvg, 6, 16, 'RAM');
+    sectionLabel(btSvg, 6, 150, 'DISK (pages)');
+    bt.wal = node(btSvg, 'bt-wal', 240, 6, 170, 34, 'WAL (redo log)', 'append then flush', { fs: 11 });
+    bt.buf = node(btSvg, 'bt-buf', 20, 6, 190, 34, 'buffer pool', 'cached pages in RAM', { fs: 11 });
+    line(btSvg, 210, 100, 60, 178);
+    bt.root = node(btSvg, 'bt-root', 150, 90, 120, 40, '[ 30 | 70 ]', 'root page', { bold: true });
+    bt.i0 = node(btSvg, 'bt-i0', 40, 185, 110, 38, '[ 10 | 20 ]', 'internal', {});
+    bt.i1 = node(btSvg, 'bt-i1', 270, 185, 110, 38, '[ 80 | 90 ]', 'internal', {});
+    line(btSvg, 210, 130, 95, 185); line(btSvg, 210, 130, 325, 185);
+    const leaves = [['bt-l0', 10, '10·20'], ['bt-l1', 115, '40·55'], ['bt-l2', 220, '75·82'], ['bt-l3', 325, '88·95']];
+    bt.leaves = leaves.map((L, i) => {
+        line(btSvg, i < 2 ? 95 : 325, 223, L[1] + 42, 300);
+        return node(btSvg, L[0], L[1], 300, 85, L[2], 'leaf', { fs: 11 });
+    });
+    sectionLabel(btSvg, 10, 405, 'leaf pages hold rows · linked for range scans →', C.muted);
+    bt.dot = el('circle', { cx: 300, cy: -20, r: 8, fill: C.amber, stroke: C.panel, 'stroke-width': 2, opacity: 0 });
+    btSvg.appendChild(bt.dot);
+}
+
+function buildLSM() {
+    lsmSvg.innerHTML = '';
+    sectionLabel(lsmSvg, 6, 16, 'RAM');
+    sectionLabel(lsmSvg, 6, 150, 'DISK (immutable SSTables)');
+    lsm.wal = node(lsmSvg, 'lsm-wal', 240, 6, 170, 34, 'commit log', 'append only', { fs: 11 });
+    lsm.mem = node(lsmSvg, 'lsm-mem', 20, 6, 190, 46, 'memtable', `skiplist · ${lsm.memKeys}/${lsm.memCap} keys`, { fs: 12, bold: true });
+    line(lsmSvg, 115, 52, 115, 175, '3 3');
+    renderLSMLevels();
+    lsm.dot = el('circle', { cx: 115, cy: -20, r: 8, fill: C.amber, stroke: C.panel, 'stroke-width': 2, opacity: 0 });
+    lsmSvg.appendChild(lsm.dot);
+}
+
+function renderLSMLevels() {
+    [...lsmSvg.querySelectorAll('.sst,.lvl')].forEach(n => n.remove());
+    const levels = [{ y: 175, n: lsm.l0, label: 'L0', tag: 'recent flushes' }, { y: 270, n: lsm.l1, label: 'L1', tag: '~10× larger' }, { y: 365, n: lsm.l2, label: 'L2', tag: '~10× larger' }];
+    levels.forEach(lv => {
+        const lab = el('text', { class: 'lvl', x: 8, y: lv.y + 26, 'font-family': 'Courier New, monospace', 'font-size': 11, fill: C.muted, 'font-weight': 'bold' });
+        lab.textContent = lv.label; lsmSvg.appendChild(lab);
+        const tag = el('text', { class: 'lvl', x: 38, y: lv.y + 62, 'font-family': 'Courier New, monospace', 'font-size': 8, fill: C.muted });
+        tag.textContent = lv.tag; lsmSvg.appendChild(tag);
+        const count = Math.max(1, lv.n);
+        const show = Math.min(count, 4);
+        for (let i = 0; i < show; i++) {
+            const x = 38 + i * 92;
+            const g = el('g', { class: 'sst', id: `sst-${lv.label}-${i}`, transform: `translate(${x},${lv.y})` });
+            const empty = lv.n === 0;
+            const rect = el('rect', { class: 'nodebox', x: 0, y: 0, width: 82, height: 44, rx: 6, fill: empty ? '#f4f2ea' : C.panel, stroke: empty ? C.line : C.line, 'stroke-width': 1.5, 'stroke-dasharray': empty ? '4 3' : 'none' });
+            g.appendChild(rect);
+            const t = el('text', { x: 41, y: 20, 'text-anchor': 'middle', 'font-family': 'Courier New, monospace', 'font-size': 10, fill: empty ? C.muted : C.ink });
+            t.textContent = empty ? '(empty)' : 'SSTable';
+            g.appendChild(t);
+            const bf = el('text', { x: 41, y: 34, 'text-anchor': 'middle', 'font-family': 'Courier New, monospace', 'font-size': 8, fill: empty ? C.muted : C.green });
+            bf.textContent = empty ? '' : '◈ bloom';
+            g.appendChild(bf);
+            g._rect = rect; g._cx = x + 41; g._cy = lv.y + 22;
+            lsmSvg.appendChild(g);
+        }
+        if (count > show) {
+            const more = el('text', { class: 'sst', x: 38 + show * 92, y: lv.y + 26, 'font-family': 'Courier New, monospace', 'font-size': 10, fill: C.muted });
+            more.textContent = '+' + (count - show); lsmSvg.appendChild(more);
+        }
+    });
+}
+
+async function moveDot(dot, tx, ty, base) {
+    dot.setAttribute('opacity', '1');
+    dot.style.transition = `cx ${speedMs(base)}ms ease, cy ${speedMs(base)}ms ease`;
+    dot.setAttribute('cx', tx); dot.setAttribute('cy', ty);
+    await sleep(speedMs(base));
+}
+function hi(g, cls) { if (g) g.classList.add(cls); }
+function clearHi(svg) { svg.querySelectorAll('.active,.read,.skip').forEach(n => n.classList.remove('active', 'read', 'skip')); }
+
+function logLine(which, io, msg) {
+    const box = document.getElementById(which === 'bt' ? 'btLog' : 'lsmLog');
+    const d = document.createElement('div');
+    const map = { seq: 'io-seq', rand: 'io-rand', ram: 'io-ram', cpu: 'io-cpu' };
+    const names = { seq: 'seq disk', rand: 'rand disk', ram: 'RAM', cpu: 'CPU' };
+    d.innerHTML = `<span class="io ${map[io]}">${names[io]}</span><span>${msg}</span>`;
+    box.prepend(d);
+    while (box.children.length > 30) box.removeChild(box.lastChild);
+}
+
+function renderMetrics() {
+    document.getElementById('btMetrics').innerHTML = `
+        <div class="metric"><div class="n">${stats.btWrites}</div><div class="l">writes</div></div>
+        <div class="metric"><div class="n">${stats.btReads}</div><div class="l">reads</div></div>
+        <div class="metric"><div class="n">${stats.btPages}</div><div class="l">page I/O</div></div>`;
+    document.getElementById('lsmMetrics').innerHTML = `
+        <div class="metric"><div class="n">${stats.lsmWrites}</div><div class="l">writes</div></div>
+        <div class="metric"><div class="n">${stats.lsmReads}</div><div class="l">reads</div></div>
+        <div class="metric"><div class="n">${stats.lsmSkips}</div><div class="l">bloom skips</div></div>`;
+}
+
+function setBusy(v) {
+    busy = v;
+    ['bWrite', 'bReadHit', 'bReadMiss', 'bCompact'].forEach(id => document.getElementById(id).disabled = v);
+}
+
+async function btWrite() {
+    clearHi(btSvg);
+    stats.btWrites++;
+    hi(bt.wal, 'active'); await moveDot(bt.dot, bt.wal._cx, bt.wal._cy, 420);
+    logLine('bt', 'seq', 'append to <b>WAL</b> (redo log) first');
+    hi(bt.root, 'active'); await moveDot(bt.dot, bt.root._cx, bt.root._cy, 420);
+    logLine('bt', 'ram', 'walk <b>root</b> page (buffer pool)'); stats.btPages++;
+    const leaf = bt.leaves[Math.floor(Math.random() * bt.leaves.length)];
+    const internal = leaf._cx < 210 ? bt.i0 : bt.i1;
+    hi(internal, 'active'); await moveDot(bt.dot, internal._cx, internal._cy, 420);
+    logLine('bt', 'ram', 'walk <b>internal</b> page'); stats.btPages++;
+    hi(leaf, 'active'); await moveDot(bt.dot, leaf._cx, leaf._cy, 420);
+    const split = Math.random() < 0.3;
+    logLine('bt', 'rand', `<b>overwrite leaf in place</b>${split ? ' → page full, SPLIT' : ''}`);
+    stats.btPages += split ? 3 : 1;
+    leaf.classList.add('flash'); setTimeout(() => leaf.classList.remove('flash'), 700);
+    if (split) { const p = bt.leaves[(bt.leaves.indexOf(leaf) + 1) % bt.leaves.length]; p.classList.add('flash'); setTimeout(() => p.classList.remove('flash'), 700); logLine('bt', 'rand', 'split cascades a key up to parent'); }
+    await sleep(speedMs(300));
+    bt.dot.setAttribute('opacity', '0');
+}
+
+async function lsmWrite() {
+    clearHi(lsmSvg);
+    stats.lsmWrites++;
+    hi(lsm.wal, 'active'); await moveDot(lsm.dot, lsm.wal._cx, lsm.wal._cy, 420);
+    logLine('lsm', 'seq', 'append to <b>commit log</b> (sequential)');
+    hi(lsm.mem, 'active'); await moveDot(lsm.dot, lsm.mem._cx, lsm.mem._cy, 420);
+    lsm.memKeys++;
+    lsm.mem._rect.parentNode.querySelectorAll('text')[1].textContent = `skiplist · ${lsm.memKeys}/${lsm.memCap} keys`;
+    logLine('lsm', 'ram', 'insert into sorted <b>memtable</b> (RAM)');
+    lsm.mem.classList.add('flash'); setTimeout(() => lsm.mem.classList.remove('flash'), 700);
+    if (lsm.memKeys >= lsm.memCap) {
+        await sleep(speedMs(280));
+        logLine('lsm', 'seq', '⚑ memtable full → <b>flush</b> as immutable SSTable to L0');
+        lsm.memKeys = 0; lsm.l0++; stats.lsmSST++;
+        buildLSM();
+        if (lsm.l0 > 4) { logLine('lsm', 'cpu', 'L0 crowded → compaction due'); }
+    }
+    await sleep(speedMs(200));
+    lsm.dot.setAttribute('opacity', '0');
+}
+
+async function btRead(hit) {
+    clearHi(btSvg);
+    stats.btReads++;
+    hi(bt.root, 'read'); await moveDot(bt.dot, bt.root._cx, bt.root._cy, 420);
+    logLine('bt', 'ram', 'read <b>root</b> (usually cached)'); stats.btPages++;
+    const leaf = bt.leaves[Math.floor(Math.random() * bt.leaves.length)];
+    const internal = leaf._cx < 210 ? bt.i0 : bt.i1;
+    hi(internal, 'read'); await moveDot(bt.dot, internal._cx, internal._cy, 420);
+    logLine('bt', 'ram', 'read <b>internal</b> page'); stats.btPages++;
+    hi(leaf, 'read'); await moveDot(bt.dot, leaf._cx, leaf._cy, 420);
+    stats.btPages++;
+    logLine('bt', hit ? 'ram' : 'rand', hit ? '<b>found</b> row in leaf — done (1 path)' : 'key not in leaf range → <b>not found</b>');
+    await sleep(speedMs(260));
+    bt.dot.setAttribute('opacity', '0');
+}
+
+async function lsmRead(hit) {
+    clearHi(lsmSvg);
+    stats.lsmReads++;
+    hi(lsm.mem, 'read'); await moveDot(lsm.dot, lsm.mem._cx, lsm.mem._cy, 420);
+    const inMem = hit && lsm.memKeys > 0 && Math.random() < 0.4;
+    logLine('lsm', 'ram', `check <b>memtable</b>${inMem ? ' — FOUND (newest)' : ' — not here'}`);
+    if (inMem) { await sleep(speedMs(260)); lsm.dot.setAttribute('opacity', '0'); return; }
+    const order = [];
+    ['L0', 'L1', 'L2'].forEach(lvl => {
+        const count = lvl === 'L0' ? lsm.l0 : lvl === 'L1' ? lsm.l1 : lsm.l2;
+        for (let i = 0; i < Math.min(Math.max(count, count === 0 ? 0 : 1), 4); i++) order.push(`sst-${lvl}-${i}`);
+    });
+    if (order.length === 0) { logLine('lsm', 'cpu', 'no SSTables yet — write some keys first'); await sleep(speedMs(200)); lsm.dot.setAttribute('opacity', '0'); return; }
+    const target = hit ? order.length - 1 : -1;
+    for (let i = 0; i < order.length; i++) {
+        const g = document.getElementById(order[i]);
+        if (!g) continue;
+        const bloomHit = (i === target) || (i !== target && Math.random() < 0.18);
+        if (!bloomHit) {
+            hi(g, 'skip'); stats.lsmSkips++;
+            logLine('lsm', 'cpu', `<b>bloom</b>: definitely not here → <b>skip</b> SSTable`);
+            await sleep(speedMs(220));
+        } else {
+            hi(g, 'read'); await moveDot(lsm.dot, g._cx, g._cy, 380); stats.lsmScans++;
+            if (i === target) { logLine('lsm', 'seq', '<b>bloom maybe</b> → read SSTable — <b>FOUND</b>'); await sleep(speedMs(240)); lsm.dot.setAttribute('opacity', '0'); return; }
+            logLine('lsm', 'seq', '<b>bloom maybe</b> → read SSTable — not the key (false positive)');
+            await sleep(speedMs(200));
+        }
+    }
+    logLine('lsm', 'cpu', hit ? 'key found after scanning down levels' : '<b>not found</b> in any SSTable');
+    await sleep(speedMs(200));
+    lsm.dot.setAttribute('opacity', '0');
+}
+
+async function doWrite() { if (busy) return; setBusy(true); await Promise.all([btWrite(), lsmWrite()]); renderMetrics(); setBusy(false); }
+async function doRead(hit) { if (busy) return; setBusy(true); await Promise.all([btRead(hit), lsmRead(hit)]); renderMetrics(); setBusy(false); }
+
+async function doCompact() {
+    if (busy) return;
+    if (lsm.l0 === 0 && lsm.l1 === 0) { logLine('lsm', 'cpu', 'nothing to compact — flush some SSTables first'); return; }
+    setBusy(true);
+    logLine('lsm', 'seq', '⇲ <b>compaction</b>: merge SSTables, drop overwritten keys + tombstones');
+    lsmSvg.querySelectorAll('.sst').forEach(n => n.classList.add('read'));
+    await sleep(speedMs(700));
+    if (lsm.l0 > 0) { lsm.l1 = Math.max(1, Math.ceil(lsm.l1 + lsm.l0 / 2)); lsm.l0 = 0; }
+    if (lsm.l1 > 4) { lsm.l2 = Math.max(1, lsm.l2 + 1); lsm.l1 = Math.ceil(lsm.l1 / 2); }
+    buildLSM();
+    logLine('lsm', 'cpu', 'merged into next level — reads now touch fewer files');
+    await sleep(speedMs(200));
+    setBusy(false);
+}
+
+function resetAll() {
+    stats = { btReads:0, btWrites:0, btPages:0, lsmReads:0, lsmWrites:0, lsmSST:0, lsmSkips:0, lsmScans:0 };
+    lsm = { memKeys: 0, memCap: 4, l0: 1, l1: 2, l2: 0, dot: null };
+    document.getElementById('btLog').innerHTML = '';
+    document.getElementById('lsmLog').innerHTML = '';
+    buildBT(); buildLSM(); renderMetrics();
+    setBusy(false);
+}
+
+lsm.l0 = 1; lsm.l1 = 2;
+buildBT(); buildLSM(); renderMetrics();
+</script>
+</body>
+</html>

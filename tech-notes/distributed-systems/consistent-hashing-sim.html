@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Consistent Hashing Simulation</title>
+    <style>
+        :root {
+            --paper: #f2efe6;
+            --ink: #17211d;
+            --muted: #5e6963;
+            --line: #c9cec3;
+            --panel: #fffdf7;
+            --green: #176b4d;
+            --amber: #dc7b22;
+            --red: #b23a3a;
+            --blue: #2f6690;
+            --purple: #7a4f9e;
+            --soft-green: #dcebe2;
+            --soft-amber: #f8e5d1;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--paper); color: var(--ink); font-family: Georgia, "Times New Roman", serif; line-height: 1.6; }
+        body::before {
+            position: fixed; inset: 0; z-index: -1; content: ""; opacity: .32;
+            background-image: linear-gradient(rgba(23,33,29,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(23,33,29,.08) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .page { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0;
+            border-bottom: 1px solid var(--line); font-family: "Courier New", monospace; font-size: .74rem;
+            letter-spacing: .08em; text-transform: uppercase;
+        }
+        .topbar a { padding: 7px 12px; border: 1px solid var(--green); color: var(--green); text-decoration: none; transition: background .2s, color .2s; }
+        .topbar a:hover { background: var(--green); color: var(--panel); }
+        header { padding: 56px 0 40px; }
+        .eyebrow { margin: 0 0 14px; color: var(--amber); font-family: "Courier New", monospace; font-size: .8rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+        h1 { margin: 0 0 20px; font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 400; letter-spacing: -.04em; line-height: .92; }
+        .lede { max-width: 720px; margin: 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.3rem); }
+        .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; padding-bottom: 60px; }
+        @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+        .panel h2 { margin: 0 0 4px; font-size: 1.05rem; font-family: "Courier New", monospace; text-transform: uppercase; letter-spacing: .06em; }
+        .panel .hint { margin: 0 0 16px; font-size: .82rem; color: var(--muted); }
+        .controls { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 16px; }
+        .btn {
+            font-family: "Courier New", monospace; font-size: .82rem; letter-spacing: .04em; padding: 10px 14px;
+            border: 1px solid var(--ink); background: var(--panel); color: var(--ink); border-radius: 7px; cursor: pointer;
+            text-align: left; transition: transform .1s, background .15s, color .15s; width: 100%;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn.green { border-color: var(--green); color: var(--green); }
+        .btn.green:hover { background: var(--green); color: var(--panel); }
+        .btn.amber { border-color: var(--amber); color: var(--amber); }
+        .btn.amber:hover { background: var(--amber); color: var(--panel); }
+        .btn.red { border-color: var(--red); color: var(--red); }
+        .btn.red:hover { background: var(--red); color: var(--panel); }
+        .btn.blue { border-color: var(--blue); color: var(--blue); }
+        .btn.blue:hover { background: var(--blue); color: var(--panel); }
+        .row { display: flex; gap: 8px; }
+        .row .btn { flex: 1; }
+        .field { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; color: var(--muted); }
+        .field input[type=text] { font-family: "Courier New", monospace; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font-size: .85rem; }
+        .field input[type=range] { width: 100%; accent-color: var(--green); }
+        .sep { height: 1px; background: var(--line); margin: 6px 0; }
+        .stagewrap { display: flex; flex-direction: column; gap: 20px; }
+        .ringpanel { display: grid; place-items: center; padding: 4px; }
+        svg { width: 100%; height: auto; max-width: 640px; display: block; overflow: visible; }
+
+        .node-marker circle { transition: transform .3s cubic-bezier(.2,1.4,.4,1); }
+        .key-dot { transition: fill .55s ease, stroke .3s ease; }
+        .connector { transition: opacity .3s ease; }
+        .pop { transform-box: fill-box; transform-origin: center; animation: pop .45s cubic-bezier(.2,1.4,.4,1); }
+        @keyframes pop { 0% { transform: scale(.1); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .moving { animation: keypulse 1s ease; }
+        @keyframes keypulse { 0% { transform: scale(1); } 35% { transform: scale(2.1); } 100% { transform: scale(1); } }
+        .move-arc { animation: arcfade 1.1s ease forwards; }
+        @keyframes arcfade { 0% { opacity: 0; stroke-width: 3; } 25% { opacity: .95; } 100% { opacity: 0; stroke-width: 1; } }
+
+        .legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: "Courier New", monospace; font-size: .74rem; color: var(--muted); }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+        .stat { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; text-align: center; }
+        .stat .num { font-family: "Courier New", monospace; font-size: 1.5rem; color: var(--green); }
+        .stat .lbl { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+        .dist { display: flex; flex-direction: column; gap: 8px; }
+        .bar-row { display: grid; grid-template-columns: 120px 1fr 46px; align-items: center; gap: 10px; font-family: "Courier New", monospace; font-size: .78rem; }
+        .bar-track { background: var(--paper); border: 1px solid var(--line); border-radius: 5px; height: 20px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width .5s cubic-bezier(.5,0,.2,1); border-radius: 4px 0 0 4px; }
+        .node-name { display: inline-flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .log { font-family: "Courier New", monospace; font-size: .76rem; color: var(--muted); max-height: 160px; overflow-y: auto; }
+        .log div { padding: 3px 0; border-bottom: 1px dashed var(--line); }
+        .log b { color: var(--ink); }
+        footer { padding: 30px 0 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+        code { font-family: "Courier New", monospace; background: var(--soft-green); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="topbar">
+        <span>Distributed Systems / Simulation</span>
+        <a href="consistent-hashing.md">Read the notes →</a>
+    </div>
+
+    <header>
+        <p class="eyebrow">Interactive · Hash Ring</p>
+        <h1>Consistent Hashing</h1>
+        <p class="lede">Keys and nodes sit on a circular hash ring at their hash angle. Each key belongs to the first node clockwise and is colored to match it. Add or remove nodes — only the keys that change owner recolor and pulse. That's the whole point: minimal movement.</p>
+    </header>
+
+    <div class="layout">
+        <aside>
+            <div class="controls">
+                <div class="panel">
+                    <h2>Nodes</h2>
+                    <p class="hint">Physical servers on the ring.</p>
+                    <div class="field">
+                        <label for="nodeName">Node name</label>
+                        <input type="text" id="nodeName" placeholder="auto (node-N)">
+                    </div>
+                    <div style="height:10px"></div>
+                    <button class="btn green" onclick="addNode()">+ Add node</button>
+                    <div style="height:8px"></div>
+                    <button class="btn red" onclick="removeRandomNode()">− Remove random node</button>
+                    <div class="sep"></div>
+                    <div class="field">
+                        <label for="vnodes">Virtual nodes per server: <b id="vnodesVal">1</b></label>
+                        <input type="range" id="vnodes" min="1" max="8" value="1" oninput="setVnodes(this.value)">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Keys</h2>
+                    <p class="hint">Data items hashed onto the ring.</p>
+                    <div class="field">
+                        <label for="keyName">Key name</label>
+                        <input type="text" id="keyName" placeholder="auto (key:N)">
+                    </div>
+                    <div style="height:10px"></div>
+                    <button class="btn amber" onclick="addKey()">+ Add key</button>
+                    <div style="height:8px"></div>
+                    <div class="row">
+                        <button class="btn amber" onclick="addManyKeys(6)">+6</button>
+                        <button class="btn red" onclick="removeRandomKey()">− Key</button>
+                    </div>
+                    <div class="sep"></div>
+                    <div class="field">
+                        <label for="replicas">Replication factor: <b id="replicasVal">1</b></label>
+                        <input type="range" id="replicas" min="1" max="4" value="1" oninput="setReplicas(this.value)">
+                    </div>
+                    <p class="hint" style="margin-top:8px">Each key is stored on N distinct nodes clockwise (dashed links).</p>
+                </div>
+
+                <div class="panel">
+                    <button class="btn blue" onclick="reset()">↺ Reset simulation</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="stagewrap">
+            <div class="panel ringpanel">
+                <svg id="ring" viewBox="0 0 600 600" role="img" aria-label="Consistent hashing ring"></svg>
+            </div>
+            <div class="panel">
+                <div class="legend">
+                    <span><i class="swatch" style="background:var(--green)"></i> Node</span>
+                    <span><i class="swatch" style="background:var(--amber)"></i> Key (colored by owner)</span>
+                    <span><i class="swatch" style="background:var(--purple)"></i> Replica link</span>
+                    <span><i class="swatch" style="background:var(--red)"></i> Key just reassigned</span>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>Live stats</h2>
+                <p class="hint">Distribution across physical nodes updates as topology changes.</p>
+                <div class="stats" id="stats"></div>
+                <div class="sep"></div>
+                <div class="dist" id="dist"></div>
+            </div>
+            <div class="panel">
+                <h2>Event log</h2>
+                <p class="hint">What moved, and how much.</p>
+                <div class="log" id="log"></div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        Consistent hashing (Karger et al., MIT 1997). Only <code>K/n</code> keys move on average when a node joins or leaves. Virtual nodes smooth out the distribution.
+    </footer>
+</div>
+
+<script>
+const RING = 1 << 20;
+const CX = 300, CY = 300, R = 210;
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById('ring');
+
+let staticLayer, linkLayer, nodeLayer, keyLayer, arcLayer;
+let nodes = [];
+let keys = [];
+let vnodeCount = 1;
+let replicas = 1;
+let nodeSeq = 0;
+let keySeq = 0;
+const palette = ['#176b4d','#2f6690','#dc7b22','#7a4f9e','#b23a3a','#3d7d5a','#4a5d8a','#8a6d3b','#9e4f7a','#5a8a3d'];
+
+function hashStr(s) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;
+    return (h >>> 0) % RING;
+}
+function angleOf(pos) { return (pos / RING) * Math.PI * 2 - Math.PI / 2; }
+function xy(pos, radius) { const a = angleOf(pos); return [CX + Math.cos(a) * radius, CY + Math.sin(a) * radius]; }
+function el(tag, a) { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); return e; }
+
+function buildScaffold() {
+    svg.innerHTML = '';
+    staticLayer = el('g', {}); linkLayer = el('g', {}); arcLayer = el('g', {}); keyLayer = el('g', {}); nodeLayer = el('g', {});
+    svg.append(staticLayer, linkLayer, arcLayer, keyLayer, nodeLayer);
+    staticLayer.appendChild(el('circle', { cx: CX, cy: CY, r: R, fill: 'none', stroke: '#c9cec3', 'stroke-width': 3 }));
+    for (let d = 0; d < 360; d += 30) {
+        const p = (d / 360) * RING;
+        const [x1, y1] = xy(p, R - 8), [x2, y2] = xy(p, R + 8);
+        staticLayer.appendChild(el('line', { x1, y1, x2, y2, stroke: '#c9cec3', 'stroke-width': 1.5 }));
+        const [lx, ly] = xy(p, R + 26);
+        const t = el('text', { x: lx, y: ly + 3, 'text-anchor': 'middle', 'font-size': 9, fill: '#b3b8ad', 'font-family': 'Courier New, monospace' });
+        t.textContent = d + '°'; staticLayer.appendChild(t);
+    }
+}
+
+function allVnodes() {
+    const list = [];
+    nodes.forEach(n => n.vnodes.forEach(pos => list.push({ pos, node: n })));
+    return list.sort((a, b) => a.pos - b.pos);
+}
+function nodesForKey(key) {
+    const ring = allVnodes();
+    if (ring.length === 0) return [];
+    const result = [];
+    let idx = ring.findIndex(v => v.pos >= key.pos);
+    if (idx === -1) idx = 0;
+    let scanned = 0;
+    while (result.length < replicas && scanned < ring.length) {
+        const cand = ring[idx % ring.length].node;
+        if (!result.includes(cand)) result.push(cand);
+        idx++; scanned++;
+    }
+    return result;
+}
+function primaryVnodePos(key, node) {
+    const ring = allVnodes();
+    let idx = ring.findIndex(v => v.pos >= key.pos);
+    if (idx === -1) idx = 0;
+    for (let s = 0; s < ring.length; s++) {
+        const v = ring[(idx + s) % ring.length];
+        if (v.node === node) return v.pos;
+    }
+    return node.vnodes[0];
+}
+function buildVnodes(name) {
+    const arr = [];
+    for (let i = 0; i < vnodeCount; i++) arr.push(hashStr(name + '#vn' + i));
+    return arr;
+}
+
+function addNode(name) {
+    name = (typeof name === 'string' && name) ? name : (document.getElementById('nodeName').value.trim() || 'node-' + (++nodeSeq));
+    if (nodes.some(n => n.name === name)) { log(`node <b>${name}</b> already exists`); return; }
+    const node = { name, color: palette[nodes.length % palette.length], vnodes: buildVnodes(name) };
+    nodes.push(node);
+    document.getElementById('nodeName').value = '';
+    const moved = render();
+    log(`+ node <b>${name}</b> joined (${vnodeCount} vnode${vnodeCount>1?'s':''}) · <b>${moved}</b> keys reassigned`);
+}
+function removeRandomNode() {
+    if (nodes.length === 0) { log('no nodes to remove'); return; }
+    const idx = Math.floor(Math.random() * nodes.length);
+    const name = nodes[idx].name;
+    nodes.splice(idx, 1);
+    const moved = render();
+    log(`− node <b>${name}</b> left · <b>${moved}</b> keys reassigned to successors`);
+}
+function addKey(name) {
+    name = (typeof name === 'string' && name) ? name : (document.getElementById('keyName').value.trim() || 'key:' + (++keySeq));
+    if (keys.some(k => k.name === name)) { log(`key <b>${name}</b> already exists`); return; }
+    keys.push({ name, pos: hashStr(name), fresh: true, owner: null });
+    document.getElementById('keyName').value = '';
+    log(`+ key <b>${name}</b> at ${(hashStr(name)/RING*360).toFixed(0)}°`);
+    render();
+}
+function addManyKeys(n) { for (let i = 0; i < n; i++) addKey('key:' + (++keySeq)); }
+function removeRandomKey() {
+    if (keys.length === 0) { log('no keys to remove'); return; }
+    const idx = Math.floor(Math.random() * keys.length);
+    log(`− key <b>${keys[idx].name}</b> removed`);
+    const g = document.getElementById('key-' + cssId(keys[idx].name));
+    if (g) g.remove();
+    keys.splice(idx, 1);
+    render();
+}
+function setVnodes(v) {
+    vnodeCount = +v; document.getElementById('vnodesVal').textContent = v;
+    nodes.forEach(n => n.vnodes = buildVnodes(n.name));
+    const moved = render();
+    log(`vnodes → <b>${v}</b> per node · <b>${moved}</b> keys reassigned`);
+}
+function setReplicas(v) {
+    replicas = +v; document.getElementById('replicasVal').textContent = v;
+    render();
+    log(`replication factor → <b>${v}</b>`);
+}
+
+function cssId(s) { return s.replace(/[^a-zA-Z0-9_-]/g, '_'); }
+
+function render() {
+    const ring = allVnodes();
+    linkLayer.innerHTML = '';
+
+    const liveNodeIds = new Set();
+    nodes.forEach(n => {
+        n.vnodes.forEach((pos, i) => {
+            const id = 'node-' + cssId(n.name) + '-' + i;
+            liveNodeIds.add(id);
+            const [ax, ay] = xy(pos, R);
+            let g = document.getElementById(id);
+            if (!g) {
+                g = el('g', { id, class: 'node-marker pop' });
+                const [ix, iy] = xy(pos, R - 26);
+                const spoke = el('line', { x1: CX, y1: CY, x2: ix, y2: iy, stroke: n.color, 'stroke-width': 1.5, 'stroke-dasharray': '2 5', opacity: .3 });
+                const c = el('circle', { cx: ax, cy: ay, r: 22, fill: n.color, stroke: '#fffdf7', 'stroke-width': 3 });
+                const short = (n.name.replace(/[^0-9]/g, '') || n.name.replace(/[^a-zA-Z]/g, '')).slice(0, 2).toUpperCase() || '?';
+                const t = el('text', { x: ax, y: ay + 5, 'text-anchor': 'middle', 'font-size': 15, fill: '#fffdf7', 'font-family': 'Courier New, monospace', 'font-weight': 'bold' });
+                t.textContent = short;
+                g.append(spoke, c, t);
+                if (i === 0) {
+                    const [nx, ny] = xy(pos, R + 48);
+                    const nameT = el('text', { x: nx, y: ny + 4, 'text-anchor': 'middle', 'font-size': 13, fill: n.color, 'font-family': 'Courier New, monospace', 'font-weight': 'bold' });
+                    nameT.textContent = n.name;
+                    g.appendChild(nameT);
+                }
+                nodeLayer.appendChild(g);
+            }
+        });
+    });
+    [...nodeLayer.children].forEach(g => { if (!liveNodeIds.has(g.id)) g.remove(); });
+
+    let moved = 0;
+    const liveKeyIds = new Set();
+    keys.forEach(k => {
+        const owners = nodesForKey(k);
+        const primary = owners[0];
+        const newOwner = primary ? primary.name : null;
+        const changed = k.owner !== null && k.owner !== newOwner;
+        if (changed) moved++;
+        const [kx, ky] = xy(k.pos, R);
+        const id = 'key-' + cssId(k.name);
+        liveKeyIds.add(id);
+        let g = document.getElementById(id);
+        const color = primary ? primary.color : '#9aa39d';
+
+        if (!g) {
+            g = el('g', { id, class: k.fresh ? 'pop' : '' });
+            const dot = el('circle', { class: 'key-dot', cx: kx, cy: ky, r: 9, fill: color, stroke: '#fffdf7', 'stroke-width': 2 });
+            const [lx, ly] = xy(k.pos, R - 26);
+            const lbl = el('text', { class: 'key-label', x: lx, y: ly + 3, 'text-anchor': 'middle', 'font-size': 11, fill: '#3a423d', 'font-family': 'Courier New, monospace' });
+            lbl.textContent = k.name;
+            g.append(dot, lbl);
+            keyLayer.appendChild(g);
+        } else {
+            g.querySelector('.key-dot').setAttribute('fill', color);
+        }
+
+        if (changed) {
+            const dot = g.querySelector('.key-dot');
+            dot.classList.remove('moving'); void dot.getBBox();
+            dot.classList.add('moving');
+            dot.setAttribute('stroke', '#b23a3a');
+            setTimeout(() => dot.setAttribute('stroke', '#fffdf7'), 1000);
+            if (primary) {
+                const [ox, oy] = xy(primaryVnodePos(k, primary), R);
+                const arc = el('line', { class: 'move-arc', x1: kx, y1: ky, x2: ox, y2: oy, stroke: '#b23a3a', 'stroke-width': 2, fill: 'none' });
+                arcLayer.appendChild(arc);
+                setTimeout(() => arc.remove(), 1200);
+            }
+        }
+        k.owner = newOwner;
+        k.fresh = false;
+
+        owners.forEach((o, ri) => {
+            const [ox, oy] = xy(primaryVnodePos(k, o), R);
+            linkLayer.appendChild(el('line', {
+                x1: kx, y1: ky, x2: ox, y2: oy,
+                stroke: ri === 0 ? o.color : '#7a4f9e',
+                'stroke-width': ri === 0 ? 1.4 : 1,
+                'stroke-dasharray': ri === 0 ? 'none' : '4 3',
+                opacity: ri === 0 ? .4 : .5
+            }));
+        });
+    });
+    [...keyLayer.children].forEach(g => { if (!liveKeyIds.has(g.id)) g.remove(); });
+
+    if (nodes.length === 0) {
+        keys.forEach(k => { const g = document.getElementById('key-' + cssId(k.name)); if (g) g.querySelector('.key-dot').setAttribute('fill', '#9aa39d'); k.owner = null; });
+    }
+
+    renderStats();
+    return moved;
+}
+
+function renderStats() {
+    const counts = {};
+    nodes.forEach(n => counts[n.name] = 0);
+    let totalPlacements = 0;
+    keys.forEach(k => nodesForKey(k).forEach(n => { counts[n.name]++; totalPlacements++; }));
+    const avg = nodes.length ? (totalPlacements / nodes.length) : 0;
+    let maxDev = 0;
+    nodes.forEach(n => { if (avg) maxDev = Math.max(maxDev, Math.abs(counts[n.name] - avg) / avg); });
+    document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="num">${nodes.length}</div><div class="lbl">Nodes</div></div>
+        <div class="stat"><div class="num">${keys.length}</div><div class="lbl">Keys</div></div>
+        <div class="stat"><div class="num">${replicas}×</div><div class="lbl">Replication</div></div>
+        <div class="stat"><div class="num">${(maxDev*100).toFixed(0)}%</div><div class="lbl">Max imbalance</div></div>`;
+    const max = Math.max(1, ...Object.values(counts));
+    document.getElementById('dist').innerHTML = nodes.map(n => {
+        const c = counts[n.name];
+        return `<div class="bar-row">
+            <span class="node-name"><i class="swatch" style="background:${n.color}"></i>${n.name}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${(c/max*100)}%;background:${n.color}"></div></div>
+            <span>${c}</span>
+        </div>`;
+    }).join('') || '<span class="hint" style="font-family:Georgia">No nodes yet.</span>';
+}
+
+function log(msg) {
+    const el = document.getElementById('log');
+    const d = document.createElement('div');
+    d.innerHTML = msg;
+    el.prepend(d);
+    while (el.children.length > 40) el.removeChild(el.lastChild);
+}
+
+function reset() {
+    nodes = []; keys = []; nodeSeq = 0; keySeq = 0;
+    document.getElementById('log').innerHTML = '';
+    buildScaffold();
+    seed();
+    log('simulation reset');
+}
+function seed() {
+    ['node-A', 'node-B', 'node-C'].forEach(n => addNode(n));
+    addManyKeys(8);
+}
+
+buildScaffold();
+seed();
+</script>
+</body>
+</html>
