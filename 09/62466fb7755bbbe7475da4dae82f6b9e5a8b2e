@@ -1,0 +1,26 @@
+tech-notes/distributed-systems/lsm-vs-btree-paths.html
+  s_30626eb640349d::t_fd6d4e485183f3 167-176
+  s_30626eb640349d::t_df64cc3c192ef6 143-152
+  s_30626eb640349d::t_0edefb792c99c3 108-110
+tech-notes/distributed-systems/rate-limiting-sim.html
+  s_30626eb640349d::t_b36968def46daf 192-202
+  s_30626eb640349d::t_3f06cdb3d942c4 366
+  s_30626eb640349d::t_4332490f73b36f 97-110
+  s_30626eb640349d::t_4026b3735f5633 191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0962466fb7755bbbe7475da4dae82f6b9e5a8b2e",
+  "prompts": {},
+  "sessions": {
+    "s_30626eb640349d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90251d9e-44c9-44dc-9535-435bd1818a9e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
