@@ -1,0 +1,28 @@
+tech-notes/sv/keeper-test.md
+  s_160418d2df6131::t_d0a920bb1cd45a 1-137
+tech-notes/sv/techno-optimism.md
+  s_160418d2df6131::t_35e36fc3b340aa 1-140
+tech-notes/sv/product-market-fit.md
+  s_160418d2df6131::t_f4851b15525a69 1-69,72-136
+  s_160418d2df6131::t_b9fce32158efaf 70-71
+tech-notes/sv/stack-ranking.md
+  s_160418d2df6131::t_186c40fdc22a0b 1-140
+tech-notes/sv/10x-engineer.md
+  s_160418d2df6131::t_a63303ba02b549 1-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "a20bb82d56bcaa878e538cc29f34b8df39515a5a",
+  "prompts": {},
+  "sessions": {
+    "s_160418d2df6131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41be6224-e3c8-4ae8-8672-8147052c001b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
