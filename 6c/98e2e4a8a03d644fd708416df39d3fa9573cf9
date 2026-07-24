@@ -1,0 +1,19 @@
+tech-notes/distributed-systems/db-read-write-sim.html
+  s_9c1fb3377c53cb::t_fddb58f88c01bd 1-456
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "6c98e2e4a8a03d644fd708416df39d3fa9573cf9",
+  "prompts": {},
+  "sessions": {
+    "s_9c1fb3377c53cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27518bc2-829f-470e-a6db-c79c7144e45e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
