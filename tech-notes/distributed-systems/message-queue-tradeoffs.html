@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Message Queue Tradeoffs</title>
+    <style>
+        :root {
+            --paper: #f2efe6;
+            --ink: #17211d;
+            --muted: #5e6963;
+            --line: #c9cec3;
+            --panel: #fffdf7;
+            --green: #176b4d;
+            --amber: #dc7b22;
+            --red: #b23a3a;
+            --blue: #2f6690;
+            --purple: #7a4f9e;
+            --soft-green: #dcebe2;
+            --soft-amber: #f8e5d1;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--paper); color: var(--ink); font-family: Georgia, "Times New Roman", serif; line-height: 1.6; }
+        body::before {
+            position: fixed; inset: 0; z-index: -1; content: ""; opacity: .32;
+            background-image: linear-gradient(rgba(23,33,29,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(23,33,29,.08) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .page { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0;
+            border-bottom: 1px solid var(--line); font-family: "Courier New", monospace; font-size: .74rem;
+            letter-spacing: .08em; text-transform: uppercase;
+        }
+        .topbar a { padding: 7px 12px; border: 1px solid var(--green); color: var(--green); text-decoration: none; transition: background .2s, color .2s; }
+        .topbar a:hover { background: var(--green); color: var(--panel); }
+        header { padding: 56px 0 40px; }
+        .eyebrow { margin: 0 0 14px; color: var(--amber); font-family: "Courier New", monospace; font-size: .8rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+        h1 { margin: 0 0 20px; font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 400; letter-spacing: -.04em; line-height: .92; }
+        .lede { max-width: 780px; margin: 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.3rem); }
+
+        .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+        .tab {
+            font-family: "Courier New", monospace; font-size: .8rem; letter-spacing: .05em; text-transform: uppercase;
+            padding: 12px 18px; border: 1px solid var(--line); border-bottom: none; background: var(--panel);
+            color: var(--muted); cursor: pointer; border-radius: 8px 8px 0 0; margin-bottom: -1px; transition: all .15s;
+        }
+        .tab:hover { color: var(--ink); }
+        .tab.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+        .view[hidden] { display: none; }
+
+        .qbar { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 24px; }
+        .q {
+            font-family: "Courier New", monospace; font-size: .78rem; padding: 9px 14px; border: 1px solid var(--line);
+            background: var(--panel); color: var(--muted); border-radius: 999px; cursor: pointer; transition: all .15s;
+        }
+        .q:hover { border-color: var(--ink); color: var(--ink); }
+        .q.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+        .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; padding-bottom: 60px; }
+        @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+        .panel h2 { margin: 0 0 4px; font-size: 1.05rem; font-family: "Courier New", monospace; text-transform: uppercase; letter-spacing: .06em; }
+        .panel .hint { margin: 0 0 16px; font-size: .82rem; color: var(--muted); }
+
+        .controls { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 16px; }
+        .btn {
+            font-family: "Courier New", monospace; font-size: .82rem; letter-spacing: .04em; padding: 10px 14px;
+            border: 1px solid var(--ink); background: var(--panel); color: var(--ink); border-radius: 7px; cursor: pointer;
+            text-align: left; transition: transform .1s, background .15s, color .15s; width: 100%;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn.green { border-color: var(--green); color: var(--green); }
+        .btn.green:hover { background: var(--green); color: var(--panel); }
+        .btn.amber { border-color: var(--amber); color: var(--amber); }
+        .btn.amber:hover { background: var(--amber); color: var(--panel); }
+        .btn.red { border-color: var(--red); color: var(--red); }
+        .btn.red:hover { background: var(--red); color: var(--panel); }
+        .btn.blue { border-color: var(--blue); color: var(--blue); }
+        .btn.blue:hover { background: var(--blue); color: var(--panel); }
+        .btn.on { background: var(--green); color: var(--panel); }
+
+        .field { display: flex; flex-direction: column; gap: 6px; font-size: .8rem; color: var(--muted); }
+        .field input[type=range] { width: 100%; accent-color: var(--green); }
+        .sep { height: 1px; background: var(--line); margin: 6px 0; }
+
+        .stagewrap { display: flex; flex-direction: column; gap: 20px; }
+        canvas { width: 100%; height: 360px; display: block; border-radius: 8px; background: var(--paper); border: 1px solid var(--line); }
+
+        .desc { font-size: .92rem; color: var(--muted); }
+        .desc b { color: var(--ink); }
+
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 12px; }
+        .stat { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; text-align: center; }
+        .stat .num { font-family: "Courier New", monospace; font-size: 1.4rem; }
+        .stat .num.g { color: var(--green); }
+        .stat .num.r { color: var(--red); }
+        .stat .num.a { color: var(--amber); }
+        .stat .num.b { color: var(--blue); }
+        .stat .lbl { font-size: .66rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+
+        .semline { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+        .semtag { font-family: "Courier New", monospace; font-size: .72rem; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); color: var(--muted); }
+        .semtag b { color: var(--ink); }
+
+        .pcgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 560px) { .pcgrid { grid-template-columns: 1fr; } }
+        .pch { margin: 0 0 6px; font-family: "Courier New", monospace; font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; }
+        .pch.pros { color: var(--green); }
+        .pch.cons { color: var(--red); }
+        .pcgrid ul { margin: 0; padding-left: 18px; font-size: .88rem; }
+        .pcgrid li { margin-bottom: 5px; }
+
+        .legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: "Courier New", monospace; font-size: .74rem; color: var(--muted); }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+        .matrixwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+        table.matrix { border-collapse: collapse; width: 100%; min-width: 900px; background: var(--panel); font-size: .84rem; }
+        table.matrix th, table.matrix td { padding: 11px 13px; text-align: left; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); vertical-align: top; }
+        table.matrix th:last-child, table.matrix td:last-child { border-right: none; }
+        table.matrix thead th { background: var(--ink); color: var(--paper); font-family: "Courier New", monospace; font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; position: sticky; top: 0; }
+        table.matrix tbody th { font-family: "Courier New", monospace; font-weight: 700; color: var(--ink); background: var(--paper); white-space: nowrap; }
+        table.matrix tbody tr:last-child th, table.matrix tbody tr:last-child td { border-bottom: none; }
+        .cell-g { color: var(--green); font-weight: 700; }
+        .cell-a { color: var(--amber); font-weight: 700; }
+        .cell-r { color: var(--red); font-weight: 700; }
+        .mono { font-family: "Courier New", monospace; }
+
+        .verdict { background: var(--panel); border: 1px solid var(--green); border-left: 5px solid var(--green); border-radius: 10px; padding: 22px 24px; margin: 28px 0; }
+        .verdict h3 { margin: 0 0 12px; font-family: "Courier New", monospace; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--green); }
+        .verdict p { margin: 0 0 10px; font-size: .95rem; }
+        .verdict p:last-child { margin-bottom: 0; }
+        .verdict .pick { color: var(--green); font-weight: 700; }
+
+        .sectitle { margin: 40px 0 8px; font-size: 1.5rem; font-weight: 400; letter-spacing: -.02em; }
+        .sectsub { margin: 0 0 22px; color: var(--muted); font-size: .95rem; max-width: 760px; }
+        .cardgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+        .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+        .card h4 { margin: 0 0 4px; font-size: 1.2rem; }
+        .card .tag { display: inline-block; font-family: "Courier New", monospace; font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; padding: 3px 9px; border-radius: 999px; margin-bottom: 12px; border: 1px solid var(--line); background: var(--paper); color: var(--muted); }
+        .card .model { color: var(--purple); font-family: "Courier New", monospace; font-size: .72rem; }
+        .card .best { margin: 10px 0 12px; font-size: .86rem; color: var(--muted); }
+        .card .best b { color: var(--ink); }
+        .card ul { margin: 0; padding-left: 18px; font-size: .84rem; }
+        .card li { margin-bottom: 4px; }
+        .card .pch { margin: 12px 0 4px; }
+
+        footer { padding: 30px 0 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+        code { font-family: "Courier New", monospace; background: var(--soft-green); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="topbar">
+        <span>Distributed Systems / Message Queues</span>
+        <a href="message-queue-tradeoffs.md">Read the notes →</a>
+    </div>
+
+    <header>
+        <p class="eyebrow">Interactive · Producer → Broker → Consumer</p>
+        <h1>Message Queue Tradeoffs</h1>
+        <p class="lede">Six tools people reach for when they say "put it on a queue" — <b>SQS</b>, <b>SNS</b>, <b>Kafka</b>, <b>Redis</b>, <b>RabbitMQ</b>, and <b>Postgres</b>. Watch how each one moves messages, and see exactly how it scales, fails, and retries.</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab active" data-view="sim" onclick="switchView('sim')">Simulation</button>
+        <button class="tab" data-view="compare" onclick="switchView('compare')">Comparison &amp; Pros / Cons</button>
+    </div>
+
+    <section class="view" id="viewSim">
+    <div class="qbar" id="qbar"></div>
+
+    <div class="layout">
+        <aside>
+            <div class="controls">
+                <div class="panel">
+                    <h2>Traffic</h2>
+                    <p class="hint">Push messages through the broker.</p>
+                    <button class="btn green" onclick="produce(1)">→ Produce 1 message</button>
+                    <div style="height:8px"></div>
+                    <button class="btn amber" onclick="produce(10)">⇉ Burst 10 messages</button>
+                    <div style="height:8px"></div>
+                    <button class="btn blue" id="autoBtn" onclick="toggleAuto()">▶ Auto-produce: off</button>
+                    <div class="sep"></div>
+                    <div class="field">
+                        <label>Produce rate: <b id="prodRateVal">6</b> msg/s</label>
+                        <input type="range" id="prodRate" min="1" max="24" value="6" oninput="prodRateVal.textContent=this.value">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Consumers</h2>
+                    <p class="hint">How fast and how reliably work is processed.</p>
+                    <div class="field">
+                        <label>Consume rate: <b id="consRateVal">5</b> msg/s</label>
+                        <input type="range" id="consRate" min="1" max="24" value="5" oninput="consRateVal.textContent=this.value">
+                    </div>
+                    <div style="height:12px"></div>
+                    <div class="field">
+                        <label>Failure rate: <b id="failVal">15</b>%</label>
+                        <input type="range" id="failRate" min="0" max="60" value="15" oninput="failVal.textContent=this.value">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <button class="btn blue" id="replayBtn" onclick="replay()">⟲ Replay from log</button>
+                    <div style="height:8px"></div>
+                    <button class="btn red" onclick="resetSim()">↺ Reset</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="stagewrap">
+            <div class="panel">
+                <h2 id="qTitle">SQS</h2>
+                <p class="desc" id="qDesc"></p>
+                <div style="height:12px"></div>
+                <div class="semline" id="semline"></div>
+                <canvas id="cv" width="900" height="360"></canvas>
+                <div style="height:14px"></div>
+                <div class="legend">
+                    <span><i class="swatch" style="background:var(--blue)"></i> in flight</span>
+                    <span><i class="swatch" style="background:var(--amber)"></i> backlog / retry</span>
+                    <span><i class="swatch" style="background:var(--green)"></i> delivered</span>
+                    <span><i class="swatch" style="background:var(--red)"></i> DLQ / dropped</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Stats</h2>
+                <div class="stats" id="stats"></div>
+            </div>
+
+            <div class="panel">
+                <div class="pcgrid">
+                    <div><h3 class="pch pros">Pros</h3><ul id="prosList"></ul></div>
+                    <div><h3 class="pch cons">Cons</h3><ul id="consList"></ul></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    </section>
+
+    <section class="view" id="viewCompare" hidden>
+        <div class="matrixwrap">
+            <table class="matrix">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>SQS</th>
+                        <th>SNS</th>
+                        <th>Kafka</th>
+                        <th>Redis</th>
+                        <th>RabbitMQ</th>
+                        <th>Postgres</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Model</th>
+                        <td>Managed queue</td>
+                        <td>Pub/sub fan-out</td>
+                        <td>Commit log</td>
+                        <td>In-mem list/stream</td>
+                        <td>AMQP broker</td>
+                        <td>Table as queue</td>
+                    </tr>
+                    <tr>
+                        <th>Delivery</th>
+                        <td class="cell-a">At-least-once<br><span class="mono">(FIFO: exactly-once)</span></td>
+                        <td class="cell-a">At-least-once</td>
+                        <td class="cell-a">At-least-once<br><span class="mono">(exactly-once in-Kafka)</span></td>
+                        <td class="cell-a">At-least-once</td>
+                        <td class="cell-a">At-least-once</td>
+                        <td class="cell-g">Exactly-once (txn)</td>
+                    </tr>
+                    <tr>
+                        <th>Ordering</th>
+                        <td class="cell-a">Best-effort / per group</td>
+                        <td class="cell-r">None</td>
+                        <td class="cell-a">Per partition</td>
+                        <td class="cell-a">Per stream</td>
+                        <td class="cell-a">Per queue</td>
+                        <td class="cell-g">By query</td>
+                    </tr>
+                    <tr>
+                        <th>Throughput</th>
+                        <td class="cell-g">Very high</td>
+                        <td class="cell-g">Very high</td>
+                        <td class="cell-g">Extreme</td>
+                        <td class="cell-g">High (1 node)</td>
+                        <td class="cell-a">Moderate–high</td>
+                        <td class="cell-r">Low–moderate</td>
+                    </tr>
+                    <tr>
+                        <th>Latency</th>
+                        <td class="cell-a mono">~10–100 ms</td>
+                        <td class="cell-a mono">~10–100 ms</td>
+                        <td class="cell-g mono">1–25 ms</td>
+                        <td class="cell-g mono">sub-ms</td>
+                        <td class="cell-g mono">~1 ms</td>
+                        <td class="cell-a mono">ms–10s ms</td>
+                    </tr>
+                    <tr>
+                        <th>Durability</th>
+                        <td class="cell-g">Managed, high</td>
+                        <td class="cell-r">None (transient)</td>
+                        <td class="cell-g">Disk + replication</td>
+                        <td class="cell-r">RAM (lossy persist)</td>
+                        <td class="cell-g">Disk (quorum)</td>
+                        <td class="cell-g">Full ACID</td>
+                    </tr>
+                    <tr>
+                        <th>Replay</th>
+                        <td class="cell-r">No</td>
+                        <td class="cell-r">No</td>
+                        <td class="cell-g">Yes — retained log</td>
+                        <td class="cell-a">Streams: limited</td>
+                        <td class="cell-a">Streams only</td>
+                        <td class="cell-g">Yes — rows persist</td>
+                    </tr>
+                    <tr>
+                        <th>Retry mechanism</th>
+                        <td class="mono">Visibility timeout</td>
+                        <td class="mono">Delivery policy</td>
+                        <td class="mono">Offset / retry topic</td>
+                        <td class="mono">XCLAIM / manual</td>
+                        <td class="mono">ack/nack + DLX</td>
+                        <td class="mono">attempts column</td>
+                    </tr>
+                    <tr>
+                        <th>DLQ</th>
+                        <td class="cell-g">Built-in</td>
+                        <td class="cell-g">Built-in (to SQS)</td>
+                        <td class="cell-a">DL topic (manual)</td>
+                        <td class="cell-r">Manual</td>
+                        <td class="cell-g">DLX</td>
+                        <td class="cell-a">Status column</td>
+                    </tr>
+                    <tr>
+                        <th>Scale model</th>
+                        <td class="cell-g">Auto (managed)</td>
+                        <td class="cell-g">Auto (managed)</td>
+                        <td class="cell-a">Partitions + brokers</td>
+                        <td class="cell-a">Cluster sharding</td>
+                        <td class="cell-r">Nodes (no shard)</td>
+                        <td class="cell-r">Vertical / one DB</td>
+                    </tr>
+                    <tr>
+                        <th>Ops overhead</th>
+                        <td class="cell-g">None</td>
+                        <td class="cell-g">None</td>
+                        <td class="cell-r">High</td>
+                        <td class="cell-a">Low–medium</td>
+                        <td class="cell-a">Medium</td>
+                        <td class="cell-g">Low (already run it)</td>
+                    </tr>
+                    <tr>
+                        <th>Managed option</th>
+                        <td class="mono">AWS native</td>
+                        <td class="mono">AWS native</td>
+                        <td class="mono">MSK / Confluent</td>
+                        <td class="mono">ElastiCache</td>
+                        <td class="mono">CloudAMQP</td>
+                        <td class="mono">RDS / Aurora</td>
+                    </tr>
+                    <tr>
+                        <th>Best for</th>
+                        <td>Decoupling + retry on AWS</td>
+                        <td>One event, many reactions</td>
+                        <td>Streaming + event sourcing</td>
+                        <td>Fast job queues</td>
+                        <td>Complex routing / RPC</td>
+                        <td>Outbox / atomic enqueue</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="verdict">
+            <h3>Which one should I pick?</h3>
+            <p>There is no single winner — match the tool to whether you need <b>fan-out</b>, <b>replay</b>, <b>routing</b>, <b>transactional enqueue</b>, or just <b>decoupling with retry</b>.</p>
+            <p><span class="pick">→ On AWS, decouple with zero ops:</span> <b>SQS</b>. Visibility timeout + DLQ give you retry for free.</p>
+            <p><span class="pick">→ One event, many independent reactions:</span> <b>SNS</b> — usually <b>SNS → SQS</b> so each subscriber gets a durable buffer.</p>
+            <p><span class="pick">→ High-throughput streaming, event sourcing, replay:</span> <b>Kafka</b> — the retained log lets many consumer groups rewind.</p>
+            <p><span class="pick">→ Sub-ms job queue, Redis already in the stack:</span> <b>Redis Streams</b> — accept a small window of loss on crash.</p>
+            <p><span class="pick">→ Complex routing, priorities, per-message retry, RPC:</span> <b>RabbitMQ</b>.</p>
+            <p><span class="pick">→ Enqueue must be atomic with a DB write, modest volume:</span> <b>Postgres</b> (transactional outbox).</p>
+        </div>
+
+        <h2 class="sectitle">Three pros and three cons each</h2>
+        <p class="sectsub">The honest tradeoffs. Every one of these is the right answer for something and the wrong answer for something else.</p>
+
+        <div class="cardgrid" id="cardgrid"></div>
+    </section>
+
+    <footer>
+        SQS decouples with built-in retry; SNS fans one event out to many; Kafka is a replayable log; Redis is fast but volatile; RabbitMQ routes with precise per-message control; Postgres makes the enqueue atomic with your data. See the <a href="message-queue-tradeoffs.md">notes</a>.
+    </footer>
+</div>
+
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const C = { paper:'#f2efe6', ink:'#17211d', muted:'#5e6963', line:'#c9cec3', panel:'#fffdf7',
+    green:'#176b4d', amber:'#dc7b22', red:'#b23a3a', blue:'#2f6690', purple:'#7a4f9e',
+    softGreen:'#dcebe2', softAmber:'#f8e5d1' };
+
+const QUEUES = {
+    sqs: {
+        name: 'SQS',
+        model: 'Managed queue',
+        desc: 'A fully-managed distributed queue. A message is <b>received, hidden by a visibility timeout, then deleted on ack</b>. If the consumer crashes, it reappears automatically; after N failed receives a redrive policy moves it to a <b>dead-letter queue</b>.',
+        sem: [['Delivery','at-least-once'],['Retry','visibility timeout'],['DLQ','built-in'],['Replay','no']],
+        retain: false, fanout: 1, drops: false,
+        best: 'Decoupling microservices and buffering background jobs on AWS with zero ops and built-in retry + DLQ.',
+        pros: ['Fully managed — zero servers, zero ops', 'Effectively infinite scale, no capacity planning', 'Visibility-timeout + DLQ retry built in'],
+        cons: ['AWS-only lock-in', 'No replay — deleted is gone forever', 'Standard queues duplicate/reorder; FIFO is rate-capped']
+    },
+    sns: {
+        name: 'SNS',
+        model: 'Pub/sub fan-out',
+        desc: 'A pub/sub bus. One publish is <b>fanned out to every subscriber</b> (SQS, Lambda, HTTP, email). It stores nothing — it pushes and forgets. Durable fan-out pairs SNS with SQS so each subscriber gets its own buffer.',
+        sem: [['Delivery','at-least-once'],['Retry','delivery policy'],['DLQ','to SQS'],['Fan-out','1 → N']],
+        retain: false, fanout: 3, drops: false,
+        best: 'One event, many independent reactions — broadcast to several services, push notifications, event fan-out on AWS.',
+        pros: ['Effortless one-to-many fan-out', 'Many protocols out of the box (SQS, Lambda, HTTP, SMS)', 'Managed and scales for you'],
+        cons: ['No storage or replay — offline subscriber can miss it', 'Filtering is limited vs a real broker', 'AWS-only']
+    },
+    kafka: {
+        name: 'Kafka',
+        model: 'Commit log',
+        desc: 'A partitioned, replicated <b>commit log</b>. Producers append to partitions; consumers advance an <b>offset</b>. Messages are <b>retained on disk</b> whether consumed or not — so you can rewind and <b>replay</b> the whole stream.',
+        sem: [['Delivery','at-least-once'],['Retry','offset / retry topic'],['Ordering','per partition'],['Replay','yes']],
+        retain: true, fanout: 1, drops: false,
+        best: 'High-throughput event streaming, event sourcing, and pipelines where many consumer groups replay the same stream.',
+        pros: ['Massive throughput and horizontal scale', 'Durable retained log with full replay/rewind', 'Many consumer groups read the same data independently'],
+        cons: ['Heaviest to operate and reason about', 'Ordering only within a partition', 'Overkill for a simple point-to-point queue']
+    },
+    redis: {
+        name: 'Redis',
+        model: 'In-mem list/stream',
+        desc: 'An <b>in-memory</b> data-structure server. Queues via Lists or Streams (consumer groups + a pending-entries list). Sub-millisecond, but the backlog must fit in RAM and a crash can lose in-flight data. <code>MAXLEN</code> trimming can <b>drop the oldest</b>.',
+        sem: [['Delivery','at-least-once'],['Retry','XCLAIM / manual'],['Durability','RAM (lossy)'],['Latency','sub-ms']],
+        retain: false, fanout: 1, drops: true,
+        best: 'Low-latency job queues where a small window of loss on crash is fine and Redis is already in the stack.',
+        pros: ['Extremely fast — sub-ms latency', 'Trivial to set up if you already run Redis', 'Streams add consumer groups, offsets, redelivery'],
+        cons: ['In-memory — limited backlog, real risk of loss on crash', 'Durability and clustering are weaker / manual', 'Not built for long-term retention']
+    },
+    rabbitmq: {
+        name: 'RabbitMQ',
+        model: 'AMQP broker',
+        desc: 'The classic broker. Producers publish to an <b>exchange</b>; rules route to <b>queues</b>; consumers <b>ack/nack</b> each message. Unacked messages requeue; a reject can route to a <b>dead-letter exchange</b>, and TTL gives delayed retries.',
+        sem: [['Delivery','at-least-once'],['Retry','ack/nack + DLX'],['Routing','rich'],['Replay','streams only']],
+        retain: false, fanout: 1, drops: false,
+        best: 'Complex routing and reliable task distribution — RPC, priorities, per-message TTL and delayed retries.',
+        pros: ['Flexible, powerful routing (topic/header/priority)', 'Precise per-message ack + DLX + TTL retries', 'Mature, protocol-rich (AMQP, MQTT, STOMP)'],
+        cons: ['Classic queues do not shard (single node per queue)', 'Lower throughput than Kafka for big streams', 'Replay needs Streams — classic queues delete on ack']
+    },
+    postgres: {
+        name: 'Postgres',
+        model: 'Table as queue',
+        desc: 'A relational table as a queue. Workers pull with <code>SELECT … FOR UPDATE SKIP LOCKED</code> so they grab disjoint rows without blocking. Its superpower: <b>enqueue in the same transaction</b> as your business write — no dual-write, no lost messages.',
+        sem: [['Delivery','exactly-once (txn)'],['Retry','attempts column'],['Consistency','ACID'],['Replay','yes']],
+        retain: true, fanout: 1, drops: false,
+        best: 'Modest volume where the enqueue must be atomic with a DB write — the transactional-outbox pattern, no new infra.',
+        pros: ['Transactional — enqueue atomically with your data (outbox)', 'Zero new infra, full SQL visibility and debuggability', 'Durable and consistent by default'],
+        cons: ['Low throughput ceiling', 'High churn causes table bloat and VACUUM load', 'You hand-build retry, DLQ, visibility, scheduling']
+    }
+};
+
+let cur = 'sqs';
+let prodRate = 6, consRate = 5, failRate = 15;
+let auto = false, lastProd = 0, lastCons = 0;
+let msgs = [];
+let log = [];
+let uid = 0;
+let stats = { produced: 0, delivered: 0, retried: 0, dlq: 0 };
+
+const LX = 90, BX = 340, CX = 620, DX = 850;
+const BY = 60, BH = 240;
+
+function now() { return performance.now() / 1000; }
+
+function spawn(n) {
+    const q = QUEUES[cur];
+    for (let i = 0; i < n; i++) {
+        stats.produced++;
+        msgs.push({ id: ++uid, stage: 'toBroker', x: LX, y: BY + BH / 2 + (Math.random() - .5) * 40, tx: BX, ty: BY + BH / 2, attempts: 0, lane: 0, t: now() });
+    }
+}
+
+function produce(n) { spawn(n); }
+
+function toggleAuto() {
+    auto = !auto;
+    const b = document.getElementById('autoBtn');
+    b.textContent = '▶ Auto-produce: ' + (auto ? 'on' : 'off');
+    b.classList.toggle('on', auto);
+}
+
+function replay() {
+    const q = QUEUES[cur];
+    if (!q.retain || !log.length) return;
+    for (const m of log) {
+        msgs.push({ id: ++uid, stage: 'toConsumer', x: BX, y: brokerSlotY(msgs.length % 8), tx: CX, ty: BY + BH / 2, attempts: 0, lane: 0, t: now(), replay: true });
+    }
+}
+
+function backlog() { return msgs.filter(m => m.stage === 'inBroker'); }
+
+function brokerSlotY(i) { return BY + 30 + (i % 8) * 24; }
+
+function stepConsume() {
+    const q = QUEUES[cur];
+    const b = backlog();
+    if (!b.length) return;
+    const m = b[0];
+    m.stage = 'toConsumer';
+    m.tx = CX;
+    m.ty = BY + BH / 2;
+}
+
+function arrive(m) {
+    const q = QUEUES[cur];
+    if (m.stage === 'toBroker') {
+        if (q.drops && backlog().length >= 8) {
+            const victim = backlog()[0];
+            if (victim) { victim.stage = 'dropfly'; victim.tx = DX; victim.ty = BH + 40; stats.dlq++; }
+        }
+        m.stage = 'inBroker';
+    } else if (m.stage === 'toConsumer') {
+        m.stage = 'processing';
+        m.procUntil = now() + .35;
+    } else if (m.stage === 'retryFly') {
+        m.stage = 'inBroker';
+    } else if (m.stage === 'deliverFly') {
+        m.stage = 'gone';
+    } else if (m.stage === 'dropfly') {
+        m.stage = 'gone';
+    }
+}
+
+function finishProcess(m) {
+    const q = QUEUES[cur];
+    const failed = Math.random() * 100 < failRate;
+    if (!failed) {
+        for (let f = 0; f < q.fanout; f++) {
+            stats.delivered++;
+        }
+        if (q.retain) log.push(m.id);
+        m.stage = 'deliverFly';
+        m.tx = DX; m.ty = BY + 40;
+        m.lane = 0;
+    } else {
+        m.attempts++;
+        if (m.attempts >= 3) {
+            stats.dlq++;
+            m.stage = 'dropfly';
+            m.tx = DX; m.ty = BH + 40;
+        } else {
+            stats.retried++;
+            m.stage = 'retryFly';
+            m.tx = BX; m.ty = BY + BH / 2;
+        }
+    }
+}
+
+function tick() {
+    const t = now();
+    if (auto && t - lastProd > 1 / prodRate) { spawn(1); lastProd = t; }
+    if (t - lastCons > 1 / consRate) { stepConsume(); lastCons = t; }
+
+    for (const m of msgs) {
+        if (m.stage === 'processing') {
+            if (t >= m.procUntil) finishProcess(m);
+            continue;
+        }
+        if (m.tx !== undefined && (m.stage === 'toBroker' || m.stage === 'toConsumer' || m.stage === 'retryFly' || m.stage === 'deliverFly' || m.stage === 'dropfly')) {
+            const dx = m.tx - m.x, dy = m.ty - m.y;
+            const d = Math.hypot(dx, dy);
+            const sp = 5.2;
+            if (d < sp) { m.x = m.tx; m.y = m.ty; arrive(m); }
+            else { m.x += dx / d * sp; m.y += dy / d * sp; }
+        }
+    }
+    msgs = msgs.filter(m => m.stage !== 'gone');
+
+    const b = backlog();
+    b.forEach((m, i) => { m.y = brokerSlotY(i); m.x = BX; });
+
+    draw();
+    updateStats();
+    requestAnimationFrame(tick);
+}
+
+function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+function node(x, y, w, h, label, sub, color) {
+    ctx.save();
+    ctx.fillStyle = C.panel;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    roundRect(x - w / 2, y - h / 2, w, h, 10);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = C.ink;
+    ctx.font = '600 14px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x, y - 2);
+    if (sub) {
+        ctx.fillStyle = C.muted;
+        ctx.font = '11px "Courier New", monospace';
+        ctx.fillText(sub, x, y + 15);
+    }
+    ctx.restore();
+}
+
+function draw() {
+    const q = QUEUES[cur];
+    ctx.clearRect(0, 0, cv.width, cv.height);
+
+    ctx.strokeStyle = C.line;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(LX, BY + BH / 2); ctx.lineTo(BX - 55, BY + BH / 2);
+    ctx.moveTo(BX + 55, BY + BH / 2); ctx.lineTo(CX - 45, BY + BH / 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = C.panel;
+    ctx.strokeStyle = C.line;
+    roundRect(BX - 55, BY, 110, BH, 10);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = C.muted;
+    ctx.font = '11px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(q.retain ? 'LOG' : 'BACKLOG', BX, BY + 18);
+    ctx.fillText('(' + backlog().length + ')', BX, BY + BH - 12);
+
+    node(LX, BY + BH / 2, 90, 54, 'PROD', 'producer', C.blue);
+
+    if (q.fanout > 1) {
+        for (let f = 0; f < 3; f++) {
+            node(CX, BY + 44 + f * 76, 96, 50, 'SUB ' + (f + 1), 'consumer', C.green);
+        }
+    } else {
+        node(CX, BY + BH / 2, 100, 54, q.name.toUpperCase(), 'consumer', C.green);
+    }
+
+    node(DX, BY + 40, 70, 44, 'OK', 'delivered', C.green);
+    node(DX, BH + 40, 70, 44, q.retain ? 'DLQ' : (q.drops ? 'LOST' : 'DLQ'), 'failed', C.red);
+
+    for (const m of msgs) {
+        let col = C.blue;
+        if (m.stage === 'inBroker' || m.stage === 'retryFly') col = C.amber;
+        else if (m.stage === 'deliverFly') col = C.green;
+        else if (m.stage === 'dropfly') col = C.red;
+        else if (m.stage === 'processing') col = C.purple;
+        else if (m.replay) col = C.purple;
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        if (m.attempts > 0 && (m.stage === 'inBroker' || m.stage === 'retryFly' || m.stage === 'processing')) {
+            ctx.fillStyle = C.ink;
+            ctx.font = '9px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('×' + m.attempts, m.x, m.y - 9);
+        }
+    }
+}
+
+function updateStats() {
+    const el = document.getElementById('stats');
+    const inflight = msgs.filter(m => m.stage !== 'gone' && m.stage !== 'inBroker').length;
+    el.innerHTML = `
+        <div class="stat"><div class="num">${stats.produced}</div><div class="lbl">Produced</div></div>
+        <div class="stat"><div class="num a">${backlog().length}</div><div class="lbl">Backlog</div></div>
+        <div class="stat"><div class="num b">${inflight}</div><div class="lbl">In flight</div></div>
+        <div class="stat"><div class="num g">${stats.delivered}</div><div class="lbl">Delivered</div></div>
+        <div class="stat"><div class="num a">${stats.retried}</div><div class="lbl">Retried</div></div>
+        <div class="stat"><div class="num r">${stats.dlq}</div><div class="lbl">${QUEUES[cur].drops ? 'DLQ/Lost' : 'DLQ'}</div></div>`;
+}
+
+function selectQueue(k) {
+    cur = k;
+    const q = QUEUES[k];
+    document.querySelectorAll('.q').forEach(b => b.classList.toggle('active', b.dataset.q === k));
+    document.getElementById('qTitle').textContent = q.name;
+    document.getElementById('qDesc').innerHTML = q.desc;
+    document.getElementById('semline').innerHTML = q.sem.map(s => `<span class="semtag">${s[0]}: <b>${s[1]}</b></span>`).join('');
+    document.getElementById('prosList').innerHTML = q.pros.map(p => `<li>${p}</li>`).join('');
+    document.getElementById('consList').innerHTML = q.cons.map(p => `<li>${p}</li>`).join('');
+    const rb = document.getElementById('replayBtn');
+    rb.style.display = q.retain ? 'block' : 'none';
+    resetSim();
+}
+
+function resetSim() {
+    msgs = []; log = [];
+    stats = { produced: 0, delivered: 0, retried: 0, dlq: 0 };
+    updateStats();
+}
+
+function buildBar() {
+    const bar = document.getElementById('qbar');
+    bar.innerHTML = Object.keys(QUEUES).map(k =>
+        `<button class="q${k === cur ? ' active' : ''}" data-q="${k}" onclick="selectQueue('${k}')">${QUEUES[k].name}</button>`).join('');
+}
+
+function buildCards() {
+    const g = document.getElementById('cardgrid');
+    g.innerHTML = Object.keys(QUEUES).map(k => {
+        const q = QUEUES[k];
+        return `<div class="card">
+            <h4>${q.name}</h4>
+            <span class="tag">${q.model}</span>
+            <p class="best"><b>Best for:</b> ${q.best}</p>
+            <h5 class="pch pros">Pros</h5>
+            <ul>${q.pros.map(p => `<li>${p}</li>`).join('')}</ul>
+            <h5 class="pch cons">Cons</h5>
+            <ul>${q.cons.map(p => `<li>${p}</li>`).join('')}</ul>
+        </div>`;
+    }).join('');
+}
+
+function switchView(v) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
+    document.getElementById('viewSim').hidden = v !== 'sim';
+    document.getElementById('viewCompare').hidden = v !== 'compare';
+}
+
+document.getElementById('prodRate').addEventListener('input', e => prodRate = +e.target.value);
+document.getElementById('consRate').addEventListener('input', e => consRate = +e.target.value);
+document.getElementById('failRate').addEventListener('input', e => failRate = +e.target.value);
+
+buildBar();
+buildCards();
+selectQueue('sqs');
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
