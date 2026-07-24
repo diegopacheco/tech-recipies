@@ -1,0 +1,23 @@
+tech-notes/distributed-systems/message-queue-tradeoffs.md
+  s_149c847d781c56::t_b12fd66648410e 1-219
+tech-notes/distributed-systems/message-queue-tradeoffs.html
+  s_149c847d781c56::t_3a7c93590f5f08 490
+  s_149c847d781c56::t_a0bd60d9dab3a9 507
+  s_149c847d781c56::t_4b2ec6d15ddc13 1-489,491-506,508-753
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "01878ec6a186e2c698d881aa0bed8a28c8dc95a0",
+  "prompts": {},
+  "sessions": {
+    "s_149c847d781c56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3e7d4c98-c0af-4fbb-98fb-23d086bf3854",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
