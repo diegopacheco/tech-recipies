@@ -972,6 +972,7 @@
     .node.scaling { background: #edf4ea; }
     .node.postgres { background: #f8efe3; }
     .node.specialized { background: #f1edf6; }
+    .node.sql { background: #e6f2f0; }
 </style>
 </head>
 <body>
@@ -980,7 +981,7 @@
       <div>
         <div class="eyebrow">Databases notes index</div>
         <h1>Storage engines, scaling, and specialized stores in one map.</h1>
-        <p class="lead">A visual guide to the Markdown notes in this folder, grouped into storage engines, replication & scaling, postgres, specialized stores.</p>
+        <p class="lead">A visual guide to the notes in this folder, grouped into storage engines, replication & scaling, postgres, specialized stores, sql & transactions.</p>
         <div class="hero-actions">
           <a class="btn" href="#topics">Browse topics</a>
           <a class="btn secondary" href="#map">View map</a>
@@ -989,16 +990,16 @@
       <aside class="atlas" aria-label="Topic preview">
         <div class="atlas-title">
           <span>Content clusters</span>
-          <span>12 files</span>
+          <span>14 files</span>
         </div>
         <div class="atlas-grid" id="heroNodes"></div>
       </aside>
     </section>
 
     <section class="stats" aria-label="Summary counts">
-      <div class="stat"><strong>12</strong><span>Markdown notes in this folder</span></div>
-      <div class="stat"><strong>4</strong><span>clusters for quick navigation</span></div>
-      <div class="stat"><strong>100%</strong><span>of notes readable inside the page</span></div>
+      <div class="stat"><strong>14</strong><span>notes indexed: 12 markdown, 2 interactive</span></div>
+      <div class="stat"><strong>5</strong><span>clusters for quick navigation</span></div>
+      <div class="stat"><strong>100%</strong><span>of markdown notes readable inside the page</span></div>
       <div class="stat"><strong>1</strong><span>self-contained HTML page, no build step</span></div>
     </section>
 
@@ -1087,6 +1088,11 @@
     "id": "specialized",
     "name": "Specialized Stores",
     "color": "violet"
+  },
+  {
+    "id": "sql",
+    "name": "SQL & Transactions",
+    "color": "teal"
   }
 ];
 
@@ -1225,6 +1231,21 @@
     "diagram": "Quadtrees\n  |\n  +-- Who created it? When?\n  +-- Who is using Quadtrees\n  +-- Simple Java Implementation\n  +-- Links"
   },
   {
+    "title": "SQL Joins",
+    "file": "sql-joins.html",
+    "category": "sql",
+    "focus": "Join Types",
+    "summary": "A join is a nested loop over two row sets plus a rule for what to do with rows that find no partner. Interactive page: step INNER, OUTER, CROSS, NATURAL, SELF, SEMI, and ANTI joins row by row and compare behavior, pitfalls, and execution notes.",
+    "tags": [
+      "INNER and OUTER",
+      "CROSS JOIN",
+      "NATURAL and USING",
+      "SELF JOIN",
+      "SEMI and ANTI JOIN"
+    ],
+    "diagram": "SQL Joins\n  |\n  +-- Row behavior per join type\n  +-- Properties and pitfalls\n  +-- Execution notes\n  +-- ON vs USING vs NATURAL vs WHERE"
+  },
+  {
     "title": "Time-Series Databases",
     "file": "time-series-databases.md",
     "category": "specialized",
@@ -1238,6 +1259,21 @@
       "Prometheus"
     ],
     "diagram": "Time-Series Databases\n  |\n  +-- Major TSDBs\n  +-- Comparison\n  +-- Data Model\n  +-- Storage Architecture"
+  },
+  {
+    "title": "Transaction Isolation Levels",
+    "file": "transaction-isolation-levels.html",
+    "category": "sql",
+    "focus": "Anomalies per Level",
+    "summary": "Isolation decides which concurrent histories a database is allowed to expose, and every level trades a class of anomaly for throughput. Interactive page: animate the dirty read, non-repeatable read, phantom, write skew, and serialization failure, then compare what each level blocks and what it costs.",
+    "tags": [
+      "Read Uncommitted",
+      "Read Committed",
+      "Repeatable Read",
+      "Snapshot Isolation",
+      "Serializable"
+    ],
+    "diagram": "Transaction Isolation Levels\n  |\n  +-- Anomalies allowed per level\n  +-- Properties and cost\n  +-- Engine support\n  +-- Anomaly glossary"
   },
   {
     "title": "Vector Database Use Cases Beyond RAG",
@@ -1331,7 +1367,7 @@
             <h3><button type="button" data-topic="${topic.file}">${escapeHtml(topic.title)}</button></h3>
             <p>${escapeHtml(topic.summary)}</p>
             <div class="tags">${topic.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
-            <div class="source"><a href="${topic.file}"><span>${escapeHtml(topic.file)}</span><strong>Open file</strong></a><button type="button" data-topic="${topic.file}">Study</button></div>
+            <div class="source"><a href="${topic.file}"><span>${escapeHtml(topic.file)}</span><strong>Open file</strong></a><button type="button" data-topic="${topic.file}">${topic.file.endsWith(".html") ? "Open" : "Study"}</button></div>
           </div>
         </article>`;
       }).join("");
@@ -1360,6 +1396,10 @@
     function openTopic(file) {
       const topic = findTopic(file);
       if (!topic) {
+        return;
+      }
+      if (topic.file.endsWith(".html")) {
+        window.open(topic.file, "_blank", "noopener");
         return;
       }
       const category = categoryById[topic.category];

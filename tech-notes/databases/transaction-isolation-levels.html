@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transaction Isolation Levels</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#ffffff;--ink:#111827;--muted:#5b6472;--line:#e3e7ed;--soft:#f2f5f9;
+  --blue:#2563eb;--blue-soft:#e8effd;--green:#0f8a5f;--green-soft:#e4f5ee;
+  --red:#d64545;--red-soft:#fdeaea;--amber:#c07a10;--amber-soft:#fdf1dc;
+  --mono:"SFMono-Regular",Menlo,Consolas,monospace;
+  --sans:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 22px 48px;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5}
+.wrap{max-width:1220px;margin:0 auto}
+header h1{margin:0;font-size:32px;letter-spacing:-.02em}
+header p{margin:6px 0 0;color:var(--muted);max-width:760px}
+.tabs{display:flex;gap:8px;margin:22px 0 18px;border-bottom:1px solid var(--line)}
+.tab{padding:10px 16px;border:1px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;background:none;color:var(--muted);font:600 14px var(--sans);cursor:pointer}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--card);border-color:var(--line);color:var(--ink);box-shadow:0 1px 0 var(--card)}
+.panel{display:none}
+.panel.active{display:block}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.pill{padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:600 13px var(--sans);cursor:pointer;transition:.15s}
+.pill:hover{border-color:var(--blue);color:var(--blue)}
+.pill.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.pill span{font:700 11px var(--mono);opacity:.6;margin-right:6px}
+.grid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(420px,1.25fr);gap:18px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h2{margin:0;font-size:22px;letter-spacing:-.01em}
+.card h3{margin:0 0 8px;font:700 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{margin:10px 0 0;padding:12px 14px;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:0 8px 8px 0;font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.box.pro{background:var(--green-soft);border-color:#c9e8dc}
+.box.con{background:var(--red-soft);border-color:#f6d3d3}
+.box.pro h3{color:var(--green)}
+.box.con h3{color:var(--red)}
+.box ul{margin:0;padding-left:16px;font-size:13px;color:#26303c}
+.box li+li{margin-top:5px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.tag{padding:4px 9px;border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--muted);font:600 11px var(--mono)}
+.tag.on{border-color:#f0bcbc;background:var(--red-soft);color:var(--red)}
+pre{margin:14px 0 0;padding:12px 14px;background:#0f172a;color:#e2e8f0;border-radius:10px;font:500 12px/1.6 var(--mono);white-space:pre-wrap;overflow-x:auto}
+.engines{margin-top:16px;display:grid;gap:8px}
+.engine{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:baseline;font-size:13px;color:var(--muted)}
+.engine b{font:700 12px var(--mono);color:var(--ink)}
+.stage{position:sticky;top:18px}
+.stage-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.stage-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.counter{padding:5px 10px;border:1px solid var(--line);border-radius:6px;font:700 11px var(--mono);color:var(--muted);white-space:nowrap}
+.lab{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.tx{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--soft)}
+.tx-head{display:flex;align-items:center;gap:8px;padding-bottom:9px;margin-bottom:9px;border-bottom:1px solid var(--line);font:700 11px var(--mono);letter-spacing:.06em}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.tx.b .dot{background:var(--amber)}
+.ops{display:grid;gap:6px}
+.op{padding:8px 10px;border:1px solid transparent;border-left:3px solid var(--line);border-radius:0 7px 7px 0;background:var(--card);color:var(--muted);font:600 12px var(--mono);opacity:.4;transition:.25s}
+.op.done{opacity:.85}
+.op.active{opacity:1;border-left-color:var(--blue);background:var(--blue-soft);color:var(--ink);transform:translateX(4px);box-shadow:0 2px 8px rgba(37,99,235,.14)}
+.tx.b .op.active{border-left-color:var(--amber);background:var(--amber-soft)}
+.state{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+.state-label{font:700 11px var(--mono);letter-spacing:.08em;color:var(--muted)}
+.state-value{font:700 16px var(--mono);padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);transition:.25s}
+.state-value.flash{animation:flash .5s}
+@keyframes flash{0%{background:var(--amber-soft);transform:scale(1.06)}100%{background:var(--card);transform:scale(1)}}
+.note{margin-top:12px;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:var(--card);font-size:13px}
+.note.bad{border-color:#f0bcbc;background:var(--red-soft);color:#8f2f2f}
+.note.good{border-color:#c9e8dc;background:var(--green-soft);color:#0b6647}
+.controls{display:flex;align-items:center;gap:8px;margin-top:14px}
+.btn{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:600 13px var(--sans);cursor:pointer}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:#000;color:#fff}
+.track{flex:1;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar{height:100%;width:0;background:var(--blue);transition:width .25s}
+.disclaimer{margin-top:12px;color:var(--muted);font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft);white-space:nowrap}
+tbody tr:hover{background:#fafbfd}
+td.level{font-weight:700;white-space:nowrap}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.badge{display:inline-block;padding:3px 9px;border-radius:6px;font:700 11px var(--mono);white-space:nowrap}
+.badge.no{background:var(--green-soft);color:var(--green)}
+.badge.yes{background:var(--red-soft);color:var(--red)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 26px;color:var(--muted);font-size:12px;align-items:center}
+.section-title{margin:30px 0 10px;font-size:18px}
+.section-title:first-child{margin-top:0}
+.section-sub{margin:0 0 12px;color:var(--muted);font-size:13px}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+footer a{color:var(--blue);text-decoration:none}
+footer a:hover{text-decoration:underline}
+@media(max-width:960px){.grid{grid-template-columns:1fr}.stage{position:static}}
+@media(max-width:620px){.two,.lab{grid-template-columns:1fr}body{padding:18px 14px 36px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Transaction Isolation Levels</h1>
+  <p>Isolation decides which concurrent histories a database is allowed to expose. Every level trades a class of anomaly for throughput. Walk the animation to see what each level lets through.</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab" data-tab="levels" aria-selected="true">Levels &amp; animation</button>
+  <button class="tab" data-tab="table" aria-selected="false">Comparison table</button>
+</nav>
+
+<section class="panel active" id="levels">
+  <div class="pills" id="pills"></div>
+  <div class="grid">
+    <article class="card">
+      <h2 id="lvName"></h2>
+      <p class="lead" id="lvDef"></p>
+      <div class="two">
+        <div class="box pro"><h3>Pros</h3><ul id="lvPros"></ul></div>
+        <div class="box con"><h3>Cons</h3><ul id="lvCons"></ul></div>
+      </div>
+      <div class="tags" id="lvTags"></div>
+      <pre id="lvSql"></pre>
+      <div class="engines" id="lvEngines"></div>
+    </article>
+
+    <article class="card stage">
+      <div class="stage-head">
+        <div><h2 id="stTitle"></h2><p id="stDesc"></p></div>
+        <span class="counter" id="stCount"></span>
+      </div>
+      <div class="lab">
+        <div class="tx a"><div class="tx-head"><span class="dot"></span>TRANSACTION A</div><div class="ops" id="opsA"></div></div>
+        <div class="tx b"><div class="tx-head"><span class="dot"></span>TRANSACTION B</div><div class="ops" id="opsB"></div></div>
+      </div>
+      <div class="state">
+        <span class="state-label" id="stLabel"></span>
+        <strong class="state-value" id="stValue"></strong>
+      </div>
+      <div class="note" id="stNote"></div>
+      <div class="controls">
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn" id="prev">Prev</button>
+        <button class="btn primary" id="play">Play</button>
+        <button class="btn" id="next">Next</button>
+        <div class="track"><div class="bar" id="bar"></div></div>
+      </div>
+      <p class="disclaimer" id="stFoot"></p>
+    </article>
+  </div>
+</section>
+
+<section class="panel" id="table">
+  <h2 class="section-title">Anomalies allowed per level</h2>
+  <p class="section-sub">Lock-based semantics of the SQL standard levels, plus Snapshot Isolation, which the standard does not define. Real engines are often stricter than the row they implement.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Level</th><th>Dirty write</th><th>Dirty read</th><th>Lost update</th><th>Non-repeatable read</th><th>Phantom read</th><th>Read skew</th><th>Write skew</th></tr></thead>
+      <tbody id="matrix"></tbody>
+    </table>
+  </div>
+  <div class="legend">
+    <span class="badge no">prevented</span><span class="badge yes">possible</span>
+    <span>Not a straight line: lock-based Repeatable Read holds read locks to commit, so it blocks write skew but still allows phantoms. Snapshot Isolation is the reverse. The two are incomparable, and only Serializable blocks both.</span>
+  </div>
+
+  <h2 class="section-title">Properties and cost</h2>
+  <p class="section-sub">How each level is implemented, what it costs, and when to reach for it.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Level</th><th>Read visibility</th><th>Mechanism</th><th>Readers block writers</th><th>Concurrency</th><th>Overhead</th><th>App must retry</th><th>Reach for it when</th></tr></thead>
+      <tbody id="props"></tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title">Engine support</h2>
+  <p class="section-sub">Defaults differ per engine; a portable service should set the level rather than inherit it.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Level</th><th>PostgreSQL</th><th>MySQL / InnoDB</th><th>SQL Server</th><th>Oracle</th></tr></thead>
+      <tbody id="support"></tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title">Anomaly glossary</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Anomaly</th><th>What happens</th><th>Cheapest fix</th></tr></thead>
+      <tbody id="glossary"></tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <span>PostgreSQL 18 · MySQL 8.4 / InnoDB · SQL Server 2022 · Oracle 23ai semantics</span>
+  <nav>
+    <a href="https://www.postgresql.org/docs/current/transaction-iso.html">PostgreSQL</a>
+    <a href="https://dev.mysql.com/doc/refman/8.4/en/innodb-transaction-isolation-levels.html">MySQL</a>
+  </nav>
+</footer>
+</div>
+
+<script>
+const LEVELS=[
+ {id:"ru",tag:"L1",name:"Read Uncommitted",
+  def:"No read isolation at all. A transaction can observe rows another transaction has written but not yet committed. Only dirty writes are still blocked, because writers hold exclusive row locks.",
+  pros:["No read locks and no snapshot bookkeeping.","Readers never wait behind a slow writer.","Acceptable for rough progress counters where a wrong number is harmless."],
+  cons:["Dirty reads: work can be based on values that get rolled back.","Everything weaker below it is allowed too: lost updates, non-repeatable reads, phantoms.","On MVCC engines it buys nothing — Read Committed is already lock-free for readers."],
+  risks:["dirty read","lost update","non-repeatable read","phantom read","read skew","write skew"],
+  sql:"SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;\nBEGIN;\nSELECT balance FROM account WHERE id = 7;\nCOMMIT;",
+  engines:[["PostgreSQL","accepted, silently runs as Read Committed"],["MySQL / InnoDB","native, dirty reads really happen"],["SQL Server","native, same as the NOLOCK hint"],["Oracle","not supported"]],
+  st:{title:"Dirty read",desc:"A reads a value B is about to throw away.",label:"balance",
+   a:["BEGIN","SELECT balance","charge fee on it","COMMIT"],
+   b:["BEGIN","UPDATE balance = 70","ROLLBACK","(nothing happened)"],
+   frames:[
+    {a:0,b:-1,v:"100",n:"A opens a transaction. Committed balance is 100.",t:""},
+    {a:0,b:0,v:"100",n:"B opens a transaction on the same row.",t:""},
+    {a:0,b:1,v:"70 uncommitted",n:"B writes 70 and holds the row lock. Nothing is committed yet.",t:""},
+    {a:1,b:1,v:"70 uncommitted",n:"Dirty read: A sees 70, a value no other level would expose.",t:"bad"},
+    {a:2,b:2,v:"100",n:"B rolls back. The 70 never existed for anyone else.",t:""},
+    {a:3,b:3,v:"100",n:"A committed a fee computed from a value that was never real.",t:"bad"}]},
+  foot:"Only Read Uncommitted permits step 4."},
+
+ {id:"rc",tag:"L2",name:"Read Committed",
+  def:"Every statement reads a fresh snapshot of data committed before that statement started. Uncommitted writes are never visible, but two identical statements inside one transaction can return different answers.",
+  pros:["Dirty reads are gone with almost no cost under MVCC.","Locks are held briefly, so throughput stays high.","Sensible default for short OLTP transactions."],
+  cons:["Non-repeatable reads: the same SELECT can change mid-transaction.","Phantoms: a range query can gain rows between statements.","Read-modify-write in application code can lose updates unless you use SELECT ... FOR UPDATE or a single atomic UPDATE."],
+  risks:["lost update","non-repeatable read","phantom read","read skew","write skew"],
+  sql:"BEGIN ISOLATION LEVEL READ COMMITTED;\nSELECT balance FROM account WHERE id = 7;\nUPDATE account SET balance = balance - 10 WHERE id = 7;\nCOMMIT;",
+  engines:[["PostgreSQL","native and the default"],["MySQL / InnoDB","native, common choice for replication-friendly locking"],["SQL Server","default; READ_COMMITTED_SNAPSHOT makes it MVCC"],["Oracle","native and the default"]],
+  st:{title:"Non-repeatable read",desc:"Two reads in one transaction disagree.",label:"balance",
+   a:["BEGIN","SELECT balance","SELECT balance again","COMMIT"],
+   b:["BEGIN","UPDATE balance = 70","COMMIT","done"],
+   frames:[
+    {a:0,b:-1,v:"100",n:"A opens a transaction.",t:""},
+    {a:1,b:-1,v:"100",n:"First read returns 100.",t:""},
+    {a:1,b:1,v:"100",n:"B writes 70 but has not committed, so A still sees 100.",t:"good"},
+    {a:1,b:2,v:"70",n:"B commits. The committed value is now 70.",t:""},
+    {a:2,b:3,v:"70",n:"Non-repeatable read: A's second read returns 70 in the same transaction.",t:"bad"},
+    {a:3,b:3,v:"70",n:"Both answers were committed truth — the transaction just never had a stable view.",t:""}]},
+  foot:"Fix a report that must not shift: raise it to Repeatable Read or Snapshot."},
+
+ {id:"rr",tag:"L3",name:"Repeatable Read",
+  def:"Every row a transaction reads stays fixed until it commits. In the lock-based standard reading a row locks it, so re-reads always match; ranges are not locked, so new rows can still appear.",
+  pros:["Reads are stable across the whole transaction.","Lost updates are prevented in lock-based implementations.","Read locks held to commit also block write skew, which snapshot isolation allows.","Multi-statement reports add up."],
+  cons:["Phantoms: the standard still allows inserts into a range you queried.","Held read locks mean more blocking and more deadlocks.","Long transactions pin old row versions and grow undo/bloat."],
+  risks:["phantom read"],
+  sql:"BEGIN ISOLATION LEVEL REPEATABLE READ;\nSELECT count(*) FROM ticket WHERE status = 'open';\nSELECT count(*) FROM ticket WHERE status = 'open';\nCOMMIT;",
+  engines:[["PostgreSQL","implemented as snapshot isolation — no phantoms"],["MySQL / InnoDB","default; consistent snapshot reads block the phantom below, gap locks do it for locking reads"],["SQL Server","native, lock-based, phantoms possible"],["Oracle","not offered as a level"]],
+  st:{title:"Phantom read",desc:"Rows already read are stable; new rows are not.",label:"open tickets",
+   a:["BEGIN","COUNT open → 3","COUNT open → 4","COMMIT"],
+   b:["BEGIN","INSERT open ticket","COMMIT","done"],
+   frames:[
+    {a:0,b:-1,v:"3",n:"A opens a transaction over the open tickets range.",t:""},
+    {a:1,b:-1,v:"3",n:"A counts 3 open tickets and keeps those rows stable.",t:""},
+    {a:1,b:1,v:"3",n:"B inserts a fourth open ticket. Not committed, not visible.",t:""},
+    {a:1,b:2,v:"4",n:"B commits the insert. No row A read was modified.",t:""},
+    {a:2,b:3,v:"4",n:"Phantom: the same range query returns a row A never saw before.",t:"bad"},
+    {a:3,b:3,v:"4",n:"Row-level stability held. Range-level stability needs predicate or gap locks.",t:""}]},
+  foot:"PostgreSQL and InnoDB both block this phantom; SQL Server at this level does not."},
+
+ {id:"si",tag:"L4",name:"Snapshot Isolation",
+  def:"The transaction reads from one consistent snapshot taken when it starts, and conflicting writes are resolved by first-committer-wins. This is what PostgreSQL and Oracle actually give you. It is stronger than Repeatable Read as the standard defines it by phenomena — phantoms are gone — but incomparable with a lock-based Repeatable Read, which blocks the write skew below.",
+  pros:["Readers never block writers and writers never block readers.","Whole-transaction consistent view: no dirty, non-repeatable, or phantom reads.","Lost updates are rejected instead of silently overwriting."],
+  cons:["Write skew: two transactions read the same rows, write disjoint rows, and together break an invariant no single one violated.","Long-running snapshots keep dead versions alive and bloat storage.","Update conflicts surface as errors, so callers need a retry path."],
+  risks:["write skew"],
+  sql:"BEGIN ISOLATION LEVEL REPEATABLE READ;\nSELECT count(*) FROM doctor WHERE on_call;\nUPDATE doctor SET on_call = false WHERE id = 1;\nCOMMIT;",
+  engines:[["PostgreSQL","REPEATABLE READ is snapshot isolation"],["MySQL / InnoDB","consistent reads under REPEATABLE READ, but no first-committer-wins, so lost updates still happen"],["SQL Server","opt-in ALLOW_SNAPSHOT_ISOLATION"],["Oracle","READ COMMITTED takes a snapshot per statement, SERIALIZABLE one per transaction"]],
+  st:{title:"Write skew",desc:"Both transactions are individually correct and jointly wrong.",label:"doctors on call",
+   a:["BEGIN","see 2 on call","set A off call","COMMIT"],
+   b:["BEGIN","see 2 on call","set B off call","COMMIT"],
+   frames:[
+    {a:0,b:0,v:"2",n:"Rule: at least one doctor must stay on call. Both transactions start.",t:""},
+    {a:1,b:1,v:"2",n:"Both read the same snapshot and both see 2 doctors on call.",t:""},
+    {a:2,b:1,v:"2",n:"A concludes it is safe to leave and updates its own row.",t:""},
+    {a:2,b:2,v:"2",n:"B updates a different row, so there is no write-write conflict to detect.",t:""},
+    {a:3,b:2,v:"1",n:"A commits. Still legal on its own.",t:""},
+    {a:3,b:3,v:"0",n:"Write skew: B commits too and the invariant is broken with nobody on call.",t:"bad"}]},
+  foot:"Fix without Serializable: SELECT ... FOR UPDATE the read set, or materialize the invariant into one row."},
+
+ {id:"ser",tag:"L5",name:"Serializable",
+  def:"Concurrent execution must produce the same result as running the transactions one after another in some order. Anything that would create a non-serializable dependency cycle is blocked or aborted.",
+  pros:["Every anomaly is gone, including write skew.","Business invariants across rows hold without hand-written locking.","Application logic stays simple to reason about."],
+  cons:["Serialization failures (SQLSTATE 40001) must be retried by the caller.","Lock-based implementations pay in blocking and deadlocks.","Throughput drops when transactions are long or contend on the same rows."],
+  risks:[],
+  sql:"BEGIN ISOLATION LEVEL SERIALIZABLE;\nSELECT count(*) FROM doctor WHERE on_call;\nUPDATE doctor SET on_call = false WHERE id = 2;\nCOMMIT;\n-- on SQLSTATE 40001 retry the whole transaction",
+  engines:[["PostgreSQL","serializable snapshot isolation, aborts one side"],["MySQL / InnoDB","locking: plain SELECT becomes a shared locking read"],["SQL Server","range locks, deadlocks instead of aborts"],["Oracle","snapshot isolation, not truly serializable: write skew still passes, write conflicts raise ORA-08177"]],
+  st:{title:"Conflict detected",desc:"The same schedule as write skew, refused.",label:"doctors on call",
+   a:["BEGIN","see 2 on call","set A off call","COMMIT"],
+   b:["BEGIN","see 2 on call","set B off call","ROLLBACK 40001"],
+   frames:[
+    {a:0,b:0,v:"2",n:"Both transactions start under Serializable.",t:""},
+    {a:1,b:1,v:"2",n:"Both read the on-call set. The engine records the read dependency.",t:""},
+    {a:2,b:1,v:"2",n:"A writes a row that B has read.",t:""},
+    {a:2,b:2,v:"2",n:"B writes a row that A has read. The dependency cycle is now unsafe.",t:""},
+    {a:3,b:2,v:"1",n:"A commits first and wins.",t:"good"},
+    {a:3,b:3,v:"1",n:"B is aborted with a serialization failure. Retrying, it reads 1 and correctly refuses.",t:"good"}]},
+  foot:"Serializable is only correct in practice if the caller retries the entire transaction, not just the failed statement."}
+];
+
+const ALL_RISKS=["dirty read","lost update","non-repeatable read","phantom read","read skew","write skew"];
+const byId=id=>document.getElementById(id);
+let current=0,step=0,timer=null;
+
+function stop(){clearInterval(timer);timer=null;byId("play").textContent="Play"}
+
+function renderPills(){
+  byId("pills").innerHTML=LEVELS.map((l,i)=>`<button class="pill ${i===current?"active":""}" data-i="${i}"><span>${l.tag}</span>${l.name}</button>`).join("");
+  document.querySelectorAll(".pill").forEach(p=>p.onclick=()=>{current=+p.dataset.i;step=0;stop();render()});
+}
+
+function renderLevel(){
+  const l=LEVELS[current];
+  byId("lvName").textContent=l.name;
+  byId("lvDef").textContent=l.def;
+  byId("lvPros").innerHTML=l.pros.map(x=>`<li>${x}</li>`).join("");
+  byId("lvCons").innerHTML=l.cons.map(x=>`<li>${x}</li>`).join("");
+  byId("lvTags").innerHTML=ALL_RISKS.map(r=>`<span class="tag ${l.risks.includes(r)?"on":""}">${l.risks.includes(r)?"allows":"blocks"} ${r}</span>`).join("");
+  byId("lvSql").textContent=l.sql;
+  byId("lvEngines").innerHTML=l.engines.map(([k,v])=>`<div class="engine"><b>${k}</b><span>${v}</span></div>`).join("");
+}
+
+function renderStage(){
+  const l=LEVELS[current],s=l.st,f=s.frames[step];
+  byId("stTitle").textContent=s.title;
+  byId("stDesc").textContent=s.desc;
+  byId("stCount").textContent=`step ${step+1} / ${s.frames.length}`;
+  byId("opsA").innerHTML=s.a.map((o,i)=>`<div class="op ${i<f.a?"done":""} ${i===f.a?"active":""}">${o}</div>`).join("");
+  byId("opsB").innerHTML=s.b.map((o,i)=>`<div class="op ${i<f.b?"done":""} ${i===f.b?"active":""}">${o}</div>`).join("");
+  byId("stLabel").textContent=s.label.toUpperCase();
+  const value=byId("stValue");
+  if(value.textContent!==f.v){value.classList.remove("flash");void value.offsetWidth;value.classList.add("flash")}
+  value.textContent=f.v;
+  byId("stNote").className=`note ${f.t}`;
+  byId("stNote").textContent=f.n;
+  byId("bar").style.width=`${step/(s.frames.length-1)*100}%`;
+  byId("stFoot").textContent=l.foot;
+}
+
+function render(){renderPills();renderLevel();renderStage()}
+function move(d){stop();const n=LEVELS[current].st.frames.length;step=Math.max(0,Math.min(n-1,step+d));renderStage()}
+
+byId("next").onclick=()=>move(1);
+byId("prev").onclick=()=>move(-1);
+byId("reset").onclick=()=>{stop();step=0;renderStage()};
+byId("play").onclick=()=>{
+  if(timer){stop();return}
+  const n=LEVELS[current].st.frames.length;
+  if(step===n-1){step=0;renderStage()}
+  byId("play").textContent="Pause";
+  timer=setInterval(()=>{if(step===n-1){stop();return}step++;renderStage()},1250);
+};
+document.addEventListener("keydown",e=>{
+  if(!byId("levels").classList.contains("active"))return;
+  if(e.key==="ArrowRight")move(1);
+  if(e.key==="ArrowLeft")move(-1);
+  if(e.key===" "){e.preventDefault();byId("play").click()}
+});
+
+const M={no:'<span class="badge no">prevented</span>',yes:'<span class="badge yes">possible</span>'};
+const MATRIX=[
+ ["Read Uncommitted",["no","yes","yes","yes","yes","yes","yes"]],
+ ["Read Committed",["no","no","yes","yes","yes","yes","yes"]],
+ ["Repeatable Read",["no","no","no","no","yes","no","no"]],
+ ["Snapshot Isolation",["no","no","no","no","no","no","yes"]],
+ ["Serializable",["no","no","no","no","no","no","no"]]
+];
+byId("matrix").innerHTML=MATRIX.map(([lv,cells])=>`<tr><td class="level">${lv}</td>${cells.map(c=>`<td>${M[c]}</td>`).join("")}</tr>`).join("");
+
+const PROPS=[
+ ["Read Uncommitted","whatever is in the page right now, committed or not","no read locks","no","highest","lowest","no","almost never; an approximate counter at most"],
+ ["Read Committed","last committed value as of each statement","short read locks or per-statement snapshot","no under MVCC, yes under locking","high","low","only for deadlocks","short OLTP work where each statement stands alone"],
+ ["Repeatable Read","rows read stay fixed for the transaction","read locks held to commit","yes","medium","medium","yes","multi-statement reads that must agree with each other"],
+ ["Snapshot Isolation","one snapshot taken at transaction start","MVCC versions plus first-committer-wins","no","high","medium, version storage","yes, on write conflict","reports, exports, and read-mostly transactions"],
+ ["Serializable","a view equivalent to some serial order","SSI conflict detection or range locks","yes under locking","lowest","highest","yes, always","cross-row invariants: balances, inventory, scheduling"]
+];
+byId("props").innerHTML=PROPS.map(r=>`<tr><td class="level">${r[0]}</td>${r.slice(1).map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+
+const SUPPORT=[
+ ["Read Uncommitted","accepted, runs as Read Committed","supported","supported (NOLOCK)","not supported"],
+ ["Read Committed","default","supported","default","default, snapshot based"],
+ ["Repeatable Read","supported, but is snapshot isolation","default, snapshot reads and gap locks stop phantoms","supported, lock based","not offered"],
+ ["Snapshot Isolation","REPEATABLE READ","consistent reads, but no write-conflict abort","opt-in per database","per statement under READ COMMITTED, per transaction under SERIALIZABLE"],
+ ["Serializable","SSI, aborts with 40001","locking reads","range locks, deadlock prone","snapshot based, allows write skew, ORA-08177"]
+];
+byId("support").innerHTML=SUPPORT.map(r=>`<tr><td class="level">${r[0]}</td>${r.slice(1).map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+
+const GLOSSARY=[
+ ["Dirty write","A transaction overwrites a value another transaction wrote but has not committed.","Every level blocks it via exclusive row locks."],
+ ["Dirty read","A transaction reads uncommitted data that may be rolled back.","Read Committed."],
+ ["Lost update","Two read-modify-write cycles overlap and one update silently disappears.","Atomic UPDATE, SELECT ... FOR UPDATE, or Snapshot Isolation."],
+ ["Non-repeatable read","The same row read twice in one transaction returns different values.","Repeatable Read or Snapshot Isolation."],
+ ["Phantom read","A range query gains or loses rows between two executions in one transaction.","Snapshot Isolation, gap locks, or Serializable."],
+ ["Read skew","Two rows are read at different points and never existed together in one committed state.","A transaction-wide snapshot."],
+ ["Write skew","Transactions read overlapping rows, write disjoint rows, and jointly violate an invariant.","Serializable, or lock the read set explicitly."]
+];
+byId("glossary").innerHTML=GLOSSARY.map(r=>`<tr><td class="level">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  stop();
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",String(x===t)));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===t.dataset.tab));
+});
+
+render();
+</script>
+</body>
+</html>

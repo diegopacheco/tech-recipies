@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SQL Joins</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#ffffff;--ink:#111827;--muted:#5b6472;--line:#e3e7ed;--soft:#f2f5f9;
+  --blue:#2563eb;--blue-soft:#e8effd;--green:#0f8a5f;--green-soft:#e4f5ee;
+  --red:#d64545;--red-soft:#fdeaea;--amber:#c07a10;--amber-soft:#fdf1dc;--violet:#7c3aed;
+  --mono:"SFMono-Regular",Menlo,Consolas,monospace;
+  --sans:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 22px 48px;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5}
+.wrap{max-width:1220px;margin:0 auto}
+header h1{margin:0;font-size:32px;letter-spacing:-.02em}
+header p{margin:6px 0 0;color:var(--muted);max-width:780px}
+.tabs{display:flex;gap:8px;margin:22px 0 18px;border-bottom:1px solid var(--line)}
+.tab{padding:10px 16px;border:1px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;background:none;color:var(--muted);font:600 14px var(--sans);cursor:pointer}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--card);border-color:var(--line);color:var(--ink);box-shadow:0 1px 0 var(--card)}
+.panel{display:none}
+.panel.active{display:block}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.pill{padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:600 13px var(--sans);cursor:pointer;transition:.15s}
+.pill:hover{border-color:var(--blue);color:var(--blue)}
+.pill.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(430px,1.3fr);gap:18px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h2{margin:0;font-size:22px;letter-spacing:-.01em}
+.card h3{margin:0 0 8px;font:700 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{margin:10px 0 0;padding:12px 14px;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:0 8px 8px 0;font-size:14px}
+.venn{display:block;margin:14px auto 0}
+.venn .region{fill:var(--blue);opacity:0;transition:opacity .4s}
+.venn .region.on{opacity:.32}
+.venn .ring{fill:none;stroke:var(--ink);stroke-width:1.5;opacity:.55}
+.venn text{font:700 11px var(--mono);fill:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.box.pro{background:var(--green-soft);border-color:#c9e8dc}
+.box.con{background:var(--red-soft);border-color:#f6d3d3}
+.box.pro h3{color:var(--green)}
+.box.con h3{color:var(--red)}
+.box ul{margin:0;padding-left:16px;font-size:13px;color:#26303c}
+.box li+li{margin-top:5px}
+pre{margin:14px 0 0;padding:12px 14px;background:#0f172a;color:#e2e8f0;border-radius:10px;font:500 12px/1.6 var(--mono);white-space:pre-wrap;overflow-x:auto}
+.stage{position:sticky;top:18px}
+.stage-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.stage-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.counter{padding:5px 10px;border:1px solid var(--line);border-radius:6px;font:700 11px var(--mono);color:var(--muted);white-space:nowrap}
+.tables{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.tname{font:700 11px var(--mono);letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.dt{width:100%;border-collapse:collapse;font:600 12px var(--mono);background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.dt th{padding:7px 9px;background:var(--soft);color:var(--muted);font-weight:700;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.dt td{padding:7px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+.dt tr:last-child td{border-bottom:none}
+.dt tbody tr{transition:.25s}
+.dt tbody tr.scan{background:var(--amber-soft);box-shadow:inset 3px 0 0 var(--amber)}
+.dt tbody tr.hit{background:var(--green-soft);box-shadow:inset 3px 0 0 var(--green)}
+.dt tbody tr.miss{background:var(--red-soft);box-shadow:inset 3px 0 0 var(--red)}
+.nul{color:var(--violet);font-style:italic}
+.result{margin-top:14px}
+.result .tname{display:flex;justify-content:space-between;align-items:center}
+.rt tbody tr:last-child{animation:pop .35s}
+@keyframes pop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.empty{padding:12px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font:600 12px var(--mono);text-align:center}
+.note{margin-top:12px;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:var(--soft);font:600 12px var(--mono);color:#26303c}
+.note.ok{border-color:#c9e8dc;background:var(--green-soft);color:#0b6647}
+.note.warn{border-color:#f0d5a8;background:var(--amber-soft);color:#8a5a09}
+.note.drop{border-color:#f0bcbc;background:var(--red-soft);color:#8f2f2f}
+.controls{display:flex;align-items:center;gap:8px;margin-top:14px}
+.btn{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:600 13px var(--sans);cursor:pointer}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:#000;color:#fff}
+.track{flex:1;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar{height:100%;width:0;background:var(--blue);transition:width .25s}
+table.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp th,.cmp td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.cmp th{font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft);white-space:nowrap}
+.cmp tbody tr:hover{background:#fafbfd}
+.cmp td.name{font-weight:700;white-space:nowrap}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.badge{display:inline-block;padding:3px 9px;border-radius:6px;font:700 11px var(--mono);white-space:nowrap}
+.badge.y{background:var(--green-soft);color:var(--green)}
+.badge.n{background:var(--red-soft);color:var(--red)}
+.badge.p{background:var(--amber-soft);color:var(--amber)}
+.section-title{margin:30px 0 10px;font-size:18px}
+.section-title:first-child{margin-top:0}
+.section-sub{margin:0 0 12px;color:var(--muted);font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 6px;color:var(--muted);font-size:12px;align-items:center}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+footer a{color:var(--blue);text-decoration:none}
+footer a:hover{text-decoration:underline}
+@media(max-width:960px){.grid{grid-template-columns:1fr}.stage{position:static}}
+@media(max-width:620px){.two,.tables{grid-template-columns:1fr}body{padding:18px 14px 36px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>SQL Joins</h1>
+  <p>A join is a nested loop over two row sets plus a rule for what to do with rows that find no partner. Step the animation to watch each row get compared, matched, padded with NULL, or dropped.</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab" data-tab="joins" aria-selected="true">Joins &amp; animation</button>
+  <button class="tab" data-tab="table" aria-selected="false">Comparison table</button>
+</nav>
+
+<section class="panel active" id="joins">
+  <div class="pills" id="pills"></div>
+  <div class="grid">
+    <article class="card">
+      <h2 id="jName"></h2>
+      <p class="lead" id="jDef"></p>
+      <svg class="venn" viewBox="0 0 260 120" width="260" height="120" aria-hidden="true">
+        <defs>
+          <clipPath id="clipB"><circle cx="160" cy="60" r="46"/></clipPath>
+          <mask id="onlyA"><rect x="0" y="0" width="260" height="120" fill="#fff"/><circle cx="160" cy="60" r="46" fill="#000"/></mask>
+          <mask id="onlyB"><rect x="0" y="0" width="260" height="120" fill="#fff"/><circle cx="100" cy="60" r="46" fill="#000"/></mask>
+        </defs>
+        <circle id="rLeft" class="region" cx="100" cy="60" r="46" mask="url(#onlyA)"/>
+        <circle id="rRight" class="region" cx="160" cy="60" r="46" mask="url(#onlyB)"/>
+        <circle id="rMid" class="region" cx="100" cy="60" r="46" clip-path="url(#clipB)"/>
+        <circle class="ring" cx="100" cy="60" r="46"/>
+        <circle class="ring" cx="160" cy="60" r="46"/>
+        <text x="52" y="24">LEFT</text><text x="182" y="24">RIGHT</text>
+      </svg>
+      <div class="two">
+        <div class="box pro"><h3>Pros</h3><ul id="jPros"></ul></div>
+        <div class="box con"><h3>Cons</h3><ul id="jCons"></ul></div>
+      </div>
+      <pre id="jSql"></pre>
+    </article>
+
+    <article class="card stage">
+      <div class="stage-head">
+        <div><h2 id="stTitle"></h2><p id="stDesc"></p></div>
+        <span class="counter" id="stCount"></span>
+      </div>
+      <div class="tables">
+        <div><div class="tname" id="ltName"></div><table class="dt" id="leftTable"></table></div>
+        <div><div class="tname" id="rtName"></div><table class="dt" id="rightTable"></table></div>
+      </div>
+      <div class="result">
+        <div class="tname"><span>RESULT SET</span><span id="rowCount"></span></div>
+        <div id="resultHost"></div>
+      </div>
+      <div class="note" id="stNote"></div>
+      <div class="controls">
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn" id="prev">Prev</button>
+        <button class="btn primary" id="play">Play</button>
+        <button class="btn" id="next">Next</button>
+        <div class="track"><div class="bar" id="bar"></div></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="panel" id="table">
+  <h2 class="section-title">Row behavior</h2>
+  <p class="section-sub">Sample rows: 4 employees (one with no department) and 3 departments (one with no employee).</p>
+  <div class="scroll">
+    <table class="cmp">
+      <thead><tr><th>Join</th><th>Keeps unmatched left</th><th>Keeps unmatched right</th><th>NULL padding</th><th>Rows on sample data</th><th>Result size</th><th>Region</th></tr></thead>
+      <tbody id="behavior"></tbody>
+    </table>
+  </div>
+  <div class="legend"><span class="badge y">yes</span><span class="badge n">no</span><span class="badge p">partly</span></div>
+
+  <h2 class="section-title">Properties and pitfalls</h2>
+  <p class="section-sub">Syntax, duplicate handling, and the mistake each join is known for.</p>
+  <div class="scroll">
+    <table class="cmp">
+      <thead><tr><th>Join</th><th>Written as</th><th>Duplicates</th><th>Standard SQL</th><th>Common pitfall</th><th>Use it for</th></tr></thead>
+      <tbody id="properties"></tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title">Execution notes</h2>
+  <p class="section-sub">What the planner tends to do, and what makes each one slow.</p>
+  <div class="scroll">
+    <table class="cmp">
+      <thead><tr><th>Join</th><th>Typical algorithm</th><th>Index that helps</th><th>What makes it slow</th></tr></thead>
+      <tbody id="exec"></tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title">ON vs USING vs NATURAL vs WHERE</h2>
+  <div class="scroll">
+    <table class="cmp">
+      <thead><tr><th>Form</th><th>Meaning</th><th>Key columns in output</th><th>Risk</th></tr></thead>
+      <tbody id="forms"></tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <span>ANSI SQL join semantics · behavior verified against PostgreSQL and MySQL 8.4</span>
+  <nav><a href="https://www.postgresql.org/docs/current/queries-table-expressions.html">PostgreSQL joins</a><a href="https://dev.mysql.com/doc/refman/8.4/en/join.html">MySQL joins</a></nav>
+</footer>
+</div>
+
+<script>
+const EMP=[{emp_id:1,name:"Ada",dept_id:10},{emp_id:2,name:"Linus",dept_id:20},{emp_id:3,name:"Grace",dept_id:10},{emp_id:4,name:"Rob",dept_id:null}];
+const DEPT=[{dept_id:10,dept_name:"Engineering"},{dept_id:20,dept_name:"Data"},{dept_id:30,dept_name:"Design"}];
+const STAFF=[{emp_id:1,name:"Ada",manager_id:null},{emp_id:2,name:"Linus",manager_id:1},{emp_id:3,name:"Grace",manager_id:1},{emp_id:4,name:"Rob",manager_id:2}];
+const MGR=STAFF.map(s=>({emp_id:s.emp_id,name:s.name}));
+
+const PAIR={L:EMP,R:DEPT,keyL:"dept_id",keyR:"dept_id",lc:["emp_id","name","dept_id"],rc:["dept_id","dept_name"],ln:"employee",rn:"department",
+  cols:["employee","dept_id","department"],row:(l,r)=>[l?l.name:null,l?l.dept_id:null,r?r.dept_name:null]};
+const SEMI={...PAIR,cols:["employee","dept_id"],row:l=>[l.name,l.dept_id]};
+const SELF={L:STAFF,R:MGR,keyL:"manager_id",keyR:"emp_id",lc:["emp_id","name","manager_id"],rc:["emp_id","name"],ln:"employee e",rn:"employee m",
+  cols:["employee","manager"],row:(l,r)=>[l?l.name:null,r?r.name:null]};
+
+const JOINS=[
+ {id:"inner",name:"INNER JOIN",mode:"inner",data:PAIR,venn:["mid"],
+  def:"Returns only the row pairs where the join condition is true. Any row on either side without a partner is dropped, including rows whose key is NULL.",
+  pros:["Smallest result set and the easiest to reason about.","No NULL padding, so downstream expressions stay simple.","Planner has the most freedom: hash, merge, or nested loop."],
+  cons:["Silently loses rows, which hides data-quality problems.","A row with a NULL key disappears without warning.","Chaining several inner joins can shrink a report to nothing and look like a bug."],
+  sql:"SELECT e.name, d.dept_name\nFROM employee e\nJOIN department d ON e.dept_id = d.dept_id;",
+  desc:"Keep only matching pairs."},
+
+ {id:"left",name:"LEFT OUTER JOIN",mode:"left",data:PAIR,venn:["left","mid"],
+  def:"Every row of the left table survives. When the right side has no match, the right columns come back as NULL instead of the row disappearing.",
+  pros:["Preserves the driving set, so counts stay stable.","Perfect for optional relationships: an employee without a department.","Makes missing data visible instead of silently dropping it."],
+  cons:["Downstream code must handle NULL: count(d.dept_id) skips them, count(*) does not.","A predicate on the right table in WHERE turns it back into an inner join — put it in ON.","Larger intermediate results than an inner join."],
+  sql:"SELECT e.name, d.dept_name\nFROM employee e\nLEFT JOIN department d ON e.dept_id = d.dept_id;",
+  desc:"Keep everything on the left, pad the right."},
+
+ {id:"right",name:"RIGHT OUTER JOIN",mode:"right",data:PAIR,venn:["mid","right"],
+  def:"The mirror image of LEFT JOIN: every row of the right table survives and the left columns are padded with NULL when nothing matches.",
+  pros:["Useful when the table you must preserve is already on the right of a long FROM clause.","Same guarantees as LEFT JOIN without reordering an existing query."],
+  cons:["Reads backwards; most teams normalize to LEFT JOIN by swapping the tables.","Easy to misread in a chain of three or more joins.","Not supported by every engine in older versions."],
+  sql:"SELECT e.name, d.dept_name\nFROM employee e\nRIGHT JOIN department d ON e.dept_id = d.dept_id;",
+  desc:"Keep everything on the right, pad the left."},
+
+ {id:"full",name:"FULL OUTER JOIN",mode:"full",data:PAIR,venn:["left","mid","right"],
+  def:"Keeps every row from both sides. Matching rows are joined, and unmatched rows from either side come back padded with NULL on the other side.",
+  pros:["Nothing is lost, which makes it the right tool for reconciliation.","One pass shows matched, left-only, and right-only rows.","Ideal for diffing two systems that should agree."],
+  cons:["NULL can mean 'no match' or 'a real NULL value' — you need COALESCE or a marker column to tell them apart.","Largest result of the outer joins.","MySQL has no FULL JOIN; you emulate it with two joins and UNION."],
+  sql:"SELECT e.name, d.dept_name\nFROM employee e\nFULL OUTER JOIN department d ON e.dept_id = d.dept_id;",
+  desc:"Keep both sides, pad whichever is missing."},
+
+ {id:"cross",name:"CROSS JOIN",mode:"cross",data:PAIR,venn:["left","mid","right"],
+  def:"The Cartesian product: every left row is paired with every right row, with no condition at all. The output has left rows multiplied by right rows.",
+  pros:["Generates combinations on purpose: calendars, grids, size and color matrices.","Pairs a tiny lookup or a single-row aggregate against a large table.","Explicit CROSS JOIN documents that the missing ON is intentional."],
+  cons:["Result grows multiplicatively and eats memory fast.","A forgotten ON clause becomes an accidental cross join, the classic runaway query.","Almost never what you want on two large tables."],
+  sql:"SELECT e.name, d.dept_name\nFROM employee e\nCROSS JOIN department d;",
+  desc:"Pair every row with every row."},
+
+ {id:"natural",name:"NATURAL JOIN",mode:"inner",data:PAIR,venn:["mid"],
+  def:"An inner join whose condition is inferred: the engine joins on every column that shares a name in both tables, and collapses those columns into one in the output.",
+  pros:["Very short to write when the schema uses consistent key names.","Automatically collapses duplicate key columns."],
+  cons:["The join condition lives in the schema, not the query — adding a column named created_at to both tables silently changes results.","Breaks the moment a name matches by coincidence.","Most style guides ban it; write JOIN ... USING (dept_id) instead."],
+  sql:"SELECT name, dept_name\nFROM employee\nNATURAL JOIN department;\n-- inferred: ON employee.dept_id = department.dept_id",
+  desc:"Inner join on every shared column name."},
+
+ {id:"self",name:"SELF JOIN",mode:"left",data:SELF,venn:["left","mid"],
+  def:"A table joined to itself under two aliases, used to follow a relationship that points back into the same rows — a manager, a previous event, a parent node.",
+  pros:["Walks one level of a hierarchy with plain SQL.","Compares a row against another row of the same table: previous price, next reading.","Any join type works; LEFT keeps the roots that point to nobody."],
+  cons:["Unaliased columns are ambiguous and the query gets hard to read.","Only walks a fixed number of levels; deeper trees need a recursive CTE.","Scans the same table twice, so the index on the join column matters."],
+  sql:"SELECT e.name AS employee, m.name AS manager\nFROM employee e\nLEFT JOIN employee m ON e.manager_id = m.emp_id;",
+  desc:"Join a table to itself through manager_id."},
+
+ {id:"semi",name:"SEMI JOIN (EXISTS)",mode:"semi",data:SEMI,venn:["mid"],
+  def:"Returns left rows that have at least one match, and only left columns. There is no SEMI JOIN keyword: you write EXISTS or IN and the planner recognizes the shape.",
+  pros:["A left row is never duplicated, however many matches it has.","Stops scanning the right side at the first match.","Filters by existence without polluting the select list with right columns."],
+  cons:["Right-side columns are unavailable, so you cannot report them.","IN with a subquery that can return NULL behaves differently from EXISTS.","Reads as a subquery, so people miss that it is a join."],
+  sql:"SELECT e.name, e.dept_id\nFROM employee e\nWHERE EXISTS (\n  SELECT 1 FROM department d WHERE d.dept_id = e.dept_id\n);",
+  desc:"Keep left rows that have a match, once."},
+
+ {id:"anti",name:"ANTI JOIN (NOT EXISTS)",mode:"anti",data:SEMI,venn:["left"],
+  def:"The complement of the semi join: returns the left rows that match nothing on the right. Written with NOT EXISTS, or as a LEFT JOIN with a WHERE right_key IS NULL.",
+  pros:["The direct way to find orphans, unmatched imports, and missing records.","No duplicates and no NULL padding to clean up.","NOT EXISTS stays correct even when the right column contains NULL."],
+  cons:["NOT IN returns nothing at all if the subquery yields a single NULL.","Every row it returns had to be probed against the whole right side, because absence is only proven by exhausting it.","The LEFT JOIN ... IS NULL form breaks if you filter on a nullable column."],
+  sql:"SELECT e.name, e.dept_id\nFROM employee e\nWHERE NOT EXISTS (\n  SELECT 1 FROM department d WHERE d.dept_id = e.dept_id\n);",
+  desc:"Keep left rows with no match at all."}
+];
+
+const byId=id=>document.getElementById(id);
+let current=0,step=0,timer=null;
+
+function build(join){
+  const d=join.data,mode=join.mode,frames=[],result=[],matched=new Set();
+  const push=(l,r,note,tone)=>frames.push({l,r,rows:result.slice(),note,tone});
+  const key=(o,k)=>o[k]===null||o[k]===undefined?"NULL":o[k];
+  push(-1,-1,`${join.name}: scan each left row against every right row.`,"");
+  d.L.forEach((l,i)=>{
+    let any=false;
+    if(mode==="cross"){
+      d.R.forEach((r,j)=>{result.push(d.row(l,r));push(i,j,`pair ${l.name} with ${r.dept_name||r.name} — no condition to check`,"ok")});
+      return;
+    }
+    for(let j=0;j<d.R.length;j++){
+      const r=d.R[j],hit=l[d.keyL]!==null&&l[d.keyL]===r[d.keyR];
+      if(hit){any=true;matched.add(j);if(mode!=="anti")result.push(mode==="semi"?d.row(l):d.row(l,r))}
+      const cmp=`${l.name}.${d.keyL}=${key(l,d.keyL)} vs ${d.rn}.${d.keyR}=${key(r,d.keyR)}`;
+      const tail=l[d.keyL]===null?"NULL never equals anything":hit?(mode==="anti"?"match found, this row is excluded":mode==="semi"?"match found, emit the left row once":"match, emit the joined row"):"no match";
+      push(i,j,`${cmp} → ${tail}`,hit?(mode==="anti"?"drop":"ok"):"");
+      if(hit&&(mode==="semi"||mode==="anti"))break;
+    }
+    if(!any){
+      if(mode==="left"||mode==="full"){result.push(d.row(l,null));push(i,-1,`${l.name} matched nothing — keep it and pad the right columns with NULL`,"warn")}
+      else if(mode==="anti"){result.push(d.row(l));push(i,-1,`${l.name} matched nothing — this is exactly what an anti join returns`,"ok")}
+      else push(i,-1,`${l.name} matched nothing — the row is dropped`,"drop");
+    }
+  });
+  if(mode==="right"||mode==="full"){
+    d.R.forEach((r,j)=>{
+      if(matched.has(j))return;
+      result.push(d.row(null,r));
+      push(-1,j,`${r.dept_name||r.name} matched no left row — keep it and pad the left columns with NULL`,"warn");
+    });
+  }
+  push(-1,-1,`Done: ${result.length} row${result.length===1?"":"s"} out of ${d.L.length} left and ${d.R.length} right rows.`,"ok");
+  return frames;
+}
+
+let frames=[];
+
+function renderPills(){
+  byId("pills").innerHTML=JOINS.map((j,i)=>`<button class="pill ${i===current?"active":""}" data-i="${i}">${j.name}</button>`).join("");
+  document.querySelectorAll(".pill").forEach(p=>p.onclick=()=>{current=+p.dataset.i;step=0;stop();render()});
+}
+
+function cell(v){return v===null||v===undefined?'<span class="nul">NULL</span>':v}
+
+function dataTable(rows,cols,markers){
+  const head=`<thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead>`;
+  const body=rows.map((r,i)=>`<tr class="${markers[i]||""}">${cols.map(c=>`<td>${cell(r[c])}</td>`).join("")}</tr>`).join("");
+  return head+`<tbody>${body}</tbody>`;
+}
+
+function renderJoin(){
+  const j=JOINS[current];
+  byId("jName").textContent=j.name;
+  byId("jDef").textContent=j.def;
+  byId("jPros").innerHTML=j.pros.map(x=>`<li>${x}</li>`).join("");
+  byId("jCons").innerHTML=j.cons.map(x=>`<li>${x}</li>`).join("");
+  byId("jSql").textContent=j.sql;
+  ["left","mid","right"].forEach(r=>byId("r"+r[0].toUpperCase()+r.slice(1)).classList.toggle("on",j.venn.includes(r)));
+  byId("stTitle").textContent=j.name;
+  byId("stDesc").textContent=j.desc;
+  byId("ltName").textContent=j.data.ln.toUpperCase();
+  byId("rtName").textContent=j.data.rn.toUpperCase();
+}
+
+function renderFrame(){
+  const j=JOINS[current],d=j.data,f=frames[step];
+  const lm=d.L.map((_,i)=>i===f.l?(f.tone==="ok"?"hit":f.tone==="drop"&&j.mode!=="anti"?"miss":"scan"):"");
+  const rm=d.R.map((_,i)=>i===f.r?(f.tone==="ok"||f.tone==="drop"?"hit":f.tone==="warn"?"scan":"miss"):"");
+  byId("leftTable").innerHTML=dataTable(d.L,d.lc,lm);
+  byId("rightTable").innerHTML=dataTable(d.R,d.rc,rm);
+  byId("resultHost").innerHTML=f.rows.length
+    ? `<table class="dt rt"><thead><tr>${d.cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${f.rows.map(r=>`<tr>${r.map(v=>`<td>${cell(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
+    : `<div class="empty">no rows yet</div>`;
+  byId("rowCount").textContent=`${f.rows.length} row${f.rows.length===1?"":"s"}`;
+  byId("stNote").className=`note ${f.tone}`;
+  byId("stNote").textContent=f.note;
+  byId("stCount").textContent=`step ${step+1} / ${frames.length}`;
+  byId("bar").style.width=`${step/(frames.length-1)*100}%`;
+}
+
+function stop(){clearInterval(timer);timer=null;byId("play").textContent="Play"}
+function render(){frames=build(JOINS[current]);renderPills();renderJoin();renderFrame()}
+function move(dir){stop();step=Math.max(0,Math.min(frames.length-1,step+dir));renderFrame()}
+
+byId("next").onclick=()=>move(1);
+byId("prev").onclick=()=>move(-1);
+byId("reset").onclick=()=>{stop();step=0;renderFrame()};
+byId("play").onclick=()=>{
+  if(timer){stop();return}
+  if(step===frames.length-1){step=0;renderFrame()}
+  byId("play").textContent="Pause";
+  timer=setInterval(()=>{if(step===frames.length-1){stop();return}step++;renderFrame()},900);
+};
+document.addEventListener("keydown",e=>{
+  if(!byId("joins").classList.contains("active"))return;
+  if(e.key==="ArrowRight")move(1);
+  if(e.key==="ArrowLeft")move(-1);
+  if(e.key===" "){e.preventDefault();byId("play").click()}
+});
+
+const Y='<span class="badge y">yes</span>',N='<span class="badge n">no</span>',P='<span class="badge p">partly</span>';
+const BEHAVIOR=[
+ ["INNER JOIN",N,N,"none","3","≤ left × right","intersection"],
+ ["LEFT OUTER JOIN",Y,N,"right columns","4","≥ left rows","left circle"],
+ ["RIGHT OUTER JOIN",N,Y,"left columns","4","≥ right rows","right circle"],
+ ["FULL OUTER JOIN",Y,Y,"either side","5","≥ max(left, right)","both circles"],
+ ["CROSS JOIN",Y,Y,"none","12","exactly left × right","every pair"],
+ ["NATURAL JOIN",N,N,"none","3","≤ left × right","intersection"],
+ ["SELF JOIN",P,P,"depends on the join type used","4","depends","same table twice"],
+ ["SEMI JOIN (EXISTS)",N,N,"none","3","≤ left rows","left side of the intersection"],
+ ["ANTI JOIN (NOT EXISTS)",Y,N,"none","1","≤ left rows","left circle only"]
+];
+byId("behavior").innerHTML=BEHAVIOR.map(r=>`<tr><td class="name">${r[0]}</td>${r.slice(1).map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+
+const PROPERTIES=[
+ ["INNER JOIN","JOIN ... ON / INNER JOIN",'one output row per matching pair, so a 1:N match multiplies the left row',"yes","rows with a NULL key vanish silently","the default when both sides are required"],
+ ["LEFT OUTER JOIN","LEFT JOIN ... ON","same multiplication, plus one padded row when nothing matches","yes","a right-table filter in WHERE quietly turns it into an inner join","optional relationships and 'with or without' reports"],
+ ["RIGHT OUTER JOIN","RIGHT JOIN ... ON","mirror of LEFT","yes","hard to read; most reviews ask you to flip it to LEFT","preserving a table already written on the right"],
+ ["FULL OUTER JOIN","FULL OUTER JOIN ... ON","matching pairs plus both sets of orphans","yes","padded NULL is indistinguishable from a stored NULL","reconciling two sources that should agree"],
+ ["CROSS JOIN","CROSS JOIN, or comma with no WHERE","every pair, always","yes","a missing ON clause produces it by accident","generating grids, calendars, and combinations"],
+ ["NATURAL JOIN","NATURAL JOIN","same as inner","yes","a new column with a shared name silently changes the join","short queries on a strictly named schema; prefer USING"],
+ ["SELF JOIN","JOIN the same table under two aliases","depends on the join type","yes","forgetting to exclude the row from matching itself","one hop in a hierarchy or comparing neighboring rows"],
+ ["SEMI JOIN (EXISTS)","WHERE EXISTS (...) / IN (...)","never duplicates a left row","yes, as a subquery","IN with NULL in the subquery behaves unlike EXISTS","filtering by existence without needing right columns"],
+ ["ANTI JOIN (NOT EXISTS)","WHERE NOT EXISTS (...)","never duplicates a left row","yes, as a subquery","NOT IN returns zero rows if the subquery yields any NULL","finding orphans and missing records"]
+];
+byId("properties").innerHTML=PROPERTIES.map(r=>`<tr><td class="name">${r[0]}</td>${r.slice(1).map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+
+const EXEC=[
+ ["INNER JOIN","hash join on large sets, nested loop when one side is tiny","index on both join keys","no index on the inner side of a nested loop"],
+ ["LEFT OUTER JOIN","hash left join or nested loop, left side drives","index on the right join key","a large right side with no usable index"],
+ ["RIGHT OUTER JOIN","same as left with the inputs swapped","index on the left join key","same as left join"],
+ ["FULL OUTER JOIN","hash full join or sort merge","sortable or hashable keys on both sides","spilling to disk when neither side fits in memory"],
+ ["CROSS JOIN","nested loop with no filter","none can help","output size, which grows multiplicatively"],
+ ["NATURAL JOIN","identical to the inner join it expands to","index on the shared columns","an unintended extra shared column joining on more than you meant"],
+ ["SELF JOIN","nested loop or hash join over two scans of the table","index on the referenced column","deep hierarchies that need a recursive CTE instead"],
+ ["SEMI JOIN (EXISTS)","hash semi join, stops at the first match","index on the right key","a correlated subquery the planner cannot flatten"],
+ ["ANTI JOIN (NOT EXISTS)","hash anti join","index on the right key","NOT IN over a nullable column, which blocks the anti-join rewrite"]
+];
+byId("exec").innerHTML=EXEC.map(r=>`<tr><td class="name">${r[0]}</td>${r.slice(1).map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+
+const FORMS=[
+ ["JOIN ... ON e.dept_id = d.dept_id","explicit condition, any expression allowed","both key columns appear","none; this is the default choice"],
+ ["JOIN ... USING (dept_id)","equality on the named columns","one merged key column","only works when the names match on both sides"],
+ ["NATURAL JOIN","equality on every shared column name","one merged column per shared name","a schema change silently rewrites the query"],
+ ["FROM a, b WHERE a.id = b.id","old-style inner join","both key columns appear","dropping the WHERE gives a cross join, and outer joins cannot be expressed"]
+];
+byId("forms").innerHTML=FORMS.map(r=>`<tr><td class="name">${r[0]}</td>${r.slice(1).map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  stop();
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",String(x===t)));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===t.dataset.tab));
+});
+
+render();
+</script>
+</body>
+</html>
