@@ -112,6 +112,48 @@
         .legend span { display: inline-flex; align-items: center; gap: 6px; }
         .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
 
+        .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+        .tab {
+            font-family: "Courier New", monospace; font-size: .8rem; letter-spacing: .05em; text-transform: uppercase;
+            padding: 12px 18px; border: 1px solid var(--line); border-bottom: none; background: var(--panel);
+            color: var(--muted); cursor: pointer; border-radius: 8px 8px 0 0; margin-bottom: -1px; transition: all .15s;
+        }
+        .tab:hover { color: var(--ink); }
+        .tab.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+        .view[hidden] { display: none; }
+
+        .matrixwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+        table.matrix { border-collapse: collapse; width: 100%; min-width: 820px; background: var(--panel); font-size: .84rem; }
+        table.matrix th, table.matrix td { padding: 11px 13px; text-align: left; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); vertical-align: top; }
+        table.matrix th:last-child, table.matrix td:last-child { border-right: none; }
+        table.matrix thead th { background: var(--ink); color: var(--paper); font-family: "Courier New", monospace; font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; position: sticky; top: 0; }
+        table.matrix tbody th { font-family: "Courier New", monospace; font-weight: 700; color: var(--ink); background: var(--paper); white-space: nowrap; }
+        table.matrix tbody tr:last-child th, table.matrix tbody tr:last-child td { border-bottom: none; }
+        .cell-g { color: var(--green); font-weight: 700; }
+        .cell-a { color: var(--amber); font-weight: 700; }
+        .cell-r { color: var(--red); font-weight: 700; }
+        .mono { font-family: "Courier New", monospace; }
+
+        .verdict { background: var(--panel); border: 1px solid var(--green); border-left: 5px solid var(--green); border-radius: 10px; padding: 22px 24px; margin: 28px 0; }
+        .verdict h3 { margin: 0 0 12px; font-family: "Courier New", monospace; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--green); }
+        .verdict p { margin: 0 0 10px; font-size: .95rem; }
+        .verdict p:last-child { margin-bottom: 0; }
+        .verdict .pick { color: var(--green); font-weight: 700; }
+
+        .sectitle { margin: 40px 0 8px; font-size: 1.5rem; font-weight: 400; letter-spacing: -.02em; }
+        .sectsub { margin: 0 0 22px; color: var(--muted); font-size: .95rem; max-width: 720px; }
+        .impgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+        .impcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+        .impcard h4 { margin: 0 0 4px; font-size: 1.1rem; }
+        .impcard .tag { display: inline-block; font-family: "Courier New", monospace; font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; padding: 3px 9px; border-radius: 999px; margin-bottom: 12px; }
+        .tag.best { background: var(--soft-green); color: var(--green); border: 1px solid var(--green); }
+        .tag.ok { background: var(--soft-amber); color: var(--amber); border: 1px solid var(--amber); }
+        .tag.limited { background: #f4dcdc; color: var(--red); border: 1px solid var(--red); }
+        .impcard p { margin: 0 0 10px; font-size: .88rem; color: var(--muted); }
+        .impcard p b { color: var(--ink); }
+        .impcard pre { margin: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; overflow-x: auto; font-family: "Courier New", monospace; font-size: .76rem; color: var(--ink); line-height: 1.5; }
+        .impcard .algofit { margin-top: 10px; font-size: .78rem; color: var(--muted); font-family: "Courier New", monospace; }
+
         footer { padding: 30px 0 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
         code { font-family: "Courier New", monospace; background: var(--soft-green); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
     </style>
@@ -129,6 +171,12 @@
         <p class="lede">Six classic algorithms, one live traffic stream. Send requests by hand, fire a burst, or turn on auto-traffic — then watch each algorithm decide <b>allow</b> or <b>deny</b> in real time, and see exactly why.</p>
     </header>
 
+    <div class="tabs">
+        <button class="tab active" data-view="sim" onclick="switchView('sim')">Simulator</button>
+        <button class="tab" data-view="compare" onclick="switchView('compare')">Comparison &amp; Implementation</button>
+    </div>
+
+    <section class="view" id="viewSim">
     <div class="algobar" id="algobar"></div>
 
     <div class="layout">
@@ -212,6 +260,188 @@
             </div>
         </main>
     </div>
+    </section>
+
+    <section class="view" id="viewCompare" hidden>
+        <div class="matrixwrap">
+            <table class="matrix">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Token Bucket</th>
+                        <th>Leaky Bucket</th>
+                        <th>Fixed Window</th>
+                        <th>Sliding Log</th>
+                        <th>Sliding Counter</th>
+                        <th>GCRA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Time / request</th>
+                        <td class="mono cell-g">O(1)</td>
+                        <td class="mono cell-g">O(1)</td>
+                        <td class="mono cell-g">O(1)</td>
+                        <td class="mono cell-r">O(n)</td>
+                        <td class="mono cell-g">O(1)</td>
+                        <td class="mono cell-g">O(1)</td>
+                    </tr>
+                    <tr>
+                        <th>Memory / client</th>
+                        <td class="mono cell-g">O(1) — 2 numbers</td>
+                        <td class="mono cell-a">O(1) + queue</td>
+                        <td class="mono cell-g">O(1)</td>
+                        <td class="mono cell-r">O(n) timestamps</td>
+                        <td class="mono cell-g">O(1) — 2 counters</td>
+                        <td class="mono cell-g">O(1) — 1 timestamp</td>
+                    </tr>
+                    <tr>
+                        <th>Burst handling</th>
+                        <td class="cell-a">Allows burst up to B</td>
+                        <td class="cell-g">Buffers, no excess</td>
+                        <td class="cell-r">Over-admits (2×)</td>
+                        <td class="cell-g">Exact, none</td>
+                        <td class="cell-a">Small, bounded</td>
+                        <td class="cell-a">Bounded by τ</td>
+                    </tr>
+                    <tr>
+                        <th>Output smoothing</th>
+                        <td class="cell-r">No</td>
+                        <td class="cell-g">Yes — constant rate</td>
+                        <td class="cell-r">No</td>
+                        <td class="cell-r">No</td>
+                        <td class="cell-r">No</td>
+                        <td class="cell-g">Yes — paces exactly</td>
+                    </tr>
+                    <tr>
+                        <th>Boundary bug</th>
+                        <td class="cell-g">None</td>
+                        <td class="cell-g">None</td>
+                        <td class="cell-r">Yes — up to 2×</td>
+                        <td class="cell-g">None</td>
+                        <td class="cell-g">None</td>
+                        <td class="cell-g">None</td>
+                    </tr>
+                    <tr>
+                        <th>Accuracy</th>
+                        <td class="cell-a">Average rate</td>
+                        <td class="cell-g">Exact rate</td>
+                        <td class="cell-r">Approximate</td>
+                        <td class="cell-g">Exact</td>
+                        <td class="cell-g">Near-exact</td>
+                        <td class="cell-g">Exact</td>
+                    </tr>
+                    <tr>
+                        <th>Distributed-friendly</th>
+                        <td class="cell-a">Good</td>
+                        <td class="cell-a">Needs shared queue</td>
+                        <td class="cell-g">Excellent (INCR)</td>
+                        <td class="cell-r">Costly (big sets)</td>
+                        <td class="cell-g">Excellent</td>
+                        <td class="cell-g">Excellent (1 atomic value)</td>
+                    </tr>
+                    <tr>
+                        <th>Best for</th>
+                        <td>Burst-friendly public APIs</td>
+                        <td>Shaping traffic to a fragile downstream</td>
+                        <td>Cheap, coarse limits</td>
+                        <td>Low-volume, must-be-exact limits</td>
+                        <td>General production default</td>
+                        <td>Precise distributed limiting</td>
+                    </tr>
+                    <tr>
+                        <th>Real-world use</th>
+                        <td class="mono">Guava, Stripe</td>
+                        <td class="mono">Nginx limit_req</td>
+                        <td class="mono">Redis INCR</td>
+                        <td class="mono">Redis ZSET</td>
+                        <td class="mono">Cloudflare</td>
+                        <td class="mono">redis-cell</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="verdict">
+            <h3>Which one is the best?</h3>
+            <p>There is no single winner — the right choice depends on what you are protecting. But for the common case:</p>
+            <p><span class="pick">→ Default pick: Sliding Window Counter.</span> O(1) time and memory, no boundary bug, near-exact, trivial to run distributed on Redis. It is what Cloudflare uses and the sensible starting point for almost any API.</p>
+            <p><span class="pick">→ Precise distributed limiting: GCRA</span> (via <code>redis-cell</code> / <code>CL.THROTTLE</code>) — rate + burst in one atomic value, exact, no background refill loop.</p>
+            <p><span class="pick">→ Burst-friendly APIs: Token Bucket</span> — when you want to let clients spend a saved-up allowance, it is the most intuitive and widely supported (Guava, Bucket4j, envoy).</p>
+            <p><span class="pick">→ Traffic shaping: Leaky Bucket</span> — when the downstream must never see more than a fixed steady rate, buffer and drain instead of rejecting.</p>
+        </div>
+
+        <h2 class="sectitle">Options to implement</h2>
+        <p class="sectsub">Where the counter actually lives and how you make it atomic. A limiter is only correct if the read-check-write is atomic across all your app instances — which is why Redis + Lua dominates.</p>
+
+        <div class="impgrid">
+            <div class="impcard">
+                <h4>Redis</h4>
+                <span class="tag best">Best fit — the default</span>
+                <p>Central, fast, atomic. Almost every distributed limiter is a Redis counter. Use a <b>Lua script</b> so check-and-increment is one atomic step (no race between instances).</p>
+                <pre>-- fixed window
+INCR key
+EXPIRE key W NX
+-- deny if value > R*W</pre>
+                <p class="algofit">Fixed window → INCR + EXPIRE · Sliding log → ZADD / ZREMRANGEBYSCORE · Sliding counter → 2 keys + Lua · Token bucket / GCRA → redis-cell CL.THROTTLE</p>
+            </div>
+
+            <div class="impcard">
+                <h4>redis-cell (module)</h4>
+                <span class="tag best">Best for GCRA</span>
+                <p>A Redis module implementing <b>GCRA</b> in one command. Rate + burst enforced atomically server-side, returns remaining quota and retry-after.</p>
+                <pre>CL.THROTTLE user123 15 30 60 1
+-- 15 burst, 30 req / 60s</pre>
+                <p class="algofit">Algorithm: GCRA — one timestamp, no Lua needed</p>
+            </div>
+
+            <div class="impcard">
+                <h4>Nginx</h4>
+                <span class="tag ok">Edge / gateway</span>
+                <p>Built-in <code>limit_req</code> is a <b>leaky bucket</b>; <code>limit_conn</code> caps concurrency. Great at the edge before traffic hits your app, but per-node unless you add a shared store.</p>
+                <pre>limit_req_zone $binary_remote_addr
+  zone=api:10m rate=10r/s;</pre>
+                <p class="algofit">Algorithm: Leaky bucket (with burst= for a token-bucket feel)</p>
+            </div>
+
+            <div class="impcard">
+                <h4>Envoy / API Gateway</h4>
+                <span class="tag ok">Service mesh / edge</span>
+                <p>Envoy, Kong, and AWS API Gateway offer <b>token-bucket</b> rate limiting, often backed by a global rate-limit service (itself usually Redis) for cross-node counting.</p>
+                <p class="algofit">Algorithm: Token bucket, global counter over gRPC/Redis</p>
+            </div>
+
+            <div class="impcard">
+                <h4>In-process (single node)</h4>
+                <span class="tag ok">No network hop</span>
+                <p>Fastest, but only limits <b>per instance</b> — behind a load balancer each replica has its own budget. Fine for local protection or a single service.</p>
+                <pre>Guava RateLimiter      (token bucket)
+Bucket4j / resilience4j (token bucket)</pre>
+                <p class="algofit">Algorithm: Token bucket, in-memory</p>
+            </div>
+
+            <div class="impcard">
+                <h4>RabbitMQ</h4>
+                <span class="tag limited">Consumer pacing, not admission</span>
+                <p>Not an HTTP limiter. <b>Prefetch (QoS)</b> and per-queue flow control pace how fast consumers pull work — a leaky-bucket-like backpressure, not request admission control.</p>
+                <p class="algofit">Use for: smoothing worker throughput, not rejecting API calls</p>
+            </div>
+
+            <div class="impcard">
+                <h4>Kafka</h4>
+                <span class="tag limited">Quotas, not per-request</span>
+                <p>Kafka <b>client/broker quotas</b> throttle produce/consume <b>bandwidth</b> per client to protect the cluster. It is backpressure for streaming, not a request-per-second gate for an API.</p>
+                <p class="algofit">Use for: protecting brokers, not gating user requests</p>
+            </div>
+
+            <div class="impcard">
+                <h4>Database / SQL</h4>
+                <span class="tag limited">Simple, but slow</span>
+                <p>A row with a counter + timestamp updated in a transaction works and is durable, but the round-trip and row-lock contention make it a poor fit at any real rate. Use only when Redis is not an option.</p>
+                <p class="algofit">Algorithm: Fixed / sliding window in a transaction</p>
+            </div>
+        </div>
+    </section>
 
     <footer>
         Token bucket permits bursts; leaky bucket smooths them; fixed window is cheap but has the boundary bug; sliding-window log is exact but O(n); sliding-window counter is the pragmatic default; <code>GCRA</code> enforces rate + burst with a single timestamp. See the <a href="rate-limiting.md">notes</a>.
@@ -330,6 +560,12 @@ let current = 'tokenBucket';
 let state = ALGOS[current].init();
 
 function now() { return performance.now() / 1000; }
+
+function switchView(v) {
+    document.getElementById('viewSim').hidden = v !== 'sim';
+    document.getElementById('viewCompare').hidden = v !== 'compare';
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
+}
 
 function buildAlgoBar() {
     const bar = document.getElementById('algobar');
