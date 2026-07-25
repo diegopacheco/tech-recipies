@@ -993,7 +993,7 @@
     </section>
 
     <section class="stats" aria-label="Summary counts">
-      <div class="stat"><strong>2</strong><span>Markdown notes in this folder</span></div>
+      <div class="stat"><strong>3</strong><span>notes in this folder: 2 markdown, 1 interactive</span></div>
       <div class="stat"><strong>1</strong><span>clusters for quick navigation</span></div>
       <div class="stat"><strong>100%</strong><span>of notes readable inside the page</span></div>
       <div class="stat"><strong>1</strong><span>self-contained HTML page, no build step</span></div>
@@ -1073,6 +1073,21 @@
 ];
 
     const topics = [
+  {
+    "title": "Blockchain Atlas",
+    "file": "blockhain.html",
+    "category": "concepts",
+    "focus": "The core loop",
+    "summary": "A blockchain is a ledger copied across many computers. Transactions are verified, grouped into blocks, cryptographically linked, and accepted by network agreement. Interactive page: mine blocks, tamper with one, and replay the sequence to see how the network replaces a central bookkeeper.",
+    "tags": [
+      "The core loop",
+      "Interactive chain lab",
+      "Sequence diagram",
+      "Distributed agreement",
+      "A visual field guide"
+    ],
+    "diagram": "Blockchain Atlas\n  |\n  +-- One transaction, four transformations\n  +-- Build it, link it, try to break it\n  +-- Who talks to whom and when\n  +-- No master copy, many matching copies"
+  },
   {
     "title": "Blockchain Platforms",
     "file": "blockchain-platforms.md",
@@ -1165,7 +1180,7 @@
             <h3><button type="button" data-topic="${topic.file}">${escapeHtml(topic.title)}</button></h3>
             <p>${escapeHtml(topic.summary)}</p>
             <div class="tags">${topic.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
-            <div class="source"><a href="${topic.file}"><span>${escapeHtml(topic.file)}</span><strong>Open file</strong></a><button type="button" data-topic="${topic.file}">Study</button></div>
+            <div class="source"><a href="${topic.file}"><span>${escapeHtml(topic.file)}</span><strong>Open file</strong></a><button type="button" data-topic="${topic.file}">${topic.file.endsWith(".html") ? "Open" : "Study"}</button></div>
           </div>
         </article>`;
       }).join("");
@@ -1194,6 +1209,10 @@
     function openTopic(file) {
       const topic = findTopic(file);
       if (!topic) {
+        return;
+      }
+      if (topic.file.endsWith(".html")) {
+        window.open(topic.file, "_blank", "noopener");
         return;
       }
       const category = categoryById[topic.category];
