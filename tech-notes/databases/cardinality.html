@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cardinality</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#ffffff;--ink:#111827;--muted:#5b6472;--line:#e3e7ed;--soft:#f2f5f9;
+  --blue:#2563eb;--blue-soft:#e8effd;--green:#0f8a5f;--green-soft:#e4f5ee;
+  --red:#d64545;--red-soft:#fdeaea;--amber:#c07a10;--amber-soft:#fdf1dc;
+  --violet:#7c3aed;--violet-soft:#f0eafe;
+  --mono:"SFMono-Regular",Menlo,Consolas,monospace;
+  --sans:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 22px 48px;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5}
+.wrap{max-width:1220px;margin:0 auto}
+header h1{margin:0;font-size:32px;letter-spacing:-.02em}
+header p{margin:6px 0 0;color:var(--muted);max-width:840px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 18px;border-bottom:1px solid var(--line)}
+.tab{padding:10px 16px;border:1px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;background:none;color:var(--muted);font:600 14px var(--sans);cursor:pointer}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--card);border-color:var(--line);color:var(--ink);box-shadow:0 1px 0 var(--card)}
+.panel{display:none}
+.panel.active{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.pill{padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:600 13px var(--sans);cursor:pointer;transition:.15s}
+.pill:hover{border-color:var(--blue);color:var(--blue)}
+.pill.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.pill .n{font:700 11px var(--mono);opacity:.7;margin-left:6px}
+.grid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(430px,1.25fr);gap:18px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card+.card{margin-top:18px}
+.card h2{margin:0;font-size:22px;letter-spacing:-.01em}
+.card h3{margin:0 0 8px;font:700 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{margin:10px 0 0;padding:12px 14px;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:0 8px 8px 0;font-size:14px}
+.lead.warn{border-color:var(--amber);background:var(--amber-soft)}
+.lead.bad{border-color:var(--red);background:var(--red-soft)}
+.lead.ok{border-color:var(--green);background:var(--green-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.box.pro{background:var(--green-soft);border-color:#c9e8dc}
+.box.con{background:var(--red-soft);border-color:#f6d3d3}
+.box.pro h3{color:var(--green)}
+.box.con h3{color:var(--red)}
+.box ul{margin:0;padding-left:16px;font-size:13px;color:#26303c}
+.box li+li{margin-top:5px}
+pre{margin:14px 0 0;padding:12px 14px;background:#0f172a;color:#e2e8f0;border-radius:10px;font:500 12px/1.6 var(--mono);white-space:pre-wrap;overflow-x:auto}
+pre b{color:#7dd3fc;font-weight:700}
+pre i{color:#fca5a5;font-style:normal}
+pre em{color:#86efac;font-style:normal}
+.stage{position:sticky;top:18px}
+.stage-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.stage-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.counter{padding:5px 10px;border:1px solid var(--line);border-radius:6px;font:700 11px var(--mono);color:var(--muted);white-space:nowrap}
+.tname{font:700 11px var(--mono);letter-spacing:.06em;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.dt{width:100%;border-collapse:collapse;font:600 12px var(--mono);background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.dt th{padding:6px 9px;background:var(--soft);color:var(--muted);font-weight:700;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.dt td{padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+.dt tr:last-child td{border-bottom:none}
+.dt tbody tr{transition:.25s}
+.dt tbody tr.scan{background:var(--amber-soft);box-shadow:inset 3px 0 0 var(--amber)}
+.dt tbody tr.seen{background:var(--soft);color:var(--muted)}
+.dt td.key{font-weight:700}
+.dt td.key.fresh{color:var(--green)}
+.dt td.key.dup{color:var(--muted)}
+.scrollbox{max-height:270px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.scrollbox .dt{border:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:34px;align-content:flex-start}
+.chip{padding:4px 10px;border-radius:999px;font:700 11px var(--mono);background:var(--violet-soft);color:var(--violet);border:1px solid #ded1fb;animation:pop .3s}
+.chip.dupd{background:var(--soft);color:var(--muted);border-color:var(--line)}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.metric{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft)}
+.metric .k{font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.metric .v{font:700 18px var(--mono);margin-top:3px;letter-spacing:-.02em}
+.meter{margin-top:12px}
+.meter .lbl{display:flex;justify-content:space-between;font:700 11px var(--mono);color:var(--muted);margin-bottom:5px}
+.track{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.track.thin{height:6px;flex:1}
+.bar{height:100%;width:0;background:var(--blue);transition:width .35s}
+.bar.g{background:var(--green)}.bar.a{background:var(--amber)}.bar.r{background:var(--red)}.bar.v{background:var(--violet)}
+.note{margin-top:12px;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:var(--soft);font:600 12px var(--mono);color:#26303c}
+.note.ok{border-color:#c9e8dc;background:var(--green-soft);color:#0b6647}
+.note.warn{border-color:#f0d5a8;background:var(--amber-soft);color:#8a5a09}
+.note.bad{border-color:#f0bcbc;background:var(--red-soft);color:#8f2f2f}
+.controls{display:flex;align-items:center;gap:8px;margin-top:14px}
+.btn{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:600 13px var(--sans);cursor:pointer}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:#000}
+.scan-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.scan-col{border:1px solid var(--line);border-radius:10px;padding:12px}
+.scan-col.win{border-color:#c9e8dc;background:var(--green-soft)}
+.scan-col h4{margin:0 0 2px;font:700 13px var(--sans)}
+.scan-col .sub{font:600 11px var(--mono);color:var(--muted)}
+.blocks{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin:10px 0}
+.blk{aspect-ratio:1;border-radius:2px;background:var(--line);transition:.18s}
+.blk.read{background:var(--blue)}
+.blk.rand{background:var(--red)}
+.blk.hot{transform:scale(1.35);box-shadow:0 0 0 2px rgba(37,99,235,.25)}
+.tree{display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0 4px}
+.tlevel{display:flex;gap:4px}
+.tnode{width:26px;height:14px;border-radius:3px;background:var(--line);transition:.2s}
+.tnode.on{background:var(--violet);transform:scaleY(1.25)}
+.tree.ghost{opacity:.3}
+.cost{display:flex;align-items:center;gap:8px;margin-top:6px;font:700 11px var(--mono);color:var(--muted)}
+.dots{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft);max-height:220px;overflow:hidden;align-content:flex-start}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:born .35s}
+.dot.dead{background:#c9ced8}
+.dot.hot{background:var(--red)}
+@keyframes born{from{opacity:0;transform:scale(0)}to{opacity:1;transform:none}}
+.labels{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.lrow{display:grid;grid-template-columns:150px 1fr 74px;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);transition:.2s}
+.lrow.off{opacity:.42}
+.lrow.danger{border-color:#f0bcbc;background:var(--red-soft)}
+.lname{font:700 12px var(--mono);display:flex;align-items:center;gap:7px}
+.lname .sw{width:26px;height:15px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;flex:none;transition:.2s}
+.lname .sw::after{content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:#fff;transition:.2s}
+.lrow:not(.off) .sw{background:var(--green)}
+.lrow:not(.off).danger .sw{background:var(--red)}
+.lrow:not(.off) .sw::after{left:13px}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.lval{font:700 12px var(--mono);color:var(--muted);text-align:right}
+.odo{font:700 34px var(--mono);letter-spacing:-.03em;transition:color .3s}
+.odo.ok{color:var(--green)}.odo.warn{color:var(--amber)}.odo.bad{color:var(--red)}
+table.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp th,.cmp td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.cmp th{font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft);white-space:nowrap}
+.cmp tbody tr:hover{background:#fafbfd}
+.cmp td.name{font-weight:700;white-space:nowrap;font-family:var(--mono)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.badge{display:inline-block;padding:3px 9px;border-radius:6px;font:700 11px var(--mono);white-space:nowrap}
+.badge.y{background:var(--green-soft);color:var(--green)}
+.badge.n{background:var(--red-soft);color:var(--red)}
+.badge.p{background:var(--amber-soft);color:var(--amber)}
+.badge.i{background:var(--blue-soft);color:var(--blue)}
+.section-title{margin:30px 0 10px;font-size:18px}
+.section-title:first-child{margin-top:0}
+.section-sub{margin:0 0 12px;color:var(--muted);font-size:13px}
+.fixes{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.fix{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;transition:.2s}
+.fix:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 6px 18px rgba(17,24,39,.06)}
+.fix .step{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--ink);color:#fff;font:700 12px var(--mono);margin-bottom:8px}
+.fix h4{margin:0 0 6px;font-size:16px}
+.fix p{margin:0;color:var(--muted);font-size:13px}
+.fix pre{font-size:11.5px}
+.scale{display:flex;gap:0;margin-top:16px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.scale div{flex:1;padding:12px 10px;font:700 11px var(--mono);text-align:center}
+.s1{background:var(--green-soft);color:var(--green)}
+.s2{background:var(--blue-soft);color:var(--blue)}
+.s3{background:var(--amber-soft);color:var(--amber)}
+.s4{background:var(--red-soft);color:var(--red)}
+.scale-sub{display:flex;gap:0;font:600 11px var(--sans);color:var(--muted);margin-top:6px}
+.scale-sub div{flex:1;text-align:center;padding:0 6px}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+footer a{color:var(--blue);text-decoration:none}
+footer a:hover{text-decoration:underline}
+@media(max-width:960px){.grid{grid-template-columns:1fr}.stage{position:static}.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.two,.scan-wrap{grid-template-columns:1fr}body{padding:18px 14px 36px}.lrow{grid-template-columns:120px 1fr 62px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Cardinality</h1>
+  <p>Cardinality is the number of distinct values in a set. The same property that makes a column perfect for an index — every value points at one row — is what makes it lethal as a metric label, where every value becomes a time series held in RAM. Step the animations to see both sides.</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab" data-tab="basics" aria-selected="true">What is cardinality</button>
+  <button class="tab" data-tab="high" aria-selected="false">High cardinality</button>
+  <button class="tab" data-tab="index" aria-selected="false">In indexes</button>
+  <button class="tab" data-tab="mon" aria-selected="false">In monitoring</button>
+  <button class="tab" data-tab="fix" aria-selected="false">How to fix it</button>
+</nav>
+
+<section class="panel active" id="basics">
+  <div class="pills" id="colPills"></div>
+  <div class="grid">
+    <article class="card">
+      <h2>Distinct values in a set</h2>
+      <p class="lead" id="defLead"></p>
+      <div class="two">
+        <div class="box"><h3>Formula</h3><ul>
+          <li>selectivity = distinct / rows</li>
+          <li>rows per value = rows / distinct</li>
+          <li>1.0 means unique, near 0 means one value covers the table</li>
+        </ul></div>
+        <div class="box"><h3>Three meanings</h3><ul>
+          <li><b>column</b> — distinct values in a column</li>
+          <li><b>table</b> — row count of a set or plan node</li>
+          <li><b>relationship</b> — 1:1, 1:N, N:M in a data model</li>
+        </ul></div>
+      </div>
+      <pre>SELECT count(*) AS rows,
+       count(DISTINCT <b id="sqlCol">country</b>) AS distinct_values,
+       count(DISTINCT <b>country</b>)::float / count(*) AS selectivity
+FROM users;
+
+<i>-- cheaper: the planner already knows</i>
+SELECT attname, n_distinct FROM pg_stats WHERE tablename = 'users';
+<i>-- positive = absolute count   negative = ratio to row count (-1 = unique)</i></pre>
+    </article>
+
+    <article class="card stage">
+      <div class="stage-head">
+        <div><h2 id="stTitle">Scanning users</h2><p id="stDesc"></p></div>
+        <span class="counter" id="stCount">row 0 / 24</span>
+      </div>
+      <div class="tname"><span>SAMPLE ROWS</span><span id="stSeen"></span></div>
+      <div class="scrollbox"><table class="dt" id="rowTable"></table></div>
+      <div class="tname" style="margin-top:12px"><span>DISTINCT VALUES SEEN</span><span id="chipCount"></span></div>
+      <div class="chips" id="chips"></div>
+      <div class="metrics">
+        <div class="metric"><div class="k">rows</div><div class="v" id="mRows">0</div></div>
+        <div class="metric"><div class="k">distinct</div><div class="v" id="mDist">0</div></div>
+        <div class="metric"><div class="k">selectivity</div><div class="v" id="mSel">0.00</div></div>
+        <div class="metric"><div class="k">rows / value</div><div class="v" id="mRpv">0</div></div>
+      </div>
+      <div class="meter"><div class="lbl"><span>SELECTIVITY</span><span id="selPct">0%</span></div><div class="track"><div class="bar" id="selBar"></div></div></div>
+      <div class="note" id="stNote"></div>
+      <div class="controls">
+        <button class="btn" id="b1reset">Reset</button>
+        <button class="btn primary" id="b1play">Play</button>
+        <button class="btn" id="b1next">Next row</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="panel" id="high">
+  <article class="card">
+    <h2>What counts as high</h2>
+    <p class="lead">High cardinality means the distinct-value count is large relative to the row count, or worse, <b>unbounded</b> — it keeps growing as the system runs. Bounded versus unbounded is the distinction that matters, not big versus small.</p>
+    <div class="scale">
+      <div class="s1">LOW<br>2 – 20</div>
+      <div class="s2">MEDIUM<br>20 – 10k</div>
+      <div class="s3">HIGH<br>10k – millions</div>
+      <div class="s4">UNBOUNDED<br>grows forever</div>
+    </div>
+    <div class="scale-sub">
+      <div>boolean, enum, status, environment, region</div>
+      <div>country, category, http status, handler</div>
+      <div>city, customer_id, email, IP address</div>
+      <div>request_id, trace_id, session_id, timestamp, URL</div>
+    </div>
+    <div class="two">
+      <div class="box pro"><h3>Bounded high cardinality is fine</h3><ul>
+        <li><code>customer_id</code> grows with the business, slowly and predictably</li>
+        <li>Unique keys are maximum cardinality by definition</li>
+        <li>You can size for it, because there is a ceiling</li>
+      </ul></div>
+      <div class="box con"><h3>Unbounded cardinality breaks things</h3><ul>
+        <li><code>trace_id</code> mints a new value on every request</li>
+        <li>No ceiling means every sizing assumption downstream is wrong</li>
+        <li>It does not add to your budget, it replaces it</li>
+      </ul></div>
+    </div>
+  </article>
+
+  <article class="card">
+    <h2 class="section-title">Where the cost lands</h2>
+    <p class="section-sub">Same property, opposite consequences depending on the subsystem.</p>
+    <div class="scroll">
+      <table class="cmp">
+        <thead><tr><th>Subsystem</th><th>Effect of high cardinality</th><th>Verdict</th></tr></thead>
+        <tbody id="costTable"></tbody>
+      </table>
+    </div>
+  </article>
+</section>
+
+<section class="panel" id="index">
+  <div class="pills" id="idxPills"></div>
+  <div class="grid">
+    <article class="card">
+      <h2>Cardinality decides if the index is used</h2>
+      <p class="lead" id="idxLead"></p>
+      <pre id="idxSql"></pre>
+      <div class="two">
+        <div class="box pro"><h3>High cardinality helps reads</h3><ul>
+          <li>Few rows per value means few random fetches</li>
+          <li>The planner picks the index instead of a scan</li>
+          <li>Equality on a unique column is 3–4 page reads</li>
+        </ul></div>
+        <div class="box con"><h3>High cardinality costs writes</h3><ul>
+          <li>Every insert updates every index</li>
+          <li>Random UUIDv4 keys split pages everywhere — use UUIDv7 / ULID</li>
+          <li>Bitmap indexes invert the rule and explode on high cardinality</li>
+        </ul></div>
+      </div>
+    </article>
+
+    <article class="card stage">
+      <div class="stage-head">
+        <div><h2>1,000,000 rows in 100 blocks</h2><p id="idxDesc"></p></div>
+        <span class="counter" id="idxCount"></span>
+      </div>
+      <div class="scan-wrap">
+        <div class="scan-col" id="colIdx">
+          <h4>Index scan</h4><div class="sub">descend, then fetch each match</div>
+          <div class="tree" id="tree"></div>
+          <div class="blocks" id="idxBlocks"></div>
+          <div class="cost"><span>cost</span><div class="track thin"><div class="bar r" id="idxBar"></div></div><span id="idxCost">0</span></div>
+        </div>
+        <div class="scan-col" id="colSeq">
+          <h4>Sequential scan</h4><div class="sub">read every block in order</div>
+          <div class="tree ghost"><div class="tlevel"><div class="tnode"></div><div class="tnode"></div><div class="tnode"></div></div><div class="tlevel"><div class="tnode"></div><div class="tnode"></div><div class="tnode"></div></div></div>
+          <div class="blocks" id="seqBlocks"></div>
+          <div class="cost"><span>cost</span><div class="track thin"><div class="bar" id="seqBar"></div></div><span id="seqCost">0</span></div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="k">distinct</div><div class="v" id="iDist">2</div></div>
+        <div class="metric"><div class="k">rows matched</div><div class="v" id="iMatch">0</div></div>
+        <div class="metric"><div class="k">% of table</div><div class="v" id="iPct">0%</div></div>
+        <div class="metric"><div class="k">blocks touched</div><div class="v" id="iBlocks">0</div></div>
+      </div>
+      <div class="note" id="idxNote"></div>
+      <div class="controls">
+        <button class="btn" id="b2reset">Reset</button>
+        <button class="btn primary" id="b2play">Run both scans</button>
+      </div>
+    </article>
+  </div>
+
+  <article class="card">
+    <h2 class="section-title">Index type by cardinality</h2>
+    <div class="scroll">
+      <table class="cmp">
+        <thead><tr><th>Index</th><th>Best cardinality</th><th>Supports</th><th>Notes</th></tr></thead>
+        <tbody id="idxTypes"></tbody>
+      </table>
+    </div>
+
+    <h2 class="section-title">Composite index column order</h2>
+    <p class="section-sub">Equality columns first, most selective among them first, ranges and ORDER BY last — everything after the first range column stops being seekable.</p>
+    <pre>WHERE tenant_id = ? AND status = ? AND created_at &gt; ?
+
+<em>INDEX (tenant_id, status, created_at)</em>   seek on tenant+status, range scan on time
+<i>INDEX (status, created_at, tenant_id)</i>   seek on 5 statuses, then filter everything</pre>
+
+    <h2 class="section-title">The low-cardinality escape hatch</h2>
+    <p class="section-sub">A skewed low-cardinality column is still worth indexing if you only index the rare value. Low cardinality turned into high selectivity.</p>
+    <pre>CREATE INDEX idx_orders_pending ON orders (created_at)
+  WHERE status = 'pending';   <i>-- 0.1% of rows, tiny index, cheap to maintain</i></pre>
+
+    <h2 class="section-title">When the planner guesses wrong</h2>
+    <p class="section-sub">The planner assumes columns are independent, so it multiplies selectivities. City already implies country, so the estimate comes out far below reality and the plan is built for a row count that never arrives.</p>
+    <pre>CREATE STATISTICS city_country (dependencies, ndistinct)
+  ON city, country FROM users;
+ANALYZE users;
+
+<i>-- skewed high-cardinality column: keep more values in the MCV list</i>
+ALTER TABLE events ALTER COLUMN tenant_id SET STATISTICS 1000;</pre>
+  </article>
+</section>
+
+<section class="panel" id="mon">
+  <div class="grid">
+    <article class="card">
+      <h2>Series count is a product, not a sum</h2>
+      <p class="lead">A time series is identified by the metric name plus <b>every</b> label key and value. Change one value and it is a different series, with its own index entry, chunk buffer and memory. Total series is the cartesian product of all label cardinalities.</p>
+      <pre>http_requests_total{method="GET", status="200", handler="/api/users"}   <em>series #1</em>
+http_requests_total{method="GET", status="500", handler="/api/users"}   <em>series #2</em>
+http_requests_total{method="POST",status="200", handler="/api/users"}   <em>series #3</em>
+
+method(5) × status(8) × handler(40) × pod(20) × region(3) = <em>96,000</em>
+    + user_id(100,000)                                    = <i>9,600,000,000</i></pre>
+      <p class="lead warn">Adding one unbounded label does not increase your cardinality — it replaces your entire budget with the size of that label's value space.</p>
+      <div class="two">
+        <div class="box con"><h3>Never a label</h3><ul>
+          <li>user_id, customer_id, account_id</li>
+          <li>request_id, trace_id, span_id, session_id</li>
+          <li>email, IP address, full URL, query string</li>
+          <li>timestamp, epoch, date</li>
+          <li>raw error message, stack trace, SQL with literals</li>
+        </ul></div>
+        <div class="box pro"><h3>Safe labels</h3><ul>
+          <li>job, service, env, region, cluster</li>
+          <li>method, status_class, route template</li>
+          <li>customer_tier, plan, error_kind</li>
+          <li>anything with a ceiling you can name out loud</li>
+        </ul></div>
+      </div>
+      <p class="lead bad">The tell: if the distinct-value count grows with traffic or time, it is not a label. Identifying one request is the job of logs and traces.</p>
+    </article>
+
+    <article class="card stage">
+      <div class="stage-head">
+        <div><h2>Series explosion</h2><p>Toggle labels and drag their value counts.</p></div>
+        <span class="counter" id="monVerdict">healthy</span>
+      </div>
+      <div class="labels" id="labelRows"></div>
+      <div class="metrics">
+        <div class="metric"><div class="k">active series</div><div class="v odo ok" id="odo">0</div></div>
+        <div class="metric"><div class="k">head RAM @ 2KB</div><div class="v" id="ram">0</div></div>
+        <div class="metric"><div class="k">samples / s @ 15s</div><div class="v" id="sps">0</div></div>
+        <div class="metric"><div class="k">disk / day @ 1.5B</div><div class="v" id="disk">0</div></div>
+      </div>
+      <div class="meter"><div class="lbl"><span>SERIES BUDGET (log scale, 10M ceiling)</span><span id="budPct">0%</span></div><div class="track"><div class="bar g" id="budBar"></div></div></div>
+      <div class="dots" id="dots"></div>
+      <div class="note" id="monNote"></div>
+    </article>
+  </div>
+
+  <article class="card">
+    <h2>Churn — the cardinality you forgot to count</h2>
+    <p class="section-sub">Series that are created and then go stale. Active series looks reasonable while the index keeps growing, because a stale series stays indexed for the whole retention window and query planning still walks it.</p>
+    <div class="grid">
+      <div>
+        <pre>pod="api-7f9c8b-x4k2q"   <i>new pod name on every deploy</i>
+version="a1b2c3d"        <i>new value on every release</i>
+container_id             <i>new value on every restart</i>
+
+<em>fix:</em> label the deployment, not the pod
+<em>fix:</em> expose build_info as one gauge, not a label on every metric</pre>
+        <div class="controls">
+          <button class="btn primary" id="deployBtn">Deploy</button>
+          <button class="btn" id="churnReset">Reset</button>
+        </div>
+        <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
+          <div class="metric"><div class="k">deploys</div><div class="v" id="chDeploys">0</div></div>
+          <div class="metric"><div class="k">active</div><div class="v" id="chActive">50</div></div>
+          <div class="metric"><div class="k">indexed total</div><div class="v" id="chTotal">50</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="tname"><span>SERIES IN THE INDEX</span><span>blue = active, grey = stale but still indexed</span></div>
+        <div class="dots" id="churnDots" style="max-height:240px"></div>
+        <div class="note" id="churnNote">50 pods, one deploy per press. Stale series stay in the index for the whole retention window.</div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card">
+    <h2 class="section-title">Finding the offender</h2>
+    <p class="section-sub">Never start deleting labels until you know which metric and which label owns the series count. It is almost always one or two.</p>
+    <pre>topk(20, count by (__name__)({__name__=~".+"}))    <i>-- series per metric</i>
+count(count by (user_id)(http_requests_total))     <i>-- distinct values of one label</i>
+prometheus_tsdb_head_series                        <i>-- current head series</i>
+
+promtool tsdb analyze /prometheus                  <i>-- top metrics and labels in a block</i>
+GET /api/v1/status/tsdb                            <i>-- top 10 label names and values</i></pre>
+  </article>
+</section>
+
+<section class="panel" id="fix">
+  <h2 class="section-title">Monitoring</h2>
+  <p class="section-sub">In order. The cheapest fix is the one closest to the source.</p>
+  <div class="fixes" id="monFixes"></div>
+
+  <h2 class="section-title">Indexes and queries</h2>
+  <p class="section-sub">Cardinality problems in a database are usually the opposite shape: an index on a column that has too few distinct values, or a planner estimate that is wrong.</p>
+  <div class="fixes" id="dbFixes"></div>
+
+  <h2 class="section-title">Decision table</h2>
+  <div class="scroll">
+    <table class="cmp">
+      <thead><tr><th>Symptom</th><th>Root cause</th><th>Fix</th><th>Cost</th></tr></thead>
+      <tbody id="decTable"></tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <span>Cardinality — distinct values, selectivity, index choice, series explosion.</span>
+  <span><a href="index.html">databases index</a></span>
+</footer>
+</div>
+
+<script>
+const byId = id => document.getElementById(id);
+const fmt = n => n >= 1e9 ? (n/1e9).toFixed(n>=1e10?0:1)+"B"
+              : n >= 1e6 ? (n/1e6).toFixed(n>=1e7?0:1)+"M"
+              : n >= 1e3 ? (n/1e3).toFixed(n>=1e4?0:1)+"k" : String(Math.round(n));
+
+const ROWS = [
+  [1,"true","active","US","Austin"],[2,"true","active","BR","Sao Paulo"],[3,"false","churned","US","Austin"],
+  [4,"true","trial","DE","Berlin"],[5,"true","active","US","Denver"],[6,"true","active","BR","Recife"],
+  [7,"false","banned","JP","Tokyo"],[8,"true","trial","US","Austin"],[9,"true","active","DE","Munich"],
+  [10,"true","active","US","Denver"],[11,"false","churned","BR","Sao Paulo"],[12,"true","active","FR","Paris"],
+  [13,"true","paused","US","Austin"],[14,"true","active","JP","Osaka"],[15,"false","churned","DE","Berlin"],
+  [16,"true","active","US","Miami"],[17,"true","trial","BR","Sao Paulo"],[18,"true","active","FR","Lyon"],
+  [19,"false","banned","US","Denver"],[20,"true","active","JP","Tokyo"],[21,"true","paused","DE","Berlin"],
+  [22,"true","active","US","Austin"],[23,"true","active","BR","Recife"],[24,"false","churned","FR","Paris"]
+];
+
+const COLS = [
+  {key:"is_active", idx:1, real:2,
+   def:"A boolean. Two distinct values over a million rows is selectivity 0.000002 — each value matches half the table. This is the shape that makes an index useless.",
+   note:"LOW CARDINALITY — one value covers half the table. An index here is maintained on every write and never used on read."},
+  {key:"status", idx:2, real:5,
+   def:"An enum. Five values, still low. Worth indexing only as a partial index on the rare value, or as a secondary column in a composite index.",
+   note:"LOW CARDINALITY — index only the rare value: CREATE INDEX ... WHERE status = 'pending'."},
+  {key:"country", idx:3, real:190,
+   def:"Medium cardinality and bounded — there is a fixed number of countries. Useful for grouping and as a secondary index column, rarely selective enough alone.",
+   note:"MEDIUM CARDINALITY — bounded set. Good grouping key, weak leading index column on a large table."},
+  {key:"city", idx:4, real:40000,
+   def:"High cardinality and effectively bounded. Selective enough that an index pays off, and the classic case where the planner underestimates because city and country are correlated.",
+   note:"HIGH CARDINALITY — index-worthy. Watch correlation with country: the planner multiplies selectivities and guesses far too low."},
+  {key:"user_id", idx:0, real:1e6,
+   def:"Unique. Selectivity 1.0 — every value matches exactly one row. This is the ideal index column and the worst possible metric label.",
+   note:"MAXIMUM CARDINALITY — perfect primary key, perfect index. Put this in a metric label and the monitoring stack dies."}
+];
+
+let c1 = {col:0, i:0, timer:null, seen:new Map()};
+
+function renderRows(){
+  const c = COLS[c1.col];
+  const head = `<thead><tr><th>#</th><th>${c.key}</th></tr></thead>`;
+  const body = ROWS.map((r,i)=>{
+    const cls = i === c1.i-1 ? "scan" : i < c1.i ? "seen" : "";
+    let kc = "";
+    if(i < c1.i){
+      const v = String(r[c.idx]);
+      kc = c1.seen.get(v) === i ? "fresh" : "dup";
+    }
+    return `<tr class="${cls}"><td>${r[0]}</td><td class="key ${kc}">${i < c1.i ? r[c.idx] : "·"}</td></tr>`;
+  }).join("");
+  byId("rowTable").innerHTML = head + "<tbody>" + body + "</tbody>";
+}
+
+function renderChips(){
+  const host = byId("chips");
+  const keys = [...c1.seen.keys()];
+  host.innerHTML = keys.map(k=>`<span class="chip">${k}</span>`).join("");
+  byId("chipCount").textContent = keys.length + " distinct";
+}
+
+function c1metrics(){
+  const c = COLS[c1.col];
+  const rows = c1.i, dist = c1.seen.size;
+  const sel = rows ? dist / rows : 0;
+  byId("mRows").textContent = rows;
+  byId("mDist").textContent = dist;
+  byId("mSel").textContent = sel.toFixed(2);
+  byId("mRpv").textContent = dist ? (rows/dist).toFixed(1) : "0";
+  byId("selPct").textContent = Math.round(sel*100) + "%";
+  const bar = byId("selBar");
+  bar.style.width = (sel*100) + "%";
+  bar.className = "bar " + (sel > .8 ? "g" : sel > .3 ? "a" : "r");
+  byId("stCount").textContent = `row ${rows} / ${ROWS.length}`;
+  byId("stSeen").textContent = `real table: ${fmt(c.real)} distinct in 1M rows`;
+  byId("stDesc").textContent = `Reading users one row at a time, collecting distinct values of ${c.key}.`;
+  const n = byId("stNote");
+  n.textContent = rows === ROWS.length ? c.note : "Play the scan to collect distinct values.";
+  n.className = "note " + (rows < ROWS.length ? "" : c.real <= 20 ? "bad" : c.real < 1e4 ? "warn" : "ok");
+}
+
+function c1step(){
+  if(c1.i >= ROWS.length) return false;
+  const c = COLS[c1.col];
+  const v = String(ROWS[c1.i][c.idx]);
+  if(!c1.seen.has(v)) c1.seen.set(v, c1.i);
+  c1.i++;
+  renderRows(); renderChips(); c1metrics();
+  return true;
+}
+
+function c1reset(){
+  clearInterval(c1.timer); c1.timer = null;
+  byId("b1play").textContent = "Play";
+  c1.i = 0; c1.seen = new Map();
+  renderRows(); renderChips(); c1metrics();
+}
+
+byId("b1next").onclick = ()=>{ clearInterval(c1.timer); c1.timer=null; byId("b1play").textContent="Play"; c1step(); };
+byId("b1reset").onclick = c1reset;
+byId("b1play").onclick = ()=>{
+  if(c1.timer){ clearInterval(c1.timer); c1.timer=null; byId("b1play").textContent="Play"; return; }
+  if(c1.i >= ROWS.length){ c1.i=0; c1.seen=new Map(); }
+  byId("b1play").textContent = "Pause";
+  c1.timer = setInterval(()=>{ if(!c1step()){ clearInterval(c1.timer); c1.timer=null; byId("b1play").textContent="Play"; } }, 180);
+};
+
+byId("colPills").innerHTML = COLS.map((c,i)=>
+  `<button class="pill ${i===0?"active":""}" data-i="${i}">${c.key}<span class="n">${fmt(c.real)}</span></button>`).join("");
+byId("colPills").querySelectorAll(".pill").forEach(p=>p.onclick=()=>{
+  byId("colPills").querySelectorAll(".pill").forEach(x=>x.classList.toggle("active", x===p));
+  c1.col = +p.dataset.i;
+  byId("defLead").textContent = COLS[c1.col].def;
+  byId("sqlCol").textContent = COLS[c1.col].key;
+  c1reset();
+});
+byId("defLead").textContent = COLS[0].def;
+byId("sqlCol").textContent = COLS[0].key;
+c1reset();
+
+const COSTS = [
+  ["B-tree index","Larger index, more page splits on write — but far better reads","<span class='badge y'>good</span>"],
+  ["Bitmap index","One bitmap per distinct value; size grows linearly with cardinality","<span class='badge n'>fatal</span>"],
+  ["Query planner","Estimation error on correlated or skewed columns, which becomes a bad join order","<span class='badge p'>risky</span>"],
+  ["GROUP BY / DISTINCT","Hash table stops fitting in work_mem and spills to disk","<span class='badge p'>risky</span>"],
+  ["Partition key","Thousands of tiny partitions; planning costs more than the scan saved","<span class='badge n'>bad</span>"],
+  ["Metric labels","Series count is the product of label cardinalities — RAM, index and bill all multiply","<span class='badge n'>fatal</span>"],
+  ["Log / trace store","Exactly what it is built for: indexed by time, searched by content","<span class='badge y'>good</span>"],
+  ["Distributed cache","Unbounded key space means a low hit rate no matter the cache size","<span class='badge n'>bad</span>"],
+  ["Column store encoding","Dictionary and RLE encodings lose their compression advantage","<span class='badge p'>risky</span>"],
+  ["Sharding","Needs enough cardinality to spread load evenly across nodes","<span class='badge y'>good</span>"]
+];
+byId("costTable").innerHTML = COSTS.map(r=>`<tr><td class="name">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+
+const TABLE_ROWS = 1e6, NBLK = 100;
+const IDX = [
+  {label:"is_active", d:2,
+   lead:"Two distinct values. The predicate matches half the table, so the index would do 500,000 random heap fetches to avoid 100 sequential block reads. The planner refuses it.",
+   sql:"SELECT * FROM users WHERE <b>is_active</b> = true;\n<i>-- 500,000 of 1,000,000 rows -> Seq Scan</i>"},
+  {label:"status", d:5,
+   lead:"Five values, 200,000 rows each. Still a sequential scan. A partial index on the rare status is the only version of this index worth having.",
+   sql:"SELECT * FROM users WHERE <b>status</b> = 'active';\n<i>-- 200,000 rows -> Seq Scan</i>\n\nCREATE INDEX ... ON orders (created_at) WHERE status = 'pending';\n<em>-- 0.1% of rows -> Index Scan</em>"},
+  {label:"country", d:190,
+   lead:"190 values, about 5,200 rows each. Every block still holds a match, so the index buys nothing on its own — useful only as part of a composite index.",
+   sql:"SELECT * FROM users WHERE <b>country</b> = 'BR';\n<i>-- ~5,263 rows spread over every block -> Seq Scan</i>"},
+  {label:"city", d:40000,
+   lead:"40,000 values, about 25 rows each. This is around the crossover: the index wins, but not by much, and a bad estimate here flips the plan.",
+   sql:"SELECT * FROM users WHERE <b>city</b> = 'Recife';\n<em>-- ~25 rows -> Index Scan</em>"},
+  {label:"user_id", d:1e6,
+   lead:"Unique. Three page descents plus one heap fetch, against 100 block reads. This is what an index is for.",
+   sql:"SELECT * FROM users WHERE <b>user_id</b> = 88213;\n<em>-- 1 row -> Index Scan (3 descents + 1 fetch)</em>"}
+];
+let i2 = {sel:0, timer:null};
+
+function idxModel(){
+  const d = IDX[i2.sel].d;
+  const matched = TABLE_ROWS / d;
+  const blocks = Math.min(NBLK, Math.round(NBLK * (1 - Math.pow(1 - 1/NBLK, Math.min(matched, 5000)))));
+  const idxCost = 3 + blocks * 4;
+  return {d, matched, blocks, idxCost, seqCost: NBLK};
+}
+
+function buildBlocks(){
+  byId("idxBlocks").innerHTML = Array.from({length:NBLK}, ()=>`<div class="blk"></div>`).join("");
+  byId("seqBlocks").innerHTML = Array.from({length:NBLK}, ()=>`<div class="blk"></div>`).join("");
+  byId("tree").innerHTML = `<div class="tlevel"><div class="tnode"></div></div>
+    <div class="tlevel"><div class="tnode"></div><div class="tnode"></div><div class="tnode"></div></div>
+    <div class="tlevel"><div class="tnode"></div><div class="tnode"></div><div class="tnode"></div><div class="tnode"></div><div class="tnode"></div></div>`;
+}
+
+function idxRender(){
+  const m = idxModel();
+  byId("iDist").textContent = fmt(m.d);
+  byId("iMatch").textContent = fmt(m.matched);
+  byId("iPct").textContent = (m.matched/TABLE_ROWS*100).toFixed(m.matched/TABLE_ROWS < .01 ? 4 : 1) + "%";
+  byId("iBlocks").textContent = m.blocks;
+  byId("idxDesc").textContent = `WHERE ${IDX[i2.sel].label} = ? matches ${fmt(m.matched)} rows across ${m.blocks} blocks.`;
+  byId("idxCount").textContent = `${fmt(m.d)} distinct values`;
+  byId("idxLead").innerHTML = IDX[i2.sel].lead;
+  byId("idxSql").innerHTML = IDX[i2.sel].sql;
+  const n = byId("idxNote"), win = m.idxCost < m.seqCost;
+  n.className = "note " + (win ? "ok" : "bad");
+  n.textContent = win
+    ? `INDEX SCAN WINS — cost ${m.idxCost} vs ${m.seqCost}. High cardinality means few matches, and few matches mean few random fetches.`
+    : `SEQ SCAN WINS — index cost ${m.idxCost} vs ${m.seqCost}. Random I/O per matched row beats sequential reading only when the predicate is selective.`;
+}
+
+function idxReset(){
+  clearInterval(i2.timer); i2.timer = null;
+  byId("b2play").textContent = "Run both scans";
+  buildBlocks();
+  byId("idxBar").style.width = "0%"; byId("seqBar").style.width = "0%";
+  byId("idxCost").textContent = "0"; byId("seqCost").textContent = "0";
+  byId("colIdx").classList.remove("win"); byId("colSeq").classList.remove("win");
+  idxRender();
+}
+
+function idxRun(){
+  clearInterval(i2.timer);
+  buildBlocks();
+  byId("colIdx").classList.remove("win"); byId("colSeq").classList.remove("win");
+  const m = idxModel(), maxCost = Math.max(m.idxCost, m.seqCost);
+  const ib = [...byId("idxBlocks").children], sb = [...byId("seqBlocks").children];
+  const order = [...Array(NBLK).keys()].sort(()=>Math.random()-.5).slice(0, m.blocks);
+  let t = 0, seqI = 0, idxI = 0, treeStep = 0;
+  const nodes = [...byId("tree").querySelectorAll(".tnode")];
+  const total = Math.max(NBLK, m.blocks + 6);
+  byId("b2play").textContent = "Running";
+  i2.timer = setInterval(()=>{
+    if(treeStep < 3){
+      const g = [[0],[1,2,3],[4,5,6,7,8]][treeStep];
+      g.forEach(k=>nodes[k] && nodes[k].classList.add("on"));
+      treeStep++;
+    } else if(idxI < m.blocks){
+      ib.forEach(b=>b.classList.remove("hot"));
+      const b = ib[order[idxI]];
+      b.classList.add("rand","hot");
+      idxI++;
+    } else ib.forEach(b=>b.classList.remove("hot"));
+
+    if(seqI < NBLK){
+      sb.forEach(b=>b.classList.remove("hot"));
+      sb[seqI].classList.add("read","hot");
+      seqI++;
+    } else sb.forEach(b=>b.classList.remove("hot"));
+
+    const ic = Math.min(m.idxCost, 3 + idxI*4), sc = seqI;
+    byId("idxCost").textContent = ic;
+    byId("seqCost").textContent = sc;
+    byId("idxBar").style.width = (ic/maxCost*100) + "%";
+    byId("seqBar").style.width = (sc/maxCost*100) + "%";
+
+    if(++t >= total){
+      clearInterval(i2.timer); i2.timer = null;
+      byId("b2play").textContent = "Run both scans";
+      ib.forEach(b=>b.classList.remove("hot")); sb.forEach(b=>b.classList.remove("hot"));
+      byId(m.idxCost < m.seqCost ? "colIdx" : "colSeq").classList.add("win");
+    }
+  }, 45);
+}
+
+byId("idxPills").innerHTML = IDX.map((c,i)=>
+  `<button class="pill ${i===0?"active":""}" data-i="${i}">${c.label}<span class="n">${fmt(c.d)}</span></button>`).join("");
+byId("idxPills").querySelectorAll(".pill").forEach(p=>p.onclick=()=>{
+  byId("idxPills").querySelectorAll(".pill").forEach(x=>x.classList.toggle("active", x===p));
+  i2.sel = +p.dataset.i; idxReset();
+});
+byId("b2reset").onclick = idxReset;
+byId("b2play").onclick = idxRun;
+idxReset();
+
+const IDXTYPES = [
+  ["B-tree","high","equality, ranges, sorting, prefix of composite","The default. Useless on a boolean, essential on a key"],
+  ["Hash","high","equality only","Smaller than a B-tree for long values, no range or ORDER BY"],
+  ["Bitmap (Oracle)","low","equality, AND/OR of many low-card columns","One bitmap per distinct value — never on high cardinality"],
+  ["BRIN","any, needs physical ordering","ranges over naturally ordered data","Kilobytes for a huge table; min/max per block range"],
+  ["GIN / inverted","high, multi-valued","containment, full text, JSONB, arrays","One posting list per distinct term"],
+  ["Partial","rescues skewed low cardinality","whatever the WHERE leaves in","Turns a useless index into a tiny selective one"],
+  ["Bloom","many low-cardinality columns","equality on arbitrary column combinations","Probabilistic, produces false positives that get rechecked"],
+  ["Covering / INCLUDE","high on the key","index-only scans","Removes the heap fetch that makes high cardinality pay off"]
+];
+byId("idxTypes").innerHTML = IDXTYPES.map(r=>`<tr><td class="name">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+
+const LABELS = [
+  {name:"job",        v:4,     max:20,      danger:false},
+  {name:"region",     v:3,     max:30,      danger:false},
+  {name:"method",     v:5,     max:9,       danger:false},
+  {name:"status",     v:8,     max:60,      danger:false},
+  {name:"handler",    v:40,    max:500,     danger:false},
+  {name:"pod",        v:20,    max:2000,    danger:false},
+  {name:"user_id",    v:1000,  max:100000,  danger:true, off:true},
+  {name:"trace_id",   v:50000, max:1000000, danger:true, off:true}
+];
+
+function monSeries(){
+  return LABELS.reduce((a,l)=> l.off ? a : a * Math.max(1, l.v), 1);
+}
+
+function monRender(){
+  const s = monSeries();
+  const odo = byId("odo");
+  odo.textContent = fmt(s);
+  const cls = s < 5e5 ? "ok" : s < 3e6 ? "warn" : "bad";
+  odo.className = "odo " + cls;
+  byId("ram").textContent = s*2048 >= 1073741824 ? (s*2048/1073741824).toFixed(1)+" GB" : Math.round(s*2048/1048576)+" MB";
+  byId("sps").textContent = fmt(s/15);
+  const bytes = s * (86400/15) * 1.5;
+  byId("disk").textContent = bytes >= 1099511627776 ? (bytes/1099511627776).toFixed(1)+" TB"
+    : bytes >= 1073741824 ? Math.round(bytes/1073741824)+" GB" : Math.round(bytes/1048576)+" MB";
+
+  const pct = Math.min(100, Math.log10(Math.max(s,1)) / 7 * 100);
+  byId("budPct").textContent = Math.round(pct) + "%";
+  const bar = byId("budBar");
+  bar.style.width = pct + "%";
+  bar.className = "bar " + (cls === "ok" ? "g" : cls === "warn" ? "a" : "r");
+
+  const v = byId("monVerdict");
+  v.textContent = cls === "ok" ? "healthy" : cls === "warn" ? "heavy" : "OOM territory";
+
+  const n = byId("monNote");
+  n.className = "note " + (cls === "ok" ? "ok" : cls === "warn" ? "warn" : "bad");
+  n.textContent = cls === "ok"
+    ? "Every label here is bounded. You can name the ceiling for each one, so you can size the server."
+    : cls === "warn"
+      ? "One more label, or one more value on an existing label, multiplies this again. Aggregate with recording rules before it grows."
+      : "An unbounded label is on. This does not add to the budget, it replaces it — the identity belongs in logs or traces, not in a metric.";
+
+  const host = byId("dots");
+  const shown = Math.min(600, Math.max(1, Math.round(Math.log10(Math.max(s,1)) * 90)));
+  const hot = cls === "bad";
+  host.innerHTML = Array.from({length:shown}, ()=>`<span class="dot${hot?" hot":""}"></span>`).join("")
+    + `<span style="margin-left:8px;font:700 11px var(--mono);color:var(--muted)">each dot ≈ ${fmt(s/shown)} series</span>`;
+}
+
+byId("labelRows").innerHTML = LABELS.map((l,i)=>`
+  <div class="lrow ${l.off?"off":""} ${l.danger?"danger":""}" data-i="${i}">
+    <div class="lname"><span class="sw"></span>${l.name}</div>
+    <input type="range" min="1" max="${l.max}" value="${l.v}">
+    <div class="lval">${fmt(l.v)}</div>
+  </div>`).join("");
+byId("labelRows").querySelectorAll(".lrow").forEach(row=>{
+  const i = +row.dataset.i;
+  row.querySelector(".sw").onclick = ()=>{
+    LABELS[i].off = !LABELS[i].off;
+    row.classList.toggle("off", !!LABELS[i].off);
+    monRender();
+  };
+  row.querySelector("input").oninput = e=>{
+    LABELS[i].v = +e.target.value;
+    row.querySelector(".lval").textContent = fmt(LABELS[i].v);
+    if(LABELS[i].off){ LABELS[i].off = false; row.classList.remove("off"); }
+    monRender();
+  };
+});
+monRender();
+
+let churn = {deploys:0, active:50, dead:0};
+function churnRender(){
+  byId("chDeploys").textContent = churn.deploys;
+  byId("chActive").textContent = churn.active;
+  byId("chTotal").textContent = churn.active + churn.dead;
+  const host = byId("churnDots");
+  const cap = 900;
+  const dead = Math.min(churn.dead, cap - churn.active);
+  host.innerHTML = Array.from({length:dead}, ()=>`<span class="dot dead"></span>`).join("")
+    + Array.from({length:churn.active}, ()=>`<span class="dot"></span>`).join("");
+  const n = byId("churnNote");
+  const ratio = churn.dead / churn.active;
+  n.className = "note " + (ratio < 4 ? "" : ratio < 12 ? "warn" : "bad");
+  n.textContent = churn.deploys === 0
+    ? "50 pods, one deploy per press. Stale series stay in the index for the whole retention window."
+    : `${churn.deploys} deploys: ${churn.active} series receiving samples, ${churn.dead} stale but still indexed. Query planning walks all ${churn.active + churn.dead}.`;
+}
+byId("deployBtn").onclick = ()=>{ churn.deploys++; churn.dead += churn.active; churnRender(); };
+byId("churnReset").onclick = ()=>{ churn = {deploys:0, active:50, dead:0}; churnRender(); };
+churnRender();
+
+const MONFIXES = [
+  ["Find the offender first","Never delete labels blind. One metric and one label almost always own the whole series count.",
+   "promtool tsdb analyze /prometheus\nGET /api/v1/status/tsdb\n\ntopk(20, count by (__name__)({__name__=~\".+\"}))"],
+  ["Drop it at the source","The cheapest fix by far. Remove the label from the instrumentation, not from the pipeline downstream of it.",
+   "<i>- counter.WithLabelValues(userID, path).Inc()</i>\n<em>+ counter.WithLabelValues(routeTemplate).Inc()</em>"],
+  ["Relabel it away","When you do not control the exporter, drop the label or the whole metric at scrape time.",
+   "metric_relabel_configs:\n  - source_labels: [user_id]\n    action: labeldrop\n  - source_labels: [__name__]\n    regex: 'debug_.*'\n    action: drop"],
+  ["Bucket instead of keeping raw","Replace an unbounded value with a bounded class of it. Almost nothing needs the exact value at metric resolution.",
+   "<i>latency_ms=\"437\"</i>        <em>-> histogram buckets</em>\n<i>customer_id=\"88213\"</i>     <em>-> customer_tier=\"pro\"</em>\n<i>status=\"503\"</i>            <em>-> status_class=\"5xx\"</em>"],
+  ["Move identity to logs and traces","High-cardinality identifiers belong where the index is built for them. Exemplars bridge the two without creating a series.",
+   "metrics  -> how many, how fast, how bad (bounded dims)\nlogs     -> what happened to this one request\ntraces   -> where the time went, by trace_id\nexemplar -> trace_id attached to a histogram bucket"],
+  ["Aggregate at write time","Record the rollup you actually query, then drop the raw series with a relabel rule.",
+   "groups:\n  - name: aggregations\n    rules:\n      - record: job:http_requests:rate5m\n        expr: sum by (job, status_class) (rate(http_requests_total[5m]))"],
+  ["Kill the churn","Deploy-scoped label values create series that die immediately and stay indexed for the whole retention window.",
+   "<i>pod=\"api-7f9c8b-x4k2q\"</i>  <em>-> deployment=\"api\"</em>\n<i>version=\"a1b2c3d\"</i>       <em>-> build_info gauge, one series</em>\n<i>container_id</i>             <em>-> drop</em>"],
+  ["Make an explosion a rejected write","A limit turns an outage into a failed scrape and a page for the team that caused it.",
+   "sample_limit: 5000\nlabel_limit: 20\nlabel_value_length_limit: 128\ntarget_limit: 500\n\n<i># Mimir/Cortex: max_global_series_per_user</i>"],
+  ["Last resort: change the engine","VictoriaMetrics, Mimir, Thanos and Chronosphere carry far more series per node. This makes the problem affordable, not absent.",
+   "vanilla Prometheus   ~1-3M active series per node\nVictoriaMetrics      10x+ on the same hardware\n\n<i>fix the labels first, then scale the storage</i>"]
+];
+byId("monFixes").innerHTML = MONFIXES.map((f,i)=>
+  `<div class="fix"><span class="step">${i+1}</span><h4>${f[0]}</h4><p>${f[1]}</p><pre>${f[2]}</pre></div>`).join("");
+
+const DBFIXES = [
+  ["Delete unused indexes","An index on a low-cardinality column is never chosen and is still maintained on every insert, update and delete.",
+   "SELECT relname, indexrelname, idx_scan\nFROM pg_stat_user_indexes\nWHERE idx_scan = 0 ORDER BY relname;"],
+  ["Partial index the rare value","Skewed low cardinality is still selective if you only index the minority.",
+   "CREATE INDEX idx_orders_pending ON orders (created_at)\n  WHERE status = 'pending';"],
+  ["Reorder composite indexes","Equality columns lead, ranges trail. Nothing after the first range column can be seeked on.",
+   "<em>(tenant_id, status, created_at)</em>\n<i>(status, created_at, tenant_id)</i>"],
+  ["Teach the planner about correlation","Estimates are multiplied as if columns were independent. They rarely are.",
+   "CREATE STATISTICS city_country (dependencies, ndistinct)\n  ON city, country FROM users;\nANALYZE users;"],
+  ["Raise the statistics target","A skewed high-cardinality column needs more values in the MCV list before estimates are usable.",
+   "ALTER TABLE events ALTER COLUMN tenant_id SET STATISTICS 1000;\nANALYZE events;"],
+  ["Approximate the distinct count","Exact COUNT(DISTINCT) sorts the whole column. HyperLogLog gives ~2% error in kilobytes.",
+   "SELECT approx_distinct(user_id) FROM events;   <i>-- Presto/Trino</i>\nPFADD visitors:2026-07-24 user:88213           <i>-- Redis HLL</i>"],
+  ["Watch work_mem on GROUP BY","Millions of distinct grouping keys build a hash table that spills to disk mid-query.",
+   "EXPLAIN (ANALYZE, BUFFERS) SELECT tenant_id, count(*)\nFROM events GROUP BY tenant_id;\n<i>-- look for: Batches: 8  Disk Usage: 240MB</i>"],
+  ["Pick a sane partition key","Partitioning by a high-cardinality column creates thousands of partitions and makes planning slower than the scan it replaced.",
+   "<i>PARTITION BY LIST (customer_id)</i>   100k partitions\n<em>PARTITION BY RANGE (created_at)</em>  one per month\n<em>PARTITION BY HASH (customer_id)</em>  a bucket count you chose"],
+  ["Use time-ordered keys","High cardinality should not also mean random write locality.",
+   "<i>UUIDv4</i>  random -> page splits across the whole tree\n<em>UUIDv7 / ULID</em>  time-ordered -> appends to the right edge"]
+];
+byId("dbFixes").innerHTML = DBFIXES.map((f,i)=>
+  `<div class="fix"><span class="step">${i+1}</span><h4>${f[0]}</h4><p>${f[1]}</p><pre>${f[2]}</pre></div>`).join("");
+
+const DEC = [
+  ["Prometheus OOMs after a deploy","A label carries a per-request or per-pod value","Drop it at the source, or labeldrop at scrape time","minutes"],
+  ["Series count climbs while traffic is flat","Churn from pod names, container IDs or version labels","Label the deployment, expose build_info as its own gauge","minutes"],
+  ["Observability bill doubled with no new services","One label added to a common metric","Attribute with promtool tsdb analyze, then relabel","hours"],
+  ["Dashboard query times out","A matcher resolves millions of series before aggregating","Recording rule for the aggregation, query the rollup","hours"],
+  ["Index exists but is never used","Too few distinct values to beat a sequential scan","Drop it, or replace with a partial index on the rare value","minutes"],
+  ["Query fast alone, slow in a join","Misestimated cardinality produced the wrong join order","EXPLAIN ANALYZE, compare estimated vs actual, add extended statistics","hours"],
+  ["Inserts got slow after adding an index","Random UUIDv4 key splitting pages across the tree","Move to UUIDv7 / ULID, or reconsider the index","days"],
+  ["GROUP BY spills to disk","Grouping key has millions of distinct values","Pre-aggregate, or raise work_mem for that query","hours"],
+  ["Partition pruning helps nothing","Partitioned on a high-cardinality column","Repartition by time or by a fixed hash bucket count","days"],
+  ["Cache hit rate near zero","Unbounded key space","Key on a bounded projection of the input, not the raw value","hours"]
+];
+byId("decTable").innerHTML = DEC.map(r=>
+  `<tr><td class="name">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="badge i">${r[3]}</span></td></tr>`).join("");
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  clearInterval(c1.timer); c1.timer = null; byId("b1play").textContent = "Play";
+  clearInterval(i2.timer); i2.timer = null; byId("b2play").textContent = "Run both scans";
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", String(x===t)));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active", p.id===t.dataset.tab));
+});
+</script>
+</body>
+</html>
