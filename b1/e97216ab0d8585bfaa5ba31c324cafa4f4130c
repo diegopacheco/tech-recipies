@@ -1,0 +1,28 @@
+tech-notes/sv/index.html
+  s_94b30cd569c460::t_d5fb32a10a0159 1441
+tech-notes/index.html
+  s_94b30cd569c460::t_3ef94339b9e39a 1070,1153,1309
+  s_94b30cd569c460::t_e592b69c6347f3 1091-1092
+  s_94b30cd569c460::t_c657f5d4620fb0 1297-1301
+tech-notes/distributed-systems/index.html
+  s_94b30cd569c460::t_fc645fd69d04f9 1432-1458
+tech-notes/ai-transformation/index.html
+  s_94b30cd569c460::t_8f7fb35c0bddbf 1575-1589
+  s_94b30cd569c460::t_d5fb32a10a0159 1788
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "b1e97216ab0d8585bfaa5ba31c324cafa4f4130c",
+  "prompts": {},
+  "sessions": {
+    "s_94b30cd569c460": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb9dc430-12d5-46a3-b0d4-31948464296c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
