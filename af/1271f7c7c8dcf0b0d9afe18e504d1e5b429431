@@ -1,0 +1,57 @@
+tech-notes/databases/vector-dbs.html
+  s_f61e98a992aa47::t_6df392dd81d9e0 405
+  s_f61e98a992aa47::t_8e05306bcb8bc3 448-463
+  s_f61e98a992aa47::t_96bccb124e41ae 551-553
+  s_f61e98a992aa47::t_c8d0ad38d59c30 626-629
+  s_f61e98a992aa47::t_0b42689ae27a04 542,545,547,549
+  s_f61e98a992aa47::t_b2016a5dc4ec20 431
+  s_f61e98a992aa47::t_810dc8fab30a77 1-404,406-430,432-447,464-541,543-544,546,548,550,554-625,630-786
+tech-notes/databases/geo-index.html
+  s_ed54c1e0af28c1::t_4312092448230c 628
+  s_ed54c1e0af28c1::t_152010c122f056 645-650
+  s_ed54c1e0af28c1::t_1146d4427cdcb4 863-864
+  s_ed54c1e0af28c1::t_16be6d49149131 286
+  s_ed54c1e0af28c1::t_9b26709f0acf7a 610,613-614
+  s_ed54c1e0af28c1::t_d64bbf51d38fa6 796
+  s_ed54c1e0af28c1::t_4ff9749630fd18 791-795,797-798
+  s_ed54c1e0af28c1::t_6d17e87a25a2df 588-589
+  s_ed54c1e0af28c1::t_ebf65730dcd1e5 684
+  s_ed54c1e0af28c1::t_72afb29ce52910 1-78,80-84,88-215,217-223,225-285,287-356,358-537,539-581,583-587,590-593,595-596,598-600,602-609,611-612,615-624,626-627,629-643,651-683,685-691,693-695,697-776,778-790,799-862,865-976
+  s_ed54c1e0af28c1::t_4072fdc914baa5 224
+  s_ed54c1e0af28c1::t_0ebdebe5a5fa81 538
+  s_ed54c1e0af28c1::t_98ced4d1e0eac0 692
+  s_ed54c1e0af28c1::t_8cf2eef6052d17 216
+  s_ed54c1e0af28c1::t_5a55d0787ea2a0 357
+  s_ed54c1e0af28c1::t_58569ca8e16ed0 85-87
+  s_ed54c1e0af28c1::t_1fcceabd58c3e8 594,597,601
+  s_ed54c1e0af28c1::t_33e52a8d8238bc 644
+  s_ed54c1e0af28c1::t_095b8977e4d79a 582
+  s_ed54c1e0af28c1::t_21d694eb289f14 79
+  s_ed54c1e0af28c1::t_57bd806783301a 625
+  s_ed54c1e0af28c1::t_49e6121d8adf5e 696
+  s_ed54c1e0af28c1::t_5d442f620ed647 777
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "af1271f7c7c8dcf0b0d9afe18e504d1e5b429431",
+  "prompts": {},
+  "sessions": {
+    "s_ed54c1e0af28c1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "53804d99-ba92-4b1a-bd0b-1751c24f1c2f",
+        "model": "claude-opus-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    },
+    "s_f61e98a992aa47": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2cd61d6a-4eed-4605-a2b9-51ac89275c6e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
