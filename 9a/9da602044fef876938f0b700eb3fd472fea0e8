@@ -1,0 +1,23 @@
+tech-notes/databases/cardinality.html
+  s_b3912ca9795400::t_aea1cabd419151 312
+  s_b3912ca9795400::t_9738947f5fc7bd 1-107,109-311,313-900
+  s_b3912ca9795400::t_7140b25e7a6582 108
+tech-notes/databases/cardinality.md
+  s_b3912ca9795400::t_a7a5c0dcd2cff2 1-382
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "9a9da602044fef876938f0b700eb3fd472fea0e8",
+  "prompts": {},
+  "sessions": {
+    "s_b3912ca9795400": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a591914d-ff5b-4849-ab5c-719824c36364",
+        "model": "claude-opus-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
