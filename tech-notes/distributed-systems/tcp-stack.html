@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCP/IP Stack Field Map</title>
+  <style>
+    :root {
+      --paper: #f5f0e4;
+      --sheet: #fffdf7;
+      --ink: #172522;
+      --muted: #63706b;
+      --line: #c7cec5;
+      --grid: rgba(23, 37, 34, .065);
+      --coral: #c84c37;
+      --coral-soft: #f6ddd5;
+      --blue: #176b91;
+      --blue-soft: #dcebf2;
+      --green: #18745a;
+      --green-soft: #dcece5;
+      --gold: #9d6a12;
+      --gold-soft: #f4e8c9;
+      --violet: #73558f;
+      --violet-soft: #ebe2f1;
+      --shadow: 0 24px 70px rgba(39, 51, 45, .12);
+      --display: Baskerville, "Iowan Old Style", "Palatino Linotype", serif;
+      --body: "Avenir Next", Avenir, "Gill Sans", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      font-family: var(--body);
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 52px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      color: var(--ink);
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: .73rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 29px;
+      height: 29px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+    }
+
+    .top-note {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(330px, .85fr);
+      gap: 52px;
+      align-items: end;
+      padding: 80px 0 62px;
+    }
+
+    .eyebrow {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin: 0 0 18px;
+      color: var(--coral);
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 38px;
+      height: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 20px;
+      font-family: var(--display);
+      font-size: clamp(4.2rem, 9vw, 8.6rem);
+      font-weight: 500;
+      letter-spacing: -.065em;
+      line-height: .78;
+    }
+
+    h1 em {
+      display: block;
+      color: var(--coral);
+      font-weight: 400;
+    }
+
+    .lede {
+      max-width: 680px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+      line-height: 1.65;
+    }
+
+    .hero-note {
+      position: relative;
+      padding: 28px;
+      overflow: hidden;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      box-shadow: 10px 10px 0 var(--ink);
+    }
+
+    .hero-note::after {
+      position: absolute;
+      right: -33px;
+      bottom: -40px;
+      width: 140px;
+      height: 140px;
+      border: 24px solid var(--gold-soft);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .hero-note strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .hero-note p {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 0;
+      font-family: var(--display);
+      font-size: 1.45rem;
+      line-height: 1.35;
+    }
+
+    .section-head {
+      display: flex;
+      gap: 24px;
+      align-items: end;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .section-kicker {
+      margin-bottom: 7px;
+      color: var(--coral);
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-family: var(--display);
+      font-size: clamp(2.25rem, 5vw, 4.2rem);
+      font-weight: 500;
+      letter-spacing: -.04em;
+      line-height: .96;
+    }
+
+    .section-head > p {
+      max-width: 450px;
+      margin-bottom: 3px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .protocol-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 28px 0 18px;
+    }
+
+    .protocol-button,
+    .play-button {
+      min-height: 40px;
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--sheet);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      transition: transform .18s ease, border-color .18s ease, color .18s ease, background .18s ease;
+    }
+
+    .protocol-button:hover,
+    .protocol-button:focus-visible,
+    .play-button:hover,
+    .play-button:focus-visible {
+      border-color: var(--ink);
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .protocol-button.active {
+      border-color: var(--ink);
+      color: var(--sheet);
+      background: var(--ink);
+    }
+
+    .stack-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 270px;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      box-shadow: var(--shadow);
+    }
+
+    .stack {
+      position: relative;
+      padding: 18px;
+      border-right: 1px solid var(--ink);
+    }
+
+    .layer {
+      --layer-color: var(--blue);
+      --layer-soft: var(--blue-soft);
+      display: grid;
+      grid-template-columns: 62px 160px minmax(0, 1fr) 118px;
+      gap: 16px;
+      align-items: center;
+      min-height: 108px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      transition: opacity .2s ease, transform .2s ease, background .2s ease;
+    }
+
+    .layer:last-child {
+      border-bottom: 0;
+    }
+
+    .layer[data-layer="7"],
+    .layer[data-layer="6"] {
+      --layer-color: var(--coral);
+      --layer-soft: var(--coral-soft);
+    }
+
+    .layer[data-layer="5"] {
+      --layer-color: var(--violet);
+      --layer-soft: var(--violet-soft);
+    }
+
+    .layer[data-layer="4"] {
+      --layer-color: var(--green);
+      --layer-soft: var(--green-soft);
+    }
+
+    .layer[data-layer="3"] {
+      --layer-color: var(--blue);
+      --layer-soft: var(--blue-soft);
+    }
+
+    .layer[data-layer="2"],
+    .layer[data-layer="1"] {
+      --layer-color: var(--gold);
+      --layer-soft: var(--gold-soft);
+    }
+
+    .layer.dimmed {
+      opacity: .32;
+    }
+
+    .layer.route {
+      background: var(--layer-soft);
+    }
+
+    .layer.pulse {
+      z-index: 1;
+      transform: translateX(8px);
+      box-shadow: -5px 0 0 var(--layer-color);
+    }
+
+    .layer-number {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 1px solid var(--layer-color);
+      border-radius: 50%;
+      color: var(--layer-color);
+      font-family: var(--display);
+      font-size: 1.7rem;
+    }
+
+    .layer-name b {
+      display: block;
+      font-family: var(--display);
+      font-size: 1.45rem;
+      font-weight: 500;
+    }
+
+    .layer-name small,
+    .pdu {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .67rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .tokens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .token {
+      padding: 6px 8px;
+      border: 1px solid color-mix(in srgb, var(--layer-color) 42%, white);
+      border-radius: 4px;
+      color: var(--layer-color);
+      background: color-mix(in srgb, var(--layer-soft) 62%, white);
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 800;
+    }
+
+    .side-rail {
+      position: relative;
+      display: flex;
+      min-height: 100%;
+      padding: 22px;
+      flex-direction: column;
+      background:
+        linear-gradient(135deg, transparent 74%, var(--green-soft) 74%);
+    }
+
+    .side-rail h3 {
+      margin-bottom: 8px;
+      font-family: var(--display);
+      font-size: 1.65rem;
+      font-weight: 500;
+    }
+
+    .side-rail p {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.55;
+    }
+
+    .route-list {
+      display: grid;
+      gap: 7px;
+      margin: 12px 0 20px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .route-list li {
+      display: grid;
+      grid-template-columns: 25px 1fr;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .7rem;
+    }
+
+    .route-list b {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--sheet);
+      background: var(--ink);
+      font-size: .65rem;
+    }
+
+    .play-button {
+      width: 100%;
+      margin-top: auto;
+      border-color: var(--coral);
+      color: var(--coral);
+      background: var(--sheet);
+    }
+
+    .tcp-map {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin: 64px 0;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+    }
+
+    .map-side {
+      background: var(--sheet);
+    }
+
+    .map-title {
+      display: flex;
+      justify-content: space-between;
+      padding: 17px 20px;
+      border-bottom: 1px solid var(--ink);
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .map-row {
+      display: grid;
+      min-height: 72px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      align-content: center;
+    }
+
+    .map-row:last-child {
+      border-bottom: 0;
+    }
+
+    .map-row b {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+
+    .map-row span {
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .map-row.application {
+      min-height: 216px;
+      background: var(--coral-soft);
+    }
+
+    .map-row.transport {
+      min-height: 72px;
+      background: var(--green-soft);
+    }
+
+    .map-row.internet {
+      background: var(--blue-soft);
+    }
+
+    .map-row.access {
+      min-height: 144px;
+      background: var(--gold-soft);
+    }
+
+    .journey {
+      margin: 64px 0;
+      padding: 34px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--sheet);
+    }
+
+    .journey .section-kicker {
+      color: #ef987f;
+    }
+
+    .journey h2 {
+      max-width: 650px;
+      margin-bottom: 34px;
+    }
+
+    .path {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .path::before {
+      position: absolute;
+      top: 34px;
+      right: 9%;
+      left: 9%;
+      height: 1px;
+      background: rgba(255,255,255,.35);
+      content: "";
+    }
+
+    .hop {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hop-index {
+      display: grid;
+      width: 68px;
+      height: 68px;
+      margin-bottom: 17px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.5);
+      border-radius: 50%;
+      background: var(--ink);
+      font-family: var(--display);
+      font-size: 1.7rem;
+      transition: background .2s ease, color .2s ease, transform .2s ease;
+    }
+
+    .hop:hover .hop-index {
+      color: var(--ink);
+      background: var(--gold-soft);
+      transform: scale(1.08);
+    }
+
+    .hop h3 {
+      margin-bottom: 7px;
+      font-family: var(--display);
+      font-size: 1.22rem;
+      font-weight: 500;
+    }
+
+    .hop p {
+      margin-bottom: 0;
+      color: rgba(255,255,255,.64);
+      font-size: .81rem;
+      line-height: 1.5;
+    }
+
+    .truth-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 26px;
+    }
+
+    .truth {
+      position: relative;
+      min-height: 180px;
+      padding: 25px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--sheet);
+    }
+
+    .truth::after {
+      position: absolute;
+      right: -28px;
+      bottom: -28px;
+      width: 82px;
+      height: 82px;
+      border: 16px solid var(--accent-soft);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .truth:nth-child(1) {
+      --accent: var(--coral);
+      --accent-soft: var(--coral-soft);
+    }
+
+    .truth:nth-child(2) {
+      --accent: var(--green);
+      --accent-soft: var(--green-soft);
+    }
+
+    .truth:nth-child(3) {
+      --accent: var(--blue);
+      --accent-soft: var(--blue-soft);
+    }
+
+    .truth:nth-child(4) {
+      --accent: var(--violet);
+      --accent-soft: var(--violet-soft);
+    }
+
+    .truth-tag {
+      display: inline-block;
+      margin-bottom: 24px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .truth h3 {
+      max-width: 390px;
+      margin-bottom: 8px;
+      font-family: var(--display);
+      font-size: 1.55rem;
+      font-weight: 500;
+    }
+
+    .truth p {
+      position: relative;
+      z-index: 1;
+      max-width: 470px;
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .encapsulation {
+      display: grid;
+      grid-template-columns: 1fr .9fr;
+      gap: 34px;
+      align-items: center;
+      margin-top: 64px;
+      padding: 34px;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+    }
+
+    .packet {
+      display: flex;
+      min-height: 92px;
+      border: 1px solid var(--ink);
+      box-shadow: 8px 8px 0 var(--gold-soft);
+    }
+
+    .packet-part {
+      display: grid;
+      min-width: 84px;
+      padding: 11px;
+      place-items: center;
+      border-right: 1px solid var(--ink);
+      font-family: var(--mono);
+      font-size: .64rem;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .packet-part:last-child {
+      width: 100%;
+      border-right: 0;
+      background: var(--coral-soft);
+    }
+
+    .packet-part:nth-child(1) {
+      background: var(--gold-soft);
+    }
+
+    .packet-part:nth-child(2) {
+      background: var(--blue-soft);
+    }
+
+    .packet-part:nth-child(3) {
+      background: var(--green-soft);
+    }
+
+    .encapsulation-copy h3 {
+      margin-bottom: 10px;
+      font-family: var(--display);
+      font-size: 2rem;
+      font-weight: 500;
+    }
+
+    .encapsulation-copy p {
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 64px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .7rem;
+    }
+
+    footer a {
+      color: var(--ink);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .encapsulation {
+        grid-template-columns: 1fr;
+      }
+
+      .stack-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .stack {
+        border-right: 0;
+        border-bottom: 1px solid var(--ink);
+      }
+
+      .layer {
+        grid-template-columns: 52px 130px 1fr;
+      }
+
+      .pdu {
+        display: none;
+      }
+
+      .path {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .path::before {
+        display: none;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .page {
+        width: min(100% - 20px, 1220px);
+      }
+
+      .top-note {
+        display: none;
+      }
+
+      .hero {
+        gap: 34px;
+        padding: 54px 0 45px;
+      }
+
+      h1 {
+        font-size: clamp(3.8rem, 22vw, 6.5rem);
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .section-head > p {
+        margin-top: 14px;
+      }
+
+      .layer {
+        grid-template-columns: 42px 1fr;
+        gap: 10px;
+        padding: 14px 8px;
+      }
+
+      .layer-number {
+        width: 38px;
+        height: 38px;
+        font-size: 1.3rem;
+      }
+
+      .tokens {
+        grid-column: 2;
+      }
+
+      .tcp-map,
+      .truth-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .path {
+        grid-template-columns: 1fr;
+      }
+
+      .journey,
+      .encapsulation {
+        padding: 24px;
+      }
+
+      .packet {
+        overflow-x: auto;
+      }
+
+      footer {
+        align-items: start;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="topbar" aria-label="Page navigation">
+      <a class="brand" href="index.html"><span class="brand-mark">↙</span>Systems field notes</a>
+      <span class="top-note">OSI reference / TCP-IP reality</span>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Protocol field map</p>
+        <h1>The packet’s <em>long way down.</em></h1>
+        <p class="lede">A request begins as meaning, becomes bytes, receives transport and network coordinates, then leaves as a signal. Seven conceptual layers make the handoffs visible.</p>
+      </div>
+      <aside class="hero-note">
+        <strong>Keep this distinction</strong>
+        <p>HTTP, gRPC, and WebSocket describe conversations. TCP and UDP move their bytes. IP finds the destination.</p>
+      </aside>
+    </header>
+
+    <section aria-labelledby="stack-title">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">01 / Explore the layers</p>
+          <h2 id="stack-title">The seven-layer stack</h2>
+        </div>
+        <p>Choose a protocol family to reveal its route, then send it down the stack. OSI is a teaching model; real protocols sometimes cross its neat boundaries.</p>
+      </div>
+
+      <div class="protocol-picker" role="group" aria-label="Protocol family">
+        <button class="protocol-button active" type="button" data-protocol="http">HTTP/1.1</button>
+        <button class="protocol-button" type="button" data-protocol="grpc">gRPC</button>
+        <button class="protocol-button" type="button" data-protocol="websocket">WebSocket</button>
+        <button class="protocol-button" type="button" data-protocol="http3">HTTP/3</button>
+        <button class="protocol-button" type="button" data-protocol="dns">DNS</button>
+        <button class="protocol-button" type="button" data-protocol="webrtc">WebRTC media</button>
+      </div>
+
+      <div class="stack-shell">
+        <div class="stack" id="stack">
+          <article class="layer" data-layer="7">
+            <div class="layer-number">7</div>
+            <div class="layer-name"><b>Application</b><small>User-facing meaning</small></div>
+            <div class="tokens">
+              <span class="token">HTTP</span><span class="token">gRPC</span><span class="token">WebSocket</span><span class="token">DNS</span><span class="token">SMTP</span><span class="token">SSH</span>
+            </div>
+            <span class="pdu">Data / message</span>
+          </article>
+          <article class="layer" data-layer="6">
+            <div class="layer-number">6</div>
+            <div class="layer-name"><b>Presentation</b><small>Shape and security</small></div>
+            <div class="tokens">
+              <span class="token">TLS 1.3</span><span class="token">JSON</span><span class="token">Protobuf</span><span class="token">UTF-8</span><span class="token">JPEG</span>
+            </div>
+            <span class="pdu">Encoded data</span>
+          </article>
+          <article class="layer" data-layer="5">
+            <div class="layer-number">5</div>
+            <div class="layer-name"><b>Session</b><small>Conversation state</small></div>
+            <div class="tokens">
+              <span class="token">RPC</span><span class="token">SIP</span><span class="token">NetBIOS</span><span class="token">Checkpoints</span>
+            </div>
+            <span class="pdu">Session data</span>
+          </article>
+          <article class="layer" data-layer="4">
+            <div class="layer-number">4</div>
+            <div class="layer-name"><b>Transport</b><small>Ports and delivery</small></div>
+            <div class="tokens">
+              <span class="token">TCP</span><span class="token">UDP</span><span class="token">QUIC over UDP</span><span class="token">SCTP</span>
+            </div>
+            <span class="pdu">Segment / datagram</span>
+          </article>
+          <article class="layer" data-layer="3">
+            <div class="layer-number">3</div>
+            <div class="layer-name"><b>Network</b><small>Routing between networks</small></div>
+            <div class="tokens">
+              <span class="token">IPv4</span><span class="token">IPv6</span><span class="token">ICMP</span><span class="token">IPsec</span>
+            </div>
+            <span class="pdu">Packet</span>
+          </article>
+          <article class="layer" data-layer="2">
+            <div class="layer-number">2</div>
+            <div class="layer-name"><b>Data link</b><small>Local hop delivery</small></div>
+            <div class="tokens">
+              <span class="token">Ethernet</span><span class="token">Wi-Fi</span><span class="token">ARP / NDP</span><span class="token">VLAN</span>
+            </div>
+            <span class="pdu">Frame</span>
+          </article>
+          <article class="layer" data-layer="1">
+            <div class="layer-number">1</div>
+            <div class="layer-name"><b>Physical</b><small>Signal on a medium</small></div>
+            <div class="tokens">
+              <span class="token">Copper</span><span class="token">Fiber</span><span class="token">Radio</span><span class="token">Optics</span>
+            </div>
+            <span class="pdu">Bits</span>
+          </article>
+        </div>
+        <aside class="side-rail" aria-live="polite">
+          <p class="section-kicker">Selected route</p>
+          <h3 id="route-title">HTTP/1.1</h3>
+          <p id="route-summary">Readable HTTP messages travel through optional TLS, then a reliable TCP byte stream.</p>
+          <ol class="route-list" id="route-list"></ol>
+          <button class="play-button" id="play-route" type="button">Send down the stack ↓</button>
+        </aside>
+      </div>
+    </section>
+
+    <section class="tcp-map" aria-label="OSI and TCP/IP model mapping">
+      <div class="map-side">
+        <div class="map-title"><span>OSI reference model</span><span>7 layers</span></div>
+        <div class="map-row"><b>7 · Application</b><span>Network services used by applications</span></div>
+        <div class="map-row"><b>6 · Presentation</b><span>Encoding, compression, encryption</span></div>
+        <div class="map-row"><b>5 · Session</b><span>Dialog and session management</span></div>
+        <div class="map-row"><b>4 · Transport</b><span>End-to-end transport and ports</span></div>
+        <div class="map-row"><b>3 · Network</b><span>Addressing and routing</span></div>
+        <div class="map-row"><b>2 · Data link</b><span>Frames on the local network</span></div>
+        <div class="map-row"><b>1 · Physical</b><span>Electrical, optical, or radio signal</span></div>
+      </div>
+      <div class="map-side">
+        <div class="map-title"><span>TCP/IP model</span><span>4 layers</span></div>
+        <div class="map-row application"><b>Application</b><span>HTTP, TLS, DNS, gRPC, WebSocket, SSH</span></div>
+        <div class="map-row transport"><b>Transport</b><span>TCP, UDP, QUIC over UDP</span></div>
+        <div class="map-row internet"><b>Internet</b><span>IP and ICMP</span></div>
+        <div class="map-row access"><b>Network access</b><span>Ethernet, Wi-Fi, fiber, copper, radio</span></div>
+      </div>
+    </section>
+
+    <section class="journey" aria-labelledby="path-title">
+      <p class="section-kicker">02 / Common infrastructure</p>
+      <h2 id="path-title">Who can see what in the request path?</h2>
+      <div class="path">
+        <article class="hop">
+          <div class="hop-index">A</div>
+          <h3>Client</h3>
+          <p>Creates the application message and resolves a domain to an IP address.</p>
+        </article>
+        <article class="hop">
+          <div class="hop-index">3</div>
+          <h3>Router</h3>
+          <p>Forwards by destination IP. It does not need to understand HTTP.</p>
+        </article>
+        <article class="hop">
+          <div class="hop-index">4</div>
+          <h3>L4 load balancer</h3>
+          <p>Distributes flows using IP addresses, ports, and transport state.</p>
+        </article>
+        <article class="hop">
+          <div class="hop-index">7</div>
+          <h3>L7 proxy</h3>
+          <p>Can route by host, path, method, header, cookie, or gRPC service.</p>
+        </article>
+        <article class="hop">
+          <div class="hop-index">B</div>
+          <h3>Service</h3>
+          <p>Parses the request, runs business logic, and creates a response.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="boundary-title">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">03 / Boundary cases</p>
+          <h2 id="boundary-title">The useful corrections</h2>
+        </div>
+        <p>Protocol diagrams are maps, not territory. These four relationships prevent the most common layer mix-ups.</p>
+      </div>
+      <div class="truth-grid">
+        <article class="truth">
+          <span class="truth-tag">WebSocket</span>
+          <h3>Application layer, carried by TCP</h3>
+          <p>It begins as an HTTP Upgrade exchange, then switches to full-duplex WebSocket frames on the same TCP connection.</p>
+        </article>
+        <article class="truth">
+          <span class="truth-tag">gRPC</span>
+          <h3>RPC semantics over HTTP/2</h3>
+          <p>Protobuf messages become HTTP/2 frames, usually protected by TLS, then travel inside TCP segments.</p>
+        </article>
+        <article class="truth">
+          <span class="truth-tag">HTTP/3</span>
+          <h3>HTTP semantics without TCP</h3>
+          <p>HTTP/3 uses QUIC, which combines transport and TLS over UDP. Independent streams avoid TCP-wide loss stalls.</p>
+        </article>
+        <article class="truth">
+          <span class="truth-tag">Load balancing</span>
+          <h3>Layer number defines visibility</h3>
+          <p>An L4 balancer sees flows. An L7 balancer terminates or parses application traffic and can make content-aware routing decisions.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="encapsulation" aria-labelledby="packet-title">
+      <div class="packet" aria-label="Encapsulated network frame">
+        <div class="packet-part">Ethernet<br>header</div>
+        <div class="packet-part">IP<br>header</div>
+        <div class="packet-part">TCP<br>header</div>
+        <div class="packet-part">HTTP payload</div>
+      </div>
+      <div class="encapsulation-copy">
+        <p class="section-kicker">04 / Encapsulation</p>
+        <h3 id="packet-title">Each layer wraps the one above.</h3>
+        <p>The receiver removes those envelopes in reverse: frame to packet, packet to segment, segment to byte stream, byte stream to application message.</p>
+      </div>
+    </section>
+
+    <footer>
+      <span>Distributed systems / protocol field map</span>
+      <a href="tcp-handshake.html">Next: connection handshakes →</a>
+    </footer>
+  </main>
+
+  <script>
+    const routes = {
+      http: {
+        title: "HTTP/1.1",
+        summary: "Readable HTTP messages travel through optional TLS, then a reliable TCP byte stream.",
+        layers: [7, 6, 5, 4, 3, 2, 1],
+        steps: ["HTTP request", "TLS or plain text", "Keep-alive session", "TCP", "IP", "Ethernet or Wi-Fi", "Signal"]
+      },
+      grpc: {
+        title: "gRPC",
+        summary: "An RPC becomes Protobuf, HTTP/2 frames, TLS records, and TCP segments.",
+        layers: [7, 6, 5, 4, 3, 2, 1],
+        steps: ["gRPC method", "Protobuf + TLS", "RPC stream", "TCP", "IP", "Ethernet or Wi-Fi", "Signal"]
+      },
+      websocket: {
+        title: "WebSocket",
+        summary: "WebSocket is Layer 7. Its full-duplex frames use a TCP connection after an HTTP Upgrade.",
+        layers: [7, 6, 5, 4, 3, 2, 1],
+        steps: ["WebSocket frame", "TLS for WSS", "Long-lived session", "TCP", "IP", "Ethernet or Wi-Fi", "Signal"]
+      },
+      http3: {
+        title: "HTTP/3",
+        summary: "HTTP/3 frames use QUIC streams. QUIC integrates TLS and runs over UDP instead of TCP.",
+        layers: [7, 6, 4, 3, 2, 1],
+        steps: ["HTTP/3 frame", "TLS inside QUIC", "QUIC over UDP", "IP", "Ethernet or Wi-Fi", "Signal"]
+      },
+      dns: {
+        title: "DNS",
+        summary: "Most DNS queries use UDP; large, truncated, or zone-transfer traffic can use TCP.",
+        layers: [7, 5, 4, 3, 2, 1],
+        steps: ["DNS message", "Query state", "UDP or TCP", "IP", "Ethernet or Wi-Fi", "Signal"]
+      },
+      webrtc: {
+        title: "WebRTC media",
+        summary: "Real-time media commonly uses SRTP over UDP, with ICE selecting a viable path.",
+        layers: [7, 6, 5, 4, 3, 2, 1],
+        steps: ["Audio or video", "SRTP encryption", "ICE session", "UDP", "IP", "Ethernet or Wi-Fi", "Signal"]
+      }
+    };
+
+    const buttons = [...document.querySelectorAll(".protocol-button")];
+    const layers = [...document.querySelectorAll(".layer")];
+    const title = document.getElementById("route-title");
+    const summary = document.getElementById("route-summary");
+    const list = document.getElementById("route-list");
+    const play = document.getElementById("play-route");
+    let selected = "http";
+    let running = false;
+
+    function selectProtocol(key) {
+      selected = key;
+      const route = routes[key];
+      buttons.forEach(button => button.classList.toggle("active", button.dataset.protocol === key));
+      layers.forEach(layer => {
+        const included = route.layers.includes(Number(layer.dataset.layer));
+        layer.classList.toggle("route", included);
+        layer.classList.toggle("dimmed", !included);
+        layer.classList.remove("pulse");
+      });
+      title.textContent = route.title;
+      summary.textContent = route.summary;
+      list.innerHTML = route.steps.map((step, index) => `<li><b>${index + 1}</b><span>${step}</span></li>`).join("");
+    }
+
+    function delay(milliseconds) {
+      return new Promise(resolve => setTimeout(resolve, milliseconds));
+    }
+
+    async function playRoute() {
+      if (running) return;
+      running = true;
+      play.textContent = "Packet in motion…";
+      const route = routes[selected];
+      for (const number of route.layers) {
+        layers.forEach(layer => layer.classList.remove("pulse"));
+        const layer = layers.find(item => Number(item.dataset.layer) === number);
+        layer.classList.add("pulse");
+        await delay(430);
+      }
+      layers.forEach(layer => layer.classList.remove("pulse"));
+      play.textContent = "Send again ↓";
+      running = false;
+    }
+
+    buttons.forEach(button => button.addEventListener("click", () => selectProtocol(button.dataset.protocol)));
+    play.addEventListener("click", playRoute);
+    selectProtocol(selected);
+  </script>
+</body>
+</html>

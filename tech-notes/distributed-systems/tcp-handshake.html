@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCP and QUIC Handshakes</title>
+  <style>
+    :root {
+      --paper: #f5f1e7;
+      --sheet: #fffdf8;
+      --ink: #182421;
+      --muted: #63706b;
+      --line: #c6cdc5;
+      --grid: rgba(24, 36, 33, .06);
+      --coral: #c44a35;
+      --coral-soft: #f7dfd8;
+      --blue: #1e668b;
+      --blue-soft: #deebf1;
+      --green: #197158;
+      --green-soft: #dfede7;
+      --gold: #a06c15;
+      --gold-soft: #f3e7c9;
+      --shadow: 0 24px 70px rgba(40, 49, 45, .12);
+      --display: Baskerville, "Iowan Old Style", "Palatino Linotype", serif;
+      --body: "Avenir Next", Avenir, "Gill Sans", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      font-family: var(--body);
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 52px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      color: var(--ink);
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: .73rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 29px;
+      height: 29px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+    }
+
+    .top-note,
+    .eyebrow,
+    .kicker {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 50px;
+      align-items: end;
+      padding: 74px 0 48px;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--coral);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 800px;
+      margin-bottom: 20px;
+      font-family: var(--display);
+      font-size: clamp(4rem, 8.4vw, 7.7rem);
+      font-weight: 500;
+      letter-spacing: -.06em;
+      line-height: .84;
+    }
+
+    h1 em {
+      color: var(--coral);
+      font-weight: 400;
+    }
+
+    .lede {
+      max-width: 690px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1.14rem;
+      line-height: 1.65;
+    }
+
+    .rtt-card {
+      position: relative;
+      padding: 25px;
+      overflow: hidden;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      box-shadow: 9px 9px 0 var(--ink);
+    }
+
+    .rtt-card::after {
+      position: absolute;
+      right: -28px;
+      bottom: -34px;
+      width: 115px;
+      height: 115px;
+      border: 22px solid var(--blue-soft);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .rtt-card strong {
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin: 7px 0;
+      font-family: var(--display);
+      font-size: 3.9rem;
+      font-weight: 500;
+      letter-spacing: -.06em;
+      line-height: 1;
+    }
+
+    .rtt-card p {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      gap: 1px;
+    }
+
+    .tab {
+      min-height: 88px;
+      padding: 16px 18px;
+      border: 0;
+      color: var(--muted);
+      background: var(--sheet);
+      cursor: pointer;
+      text-align: left;
+      transition: color .2s ease, background .2s ease;
+    }
+
+    .tab:hover,
+    .tab:focus-visible {
+      color: var(--ink);
+      background: var(--gold-soft);
+      outline: none;
+    }
+
+    .tab.active {
+      color: var(--sheet);
+      background: var(--ink);
+    }
+
+    .tab-index {
+      display: block;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+      font-size: .66rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .tab strong {
+      display: block;
+      font-family: var(--display);
+      font-size: 1.35rem;
+      font-weight: 500;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 285px;
+      min-height: 670px;
+      border: 1px solid var(--ink);
+      border-top: 0;
+      background: var(--sheet);
+      box-shadow: var(--shadow);
+    }
+
+    .diagram-shell {
+      padding: 28px;
+      border-right: 1px solid var(--ink);
+    }
+
+    .diagram-head {
+      display: flex;
+      gap: 20px;
+      align-items: start;
+      justify-content: space-between;
+      min-height: 92px;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .diagram-head h2 {
+      margin-bottom: 7px;
+      font-family: var(--display);
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      font-weight: 500;
+      letter-spacing: -.04em;
+      line-height: .95;
+    }
+
+    .diagram-head p {
+      max-width: 560px;
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .transport-badge {
+      flex: 0 0 auto;
+      padding: 8px 11px;
+      border: 1px solid var(--blue);
+      color: var(--blue);
+      background: var(--blue-soft);
+      font-family: var(--mono);
+      font-size: .67rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .sequence {
+      position: relative;
+      min-height: 495px;
+      padding: 0 76px;
+      overflow: hidden;
+    }
+
+    .actor {
+      position: absolute;
+      top: 0;
+      z-index: 2;
+      display: grid;
+      width: 110px;
+      height: 58px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .actor.client {
+      left: 20px;
+      box-shadow: 5px 5px 0 var(--coral-soft);
+    }
+
+    .actor.server {
+      right: 20px;
+      box-shadow: 5px 5px 0 var(--blue-soft);
+    }
+
+    .lifeline {
+      position: absolute;
+      top: 58px;
+      bottom: 0;
+      width: 1px;
+      background: repeating-linear-gradient(to bottom, var(--line) 0 7px, transparent 7px 13px);
+    }
+
+    .lifeline.client {
+      left: 75px;
+    }
+
+    .lifeline.server {
+      right: 75px;
+    }
+
+    .messages {
+      position: relative;
+      z-index: 1;
+      padding-top: 78px;
+    }
+
+    .message {
+      --message-color: var(--green);
+      position: relative;
+      display: grid;
+      min-height: 63px;
+      opacity: .22;
+      align-content: start;
+      transition: opacity .32s ease, transform .32s ease;
+    }
+
+    .message.reverse {
+      text-align: right;
+    }
+
+    .message.visible {
+      opacity: 1;
+    }
+
+    .message.current {
+      transform: translateY(-2px);
+    }
+
+    .message-label {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 7px;
+      color: var(--message-color);
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 900;
+    }
+
+    .message.reverse .message-label {
+      justify-content: end;
+    }
+
+    .message-label small {
+      color: var(--muted);
+      font-size: .61rem;
+      font-weight: 500;
+    }
+
+    .arrow {
+      position: relative;
+      height: 2px;
+      background: var(--message-color);
+      transform-origin: left center;
+    }
+
+    .arrow::after {
+      position: absolute;
+      top: -4px;
+      right: -1px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--message-color);
+      border-right: 2px solid var(--message-color);
+      content: "";
+      transform: rotate(45deg);
+    }
+
+    .message.reverse .arrow::after {
+      right: auto;
+      left: -1px;
+      border: 0;
+      border-bottom: 2px solid var(--message-color);
+      border-left: 2px solid var(--message-color);
+    }
+
+    .message.current .arrow {
+      animation: draw-line .65s ease both;
+    }
+
+    @keyframes draw-line {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .control-rail {
+      display: flex;
+      padding: 25px;
+      flex-direction: column;
+      background:
+        linear-gradient(145deg, transparent 75%, var(--gold-soft) 75%);
+    }
+
+    .control-rail h3 {
+      margin: 8px 0 8px;
+      font-family: var(--display);
+      font-size: 1.65rem;
+      font-weight: 500;
+    }
+
+    .control-rail > p {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.55;
+    }
+
+    .step-counter {
+      display: flex;
+      gap: 9px;
+      margin: 18px 0;
+    }
+
+    .step-dot {
+      width: 9px;
+      height: 9px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--sheet);
+      transition: background .2s ease, border-color .2s ease;
+    }
+
+    .step-dot.done {
+      border-color: var(--coral);
+      background: var(--coral);
+    }
+
+    .current-copy {
+      min-height: 130px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.66);
+    }
+
+    .current-copy b {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--coral);
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .current-copy p {
+      margin-bottom: 0;
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .control {
+      min-height: 43px;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      transition: transform .18s ease, background .18s ease, color .18s ease;
+    }
+
+    .control:hover,
+    .control:focus-visible {
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .control.primary {
+      color: var(--sheet);
+      background: var(--coral);
+      border-color: var(--coral);
+    }
+
+    .roundtrip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 64px 0;
+    }
+
+    .roundtrip-card {
+      min-height: 205px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: var(--sheet);
+    }
+
+    .roundtrip-card:nth-child(1) {
+      border-top: 5px solid var(--coral);
+    }
+
+    .roundtrip-card:nth-child(2) {
+      border-top: 5px solid var(--blue);
+    }
+
+    .roundtrip-card:nth-child(3) {
+      border-top: 5px solid var(--green);
+    }
+
+    .roundtrip-card strong {
+      display: block;
+      margin: 12px 0 8px;
+      font-family: var(--display);
+      font-size: 2rem;
+      font-weight: 500;
+    }
+
+    .roundtrip-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .anatomy {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 30px;
+      align-items: start;
+      padding: 34px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--sheet);
+    }
+
+    .anatomy h2 {
+      max-width: 430px;
+      margin-bottom: 15px;
+      font-family: var(--display);
+      font-size: clamp(2.5rem, 5vw, 4.2rem);
+      font-weight: 500;
+      letter-spacing: -.04em;
+      line-height: .95;
+    }
+
+    .anatomy-copy {
+      color: rgba(255,255,255,.64);
+      line-height: 1.6;
+    }
+
+    .flag-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.28);
+    }
+
+    .flag {
+      min-height: 136px;
+      padding: 18px;
+      background: var(--ink);
+    }
+
+    .flag b {
+      display: block;
+      margin-bottom: 9px;
+      color: #ef987f;
+      font-family: var(--mono);
+      font-size: .75rem;
+      letter-spacing: .08em;
+    }
+
+    .flag p {
+      margin-bottom: 0;
+      color: rgba(255,255,255,.68);
+      font-size: .87rem;
+      line-height: 1.5;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 62px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .7rem;
+    }
+
+    footer a {
+      color: var(--ink);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .anatomy {
+        grid-template-columns: 1fr;
+      }
+
+      .stage {
+        grid-template-columns: 1fr;
+      }
+
+      .diagram-shell {
+        border-right: 0;
+        border-bottom: 1px solid var(--ink);
+      }
+
+      .control-rail {
+        min-height: 310px;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .page {
+        width: min(100% - 20px, 1180px);
+      }
+
+      .top-note {
+        display: none;
+      }
+
+      .hero {
+        gap: 32px;
+        padding: 52px 0 38px;
+      }
+
+      h1 {
+        font-size: clamp(3.8rem, 21vw, 6rem);
+      }
+
+      .tabs {
+        grid-template-columns: 1fr;
+      }
+
+      .tab {
+        min-height: 68px;
+      }
+
+      .diagram-shell {
+        padding: 18px 12px;
+      }
+
+      .diagram-head {
+        display: block;
+      }
+
+      .transport-badge {
+        display: inline-block;
+        margin-top: 14px;
+      }
+
+      .sequence {
+        padding: 0 52px;
+      }
+
+      .actor {
+        width: 85px;
+      }
+
+      .actor.client {
+        left: 0;
+      }
+
+      .actor.server {
+        right: 0;
+      }
+
+      .lifeline.client {
+        left: 42px;
+      }
+
+      .lifeline.server {
+        right: 42px;
+      }
+
+      .message-label {
+        font-size: .61rem;
+      }
+
+      .message-label small {
+        display: none;
+      }
+
+      .roundtrip {
+        grid-template-columns: 1fr;
+      }
+
+      .flag-grid {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="topbar" aria-label="Page navigation">
+      <a class="brand" href="tcp-stack.html"><span class="brand-mark">←</span>TCP/IP stack</a>
+      <span class="top-note">Connection setup / packet sequence</span>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Before the first response</p>
+        <h1>Meet. Agree. <em>Send.</em></h1>
+        <p class="lede">A connection is a short negotiation before application data can flow. TCP synchronizes sequence spaces, TLS proves identity and establishes keys, while QUIC combines transport and security.</p>
+      </div>
+      <aside class="rtt-card">
+        <span class="kicker">Core measure</span>
+        <strong>1 RTT</strong>
+        <p>One round trip is the time for a message to reach the peer and a reply to return.</p>
+      </aside>
+    </header>
+
+    <section aria-label="Handshake explorer">
+      <div class="tabs" role="tablist" aria-label="Connection type">
+        <button class="tab active" id="tab-http1" type="button" role="tab" aria-selected="true" aria-controls="handshake-panel" data-key="http1">
+          <span class="tab-index">Tab 01 / TCP</span>
+          <strong>HTTP/1.1</strong>
+        </button>
+        <button class="tab" id="tab-http2" type="button" role="tab" aria-selected="false" aria-controls="handshake-panel" data-key="http2">
+          <span class="tab-index">Tab 02 / TCP + TLS</span>
+          <strong>HTTP/2</strong>
+        </button>
+        <button class="tab" id="tab-http3" type="button" role="tab" aria-selected="false" aria-controls="handshake-panel" data-key="http3">
+          <span class="tab-index">Tab 03 / QUIC</span>
+          <strong>HTTP/3</strong>
+        </button>
+      </div>
+
+      <div class="stage" id="handshake-panel" role="tabpanel" aria-labelledby="tab-http1">
+        <div class="diagram-shell">
+          <div class="diagram-head">
+            <div>
+              <h2 id="diagram-title">HTTP/1.1 over TCP</h2>
+              <p id="diagram-summary">The three-way handshake establishes a reliable byte stream. Only then does the client send the HTTP request.</p>
+            </div>
+            <span class="transport-badge" id="transport-badge">TCP / port 80</span>
+          </div>
+
+          <div class="sequence">
+            <div class="actor client">Client</div>
+            <div class="actor server">Server</div>
+            <div class="lifeline client"></div>
+            <div class="lifeline server"></div>
+            <div class="messages" id="messages"></div>
+          </div>
+        </div>
+
+        <aside class="control-rail">
+          <span class="kicker" id="phase-label">Connection phase</span>
+          <h3 id="step-title">Ready to connect</h3>
+          <p id="step-summary">Play the exchange or move through one network event at a time.</p>
+          <div class="step-counter" id="step-counter" aria-hidden="true"></div>
+          <div class="current-copy" aria-live="polite">
+            <b id="packet-label">Waiting</b>
+            <p id="packet-detail">No packet has left the client yet.</p>
+          </div>
+          <div class="controls">
+            <button class="control" id="reset" type="button">Reset</button>
+            <button class="control" id="next" type="button">Next</button>
+            <button class="control primary" id="play" type="button">Play all</button>
+            <button class="control" id="replay" type="button">Replay</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="roundtrip" aria-label="Handshake cost comparison">
+      <article class="roundtrip-card">
+        <span class="kicker">HTTP/1.1 cleartext</span>
+        <strong>1 RTT + request</strong>
+        <p>TCP needs one round trip before the HTTP request. Persistent connections amortize that cost across later requests.</p>
+      </article>
+      <article class="roundtrip-card">
+        <span class="kicker">HTTP/2 with TLS 1.3</span>
+        <strong>About 2 RTT</strong>
+        <p>One round trip establishes TCP and another establishes fresh TLS keys before protected application data.</p>
+      </article>
+      <article class="roundtrip-card">
+        <span class="kicker">HTTP/3 with QUIC</span>
+        <strong>1 RTT / 0-RTT</strong>
+        <p>A fresh QUIC connection combines transport and TLS. A resumed connection can carry replay-safe data immediately.</p>
+      </article>
+    </section>
+
+    <section class="anatomy" aria-labelledby="flags-title">
+      <div>
+        <p class="eyebrow">TCP flag anatomy</p>
+        <h2 id="flags-title">Three packets create shared certainty.</h2>
+        <p class="anatomy-copy">Both sides choose an initial sequence number, prove they can send and receive, and acknowledge the next byte expected. Reliability begins with that shared state.</p>
+      </div>
+      <div class="flag-grid">
+        <article class="flag">
+          <b>SYN</b>
+          <p>Synchronize. The client proposes its starting sequence number and TCP options.</p>
+        </article>
+        <article class="flag">
+          <b>SYN + ACK</b>
+          <p>The server acknowledges the client and proposes its own starting sequence number.</p>
+        </article>
+        <article class="flag">
+          <b>ACK</b>
+          <p>The client acknowledges the server. The TCP connection is established.</p>
+        </article>
+        <article class="flag">
+          <b>FIN / RST</b>
+          <p>FIN closes gracefully in each direction. RST aborts the connection immediately.</p>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <span>Distributed systems / handshake field guide</span>
+      <a href="http-1-2-3.html">Next: HTTP versions →</a>
+    </footer>
+  </main>
+
+  <script>
+    const handshakes = {
+      http1: {
+        title: "HTTP/1.1 over TCP",
+        summary: "The three-way handshake establishes a reliable byte stream. Only then does the client send the HTTP request.",
+        badge: "TCP / port 80",
+        phase: "Three-way handshake",
+        steps: [
+          { label: "SYN", meta: "seq = x", reverse: false, color: "var(--coral)", title: "Client opens", detail: "The client enters SYN-SENT and proposes initial sequence number x." },
+          { label: "SYN + ACK", meta: "seq = y · ack = x + 1", reverse: true, color: "var(--blue)", title: "Server answers", detail: "The server acknowledges x and proposes its own initial sequence number y." },
+          { label: "ACK", meta: "ack = y + 1", reverse: false, color: "var(--green)", title: "TCP established", detail: "The client acknowledges y. Both peers now agree on sequence state." },
+          { label: "GET / HTTP/1.1", meta: "Host: service.test", reverse: false, color: "var(--gold)", title: "Request begins", detail: "Application bytes can now enter the reliable TCP stream." },
+          { label: "HTTP/1.1 200 OK", meta: "Content-Length: …", reverse: true, color: "var(--blue)", title: "Response returns", detail: "The connection can remain open for more request-response exchanges." }
+        ]
+      },
+      http2: {
+        title: "HTTP/2 over TCP + TLS 1.3",
+        summary: "TCP connects first, TLS establishes protected keys, then HTTP/2 negotiates settings and multiplexed streams.",
+        badge: "TCP + TLS / port 443",
+        phase: "Layered setup",
+        steps: [
+          { label: "SYN", meta: "seq = x", reverse: false, color: "var(--coral)", title: "TCP begins", detail: "The client proposes sequence state and transport options." },
+          { label: "SYN + ACK", meta: "seq = y · ack = x + 1", reverse: true, color: "var(--blue)", title: "Server answers", detail: "The server acknowledges the client and offers its own sequence state." },
+          { label: "ACK + ClientHello", meta: "ALPN: h2", reverse: false, color: "var(--green)", title: "TCP and TLS overlap", detail: "The final TCP acknowledgment can carry a TLS ClientHello advertising HTTP/2 through ALPN." },
+          { label: "ServerHello + Finished", meta: "certificate · keys", reverse: true, color: "var(--gold)", title: "Server proves identity", detail: "TLS 1.3 selects keys and returns the certificate and finished data." },
+          { label: "Finished + SETTINGS", meta: "HTTP/2 preface", reverse: false, color: "var(--coral)", title: "HTTP/2 starts", detail: "The protected connection begins with the client preface and SETTINGS frame." },
+          { label: "HEADERS + DATA", meta: "stream 1", reverse: true, color: "var(--blue)", title: "Multiplexed response", detail: "HTTP/2 frames carry the response on a numbered stream." }
+        ]
+      },
+      http3: {
+        title: "HTTP/3 over QUIC",
+        summary: "HTTP/3 does not use TCP. QUIC carries TLS 1.3 inside its transport handshake over UDP.",
+        badge: "QUIC over UDP / port 443",
+        phase: "Combined transport + TLS",
+        steps: [
+          { label: "QUIC Initial", meta: "ClientHello · connection ID", reverse: false, color: "var(--coral)", title: "One packet starts both", detail: "The client proposes QUIC transport parameters and TLS keys in an Initial packet." },
+          { label: "Initial + Handshake", meta: "ServerHello · certificate", reverse: true, color: "var(--blue)", title: "Server answers", detail: "The server returns transport parameters, identity, and encrypted handshake data." },
+          { label: "Handshake + HEADERS", meta: "HTTP/3 request", reverse: false, color: "var(--green)", title: "Request at one RTT", detail: "The client completes the handshake and can send an HTTP/3 request." },
+          { label: "1-RTT HEADERS + DATA", meta: "QUIC stream", reverse: true, color: "var(--gold)", title: "Independent response stream", detail: "The response uses protected 1-RTT packets on an independently delivered QUIC stream." }
+        ]
+      }
+    };
+
+    const tabs = [...document.querySelectorAll(".tab")];
+    const messages = document.getElementById("messages");
+    const counter = document.getElementById("step-counter");
+    const title = document.getElementById("diagram-title");
+    const summary = document.getElementById("diagram-summary");
+    const badge = document.getElementById("transport-badge");
+    const panel = document.getElementById("handshake-panel");
+    const phase = document.getElementById("phase-label");
+    const stepTitle = document.getElementById("step-title");
+    const stepSummary = document.getElementById("step-summary");
+    const packetLabel = document.getElementById("packet-label");
+    const packetDetail = document.getElementById("packet-detail");
+    const resetButton = document.getElementById("reset");
+    const nextButton = document.getElementById("next");
+    const playButton = document.getElementById("play");
+    const replayButton = document.getElementById("replay");
+    let active = "http1";
+    let current = -1;
+    let playing = false;
+
+    function wait(milliseconds) {
+      return new Promise(resolve => setTimeout(resolve, milliseconds));
+    }
+
+    function render(key) {
+      active = key;
+      current = -1;
+      playing = false;
+      const item = handshakes[key];
+      tabs.forEach(tab => {
+        const selected = tab.dataset.key === key;
+        tab.classList.toggle("active", selected);
+        tab.setAttribute("aria-selected", selected);
+      });
+      panel.setAttribute("aria-labelledby", `tab-${key}`);
+      title.textContent = item.title;
+      summary.textContent = item.summary;
+      badge.textContent = item.badge;
+      phase.textContent = item.phase;
+      messages.innerHTML = item.steps.map((step, index) => `
+        <div class="message ${step.reverse ? "reverse" : ""}" data-index="${index}" style="--message-color:${step.color}">
+          <div class="message-label"><span>${step.label}</span><small>${step.meta}</small></div>
+          <div class="arrow"></div>
+        </div>
+      `).join("");
+      counter.innerHTML = item.steps.map(() => '<span class="step-dot"></span>').join("");
+      stepTitle.textContent = "Ready to connect";
+      stepSummary.textContent = "Play the exchange or move through one network event at a time.";
+      packetLabel.textContent = "Waiting";
+      packetDetail.textContent = "No packet has left the client yet.";
+      playButton.textContent = "Play all";
+    }
+
+    function showStep(index) {
+      const item = handshakes[active];
+      current = Math.min(index, item.steps.length - 1);
+      [...messages.children].forEach((message, messageIndex) => {
+        message.classList.toggle("visible", messageIndex <= current);
+        message.classList.toggle("current", messageIndex === current);
+      });
+      [...counter.children].forEach((dot, dotIndex) => dot.classList.toggle("done", dotIndex <= current));
+      const step = item.steps[current];
+      stepTitle.textContent = step.title;
+      stepSummary.textContent = current === item.steps.length - 1 ? "The exchange is complete. Replay it or inspect another connection type." : `Event ${current + 1} of ${item.steps.length}`;
+      packetLabel.textContent = step.label;
+      packetDetail.textContent = step.detail;
+    }
+
+    function reset() {
+      current = -1;
+      [...messages.children].forEach(message => message.classList.remove("visible", "current"));
+      [...counter.children].forEach(dot => dot.classList.remove("done"));
+      stepTitle.textContent = "Ready to connect";
+      stepSummary.textContent = "Play the exchange or move through one network event at a time.";
+      packetLabel.textContent = "Waiting";
+      packetDetail.textContent = "No packet has left the client yet.";
+      playButton.textContent = "Play all";
+    }
+
+    async function playAll() {
+      if (playing) return;
+      playing = true;
+      reset();
+      playButton.textContent = "Playing…";
+      for (let index = 0; index < handshakes[active].steps.length; index += 1) {
+        showStep(index);
+        await wait(720);
+      }
+      playButton.textContent = "Complete";
+      playing = false;
+    }
+
+    tabs.forEach(tab => tab.addEventListener("click", () => render(tab.dataset.key)));
+    resetButton.addEventListener("click", reset);
+    replayButton.addEventListener("click", playAll);
+    playButton.addEventListener("click", playAll);
+    nextButton.addEventListener("click", () => {
+      if (playing) return;
+      if (current >= handshakes[active].steps.length - 1) reset();
+      else showStep(current + 1);
+    });
+    render(active);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTTP/1.1 vs HTTP/2 vs HTTP/3</title>
+  <style>
+    :root {
+      --paper: #f6f1e6;
+      --sheet: #fffdf7;
+      --ink: #182421;
+      --muted: #64706c;
+      --line: #c7cec6;
+      --grid: rgba(24, 36, 33, .06);
+      --coral: #c64b37;
+      --coral-soft: #f7dfd8;
+      --blue: #17698e;
+      --blue-soft: #dfeef3;
+      --green: #19735a;
+      --green-soft: #deede6;
+      --gold: #a16d14;
+      --gold-soft: #f3e8cc;
+      --violet: #75558f;
+      --violet-soft: #ece3f2;
+      --shadow: 0 24px 70px rgba(39, 49, 45, .12);
+      --display: Baskerville, "Iowan Old Style", "Palatino Linotype", serif;
+      --body: "Avenir Next", Avenir, "Gill Sans", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      font-family: var(--body);
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 52px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      color: var(--ink);
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: .73rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 29px;
+      height: 29px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+    }
+
+    .top-note,
+    .eyebrow,
+    .kicker {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .69rem;
+      font-weight: 900;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 48px;
+      align-items: end;
+      padding: 76px 0 58px;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--coral);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 21px;
+      font-family: var(--display);
+      font-size: clamp(4.3rem, 10vw, 9.3rem);
+      font-weight: 500;
+      letter-spacing: -.075em;
+      line-height: .75;
+    }
+
+    h1 span {
+      display: inline-block;
+      color: var(--coral);
+      font-weight: 400;
+    }
+
+    .lede {
+      max-width: 700px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1.16rem;
+      line-height: 1.65;
+    }
+
+    .hero-aside {
+      display: grid;
+      gap: 1px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      box-shadow: 9px 9px 0 var(--ink);
+    }
+
+    .hero-stat {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 13px;
+      align-items: center;
+      padding: 17px;
+      background: var(--sheet);
+    }
+
+    .hero-stat b {
+      font-family: var(--display);
+      font-size: 2rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .hero-stat:nth-child(1) b {
+      color: var(--coral);
+    }
+
+    .hero-stat:nth-child(2) b {
+      color: var(--blue);
+    }
+
+    .hero-stat:nth-child(3) b {
+      color: var(--green);
+    }
+
+    .hero-stat span {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.4;
+    }
+
+    .version-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-bottom: 64px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .version-card {
+      --accent: var(--coral);
+      --soft: var(--coral-soft);
+      position: relative;
+      min-height: 320px;
+      padding: 25px;
+      overflow: hidden;
+      background: var(--sheet);
+    }
+
+    .version-card:nth-child(2) {
+      --accent: var(--blue);
+      --soft: var(--blue-soft);
+    }
+
+    .version-card:nth-child(3) {
+      --accent: var(--green);
+      --soft: var(--green-soft);
+    }
+
+    .version-card::after {
+      position: absolute;
+      right: -42px;
+      bottom: -48px;
+      width: 150px;
+      height: 150px;
+      border: 25px solid var(--soft);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .version-number {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      margin-bottom: 36px;
+    }
+
+    .version-number b {
+      color: var(--accent);
+      font-family: var(--display);
+      font-size: 5rem;
+      font-weight: 400;
+      letter-spacing: -.07em;
+      line-height: .8;
+    }
+
+    .version-number span {
+      padding: 6px 8px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: .63rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .version-card h2 {
+      margin-bottom: 8px;
+      font-family: var(--display);
+      font-size: 1.65rem;
+      font-weight: 500;
+    }
+
+    .version-card p {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 20px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .mini-stack {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .mini-stack span {
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      font-family: var(--mono);
+      font-size: .64rem;
+      font-weight: 800;
+    }
+
+    .section-head {
+      display: flex;
+      gap: 28px;
+      align-items: end;
+      justify-content: space-between;
+      margin-bottom: 23px;
+    }
+
+    .section-head h2 {
+      margin-bottom: 0;
+      font-family: var(--display);
+      font-size: clamp(2.5rem, 5vw, 4.4rem);
+      font-weight: 500;
+      letter-spacing: -.045em;
+      line-height: .94;
+    }
+
+    .section-head > p {
+      max-width: 470px;
+      margin-bottom: 3px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .race-shell {
+      margin-bottom: 64px;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      box-shadow: var(--shadow);
+    }
+
+    .race-toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .mode-group {
+      display: flex;
+      gap: 7px;
+    }
+
+    .mode,
+    .race-button,
+    .sequence-tab,
+    .sequence-control {
+      min-height: 39px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      background: var(--sheet);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .04em;
+      transition: transform .18s ease, color .18s ease, background .18s ease, border-color .18s ease;
+    }
+
+    .mode:hover,
+    .mode:focus-visible,
+    .race-button:hover,
+    .race-button:focus-visible,
+    .sequence-tab:hover,
+    .sequence-tab:focus-visible,
+    .sequence-control:hover,
+    .sequence-control:focus-visible {
+      border-color: var(--ink);
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .mode.active {
+      color: var(--sheet);
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .race-button {
+      min-width: 175px;
+      color: var(--sheet);
+      background: var(--coral);
+      border-color: var(--coral);
+    }
+
+    .race {
+      padding: 18px;
+    }
+
+    .race-row {
+      display: grid;
+      grid-template-columns: 145px minmax(0, 1fr) 104px;
+      gap: 16px;
+      align-items: center;
+      min-height: 145px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .race-row:last-child {
+      border-bottom: 0;
+    }
+
+    .race-label b {
+      display: block;
+      margin-bottom: 6px;
+      font-family: var(--display);
+      font-size: 1.55rem;
+      font-weight: 500;
+    }
+
+    .race-label span,
+    .finish {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .63rem;
+      line-height: 1.45;
+      text-transform: uppercase;
+    }
+
+    .track {
+      position: relative;
+      height: 105px;
+      overflow: hidden;
+      border-right: 1px solid var(--ink);
+      border-left: 1px solid var(--ink);
+      background:
+        linear-gradient(90deg, transparent 24.7%, var(--grid) 25%, transparent 25.3%, transparent 49.7%, var(--grid) 50%, transparent 50.3%, transparent 74.7%, var(--grid) 75%, transparent 75.3%),
+        #faf8f1;
+    }
+
+    .track-line {
+      position: absolute;
+      right: 0;
+      left: 0;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .track-line:nth-child(1) {
+      top: 26px;
+    }
+
+    .track-line:nth-child(2) {
+      top: 52px;
+    }
+
+    .track-line:nth-child(3) {
+      top: 78px;
+    }
+
+    .packet {
+      --delay: 0s;
+      --duration: 2.1s;
+      --top: 13px;
+      position: absolute;
+      top: var(--top);
+      left: -46px;
+      z-index: 2;
+      display: grid;
+      width: 40px;
+      height: 22px;
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 3px;
+      color: var(--coral);
+      background: var(--coral-soft);
+      font-family: var(--mono);
+      font-size: .58rem;
+      font-weight: 900;
+    }
+
+    .h2 .packet {
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .h3 .packet {
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .race.running .packet {
+      animation: packet-cross var(--duration) cubic-bezier(.22,.7,.25,1) var(--delay) forwards;
+    }
+
+    @keyframes packet-cross {
+      0% {
+        left: -46px;
+      }
+      100% {
+        left: calc(100% + 5px);
+      }
+    }
+
+    .loss-marker {
+      position: absolute;
+      top: 7px;
+      bottom: 7px;
+      left: 47%;
+      z-index: 3;
+      display: none;
+      width: 2px;
+      background: var(--coral);
+    }
+
+    .loss-marker::before {
+      position: absolute;
+      top: 36px;
+      left: -11px;
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--sheet);
+      background: var(--coral);
+      content: "×";
+      font-family: var(--mono);
+      font-size: .8rem;
+      font-weight: 900;
+    }
+
+    .race.lossy .loss-marker {
+      display: block;
+    }
+
+    .race.lossy.running .h1 .packet:nth-of-type(n+5) {
+      animation-delay: calc(var(--delay) + 1.35s);
+    }
+
+    .race.lossy.running .h2 .packet:nth-of-type(n+4) {
+      animation-delay: calc(var(--delay) + 1.45s);
+    }
+
+    .race.lossy.running .h3 .packet:nth-of-type(4) {
+      animation-name: packet-cross-retry;
+      animation-duration: 3.3s;
+    }
+
+    @keyframes packet-cross-retry {
+      0% {
+        left: -46px;
+      }
+      43% {
+        left: 43%;
+        opacity: 1;
+      }
+      44% {
+        opacity: 0;
+      }
+      62% {
+        left: 20%;
+        opacity: 0;
+      }
+      63% {
+        opacity: 1;
+      }
+      100% {
+        left: calc(100% + 5px);
+      }
+    }
+
+    .finish {
+      padding-left: 5px;
+    }
+
+    .finish b {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: 1.45rem;
+      font-weight: 500;
+      text-transform: none;
+    }
+
+    .race-note {
+      min-height: 52px;
+      padding: 15px 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: var(--gold-soft);
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+
+    .sequence-shell {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      margin-bottom: 64px;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+    }
+
+    .sequence-nav {
+      display: flex;
+      padding: 18px;
+      border-right: 1px solid var(--ink);
+      flex-direction: column;
+      background: var(--ink);
+    }
+
+    .sequence-nav .kicker {
+      margin-bottom: 20px;
+      color: rgba(255,255,255,.6);
+    }
+
+    .sequence-tab {
+      margin-bottom: 8px;
+      border-color: rgba(255,255,255,.28);
+      color: rgba(255,255,255,.66);
+      background: transparent;
+      text-align: left;
+    }
+
+    .sequence-tab.active {
+      color: var(--ink);
+      background: var(--sheet);
+    }
+
+    .sequence-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: auto;
+    }
+
+    .sequence-control {
+      border-color: rgba(255,255,255,.35);
+      color: var(--sheet);
+      background: transparent;
+    }
+
+    .sequence-control.primary {
+      color: var(--ink);
+      background: var(--gold-soft);
+    }
+
+    .sequence-panel {
+      padding: 26px;
+    }
+
+    .sequence-panel-head {
+      display: flex;
+      gap: 20px;
+      align-items: start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sequence-panel h3 {
+      margin-bottom: 6px;
+      font-family: var(--display);
+      font-size: 2.1rem;
+      font-weight: 500;
+    }
+
+    .sequence-panel-head p {
+      max-width: 630px;
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .sequence-step-count {
+      flex: 0 0 auto;
+      color: var(--coral);
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 900;
+    }
+
+    .sequence-diagram {
+      position: relative;
+      min-height: 405px;
+      padding: 70px 85px 0;
+    }
+
+    .sequence-actor {
+      position: absolute;
+      top: 0;
+      display: grid;
+      width: 110px;
+      height: 50px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .sequence-actor:first-child {
+      left: 20px;
+      box-shadow: 5px 5px 0 var(--coral-soft);
+    }
+
+    .sequence-actor:nth-child(2) {
+      right: 20px;
+      box-shadow: 5px 5px 0 var(--green-soft);
+    }
+
+    .sequence-life {
+      position: absolute;
+      top: 50px;
+      bottom: 0;
+      width: 1px;
+      background: repeating-linear-gradient(to bottom, var(--line) 0 7px, transparent 7px 13px);
+    }
+
+    .sequence-life.left {
+      left: 75px;
+    }
+
+    .sequence-life.right {
+      right: 75px;
+    }
+
+    .exchange {
+      --accent: var(--blue);
+      min-height: 58px;
+      opacity: .2;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+
+    .exchange.reverse {
+      text-align: right;
+    }
+
+    .exchange.visible {
+      opacity: 1;
+    }
+
+    .exchange.current {
+      transform: translateY(-2px);
+    }
+
+    .exchange-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: .66rem;
+      font-weight: 900;
+    }
+
+    .exchange.reverse .exchange-label {
+      flex-direction: row-reverse;
+    }
+
+    .exchange-line {
+      position: relative;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .exchange-line::after {
+      position: absolute;
+      top: -4px;
+      right: -1px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--accent);
+      border-right: 2px solid var(--accent);
+      content: "";
+      transform: rotate(45deg);
+    }
+
+    .exchange.reverse .exchange-line::after {
+      right: auto;
+      left: -1px;
+      border: 0;
+      border-bottom: 2px solid var(--accent);
+      border-left: 2px solid var(--accent);
+    }
+
+    .exchange.current .exchange-line {
+      animation: draw .65s ease both;
+    }
+
+    @keyframes draw {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .matrix-wrap {
+      margin-bottom: 64px;
+      overflow-x: auto;
+      border: 1px solid var(--ink);
+      background: var(--sheet);
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 15px 18px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th {
+      color: var(--sheet);
+      background: var(--ink);
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    th:nth-child(2) {
+      color: #f29b87;
+    }
+
+    th:nth-child(3) {
+      color: #8cc5df;
+    }
+
+    th:nth-child(4) {
+      color: #84c9ae;
+    }
+
+    td:first-child {
+      font-weight: 800;
+    }
+
+    td {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .tradeoffs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .tradeoff {
+      --accent: var(--coral);
+      --soft: var(--coral-soft);
+      border: 1px solid var(--line);
+      background: var(--sheet);
+    }
+
+    .tradeoff:nth-child(2) {
+      --accent: var(--blue);
+      --soft: var(--blue-soft);
+    }
+
+    .tradeoff:nth-child(3) {
+      --accent: var(--green);
+      --soft: var(--green-soft);
+    }
+
+    .tradeoff h3 {
+      margin: 0;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      color: var(--accent);
+      background: var(--soft);
+      font-family: var(--display);
+      font-size: 1.6rem;
+      font-weight: 500;
+    }
+
+    .tradeoff-sides {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .tradeoff-side {
+      padding: 18px;
+      background: var(--sheet);
+    }
+
+    .tradeoff-side b {
+      display: block;
+      margin-bottom: 12px;
+      font-family: var(--mono);
+      font-size: .66rem;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .tradeoff-side ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 17px;
+      color: var(--muted);
+      font-size: .83rem;
+      line-height: 1.45;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 64px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .7rem;
+    }
+
+    footer a {
+      color: var(--ink);
+    }
+
+    @media (max-width: 950px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .race-row {
+        grid-template-columns: 110px minmax(0, 1fr);
+      }
+
+      .finish {
+        display: none;
+      }
+
+      .sequence-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sequence-nav {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        border-right: 0;
+        border-bottom: 1px solid var(--ink);
+      }
+
+      .sequence-nav .kicker {
+        grid-column: 1 / -1;
+        margin-bottom: 4px;
+      }
+
+      .sequence-tab {
+        margin-bottom: 0;
+      }
+
+      .sequence-controls {
+        grid-column: 1 / -1;
+        margin-top: 6px;
+      }
+
+      .tradeoffs {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        width: min(100% - 20px, 1220px);
+      }
+
+      .top-note {
+        display: none;
+      }
+
+      .hero {
+        gap: 30px;
+        padding: 52px 0 42px;
+      }
+
+      h1 {
+        font-size: clamp(4rem, 25vw, 7rem);
+      }
+
+      .version-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .section-head > p {
+        margin-top: 14px;
+      }
+
+      .race-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .mode-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .race-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 14px 0;
+      }
+
+      .track {
+        width: 100%;
+      }
+
+      .sequence-nav {
+        grid-template-columns: 1fr;
+      }
+
+      .sequence-nav .kicker,
+      .sequence-controls {
+        grid-column: 1;
+      }
+
+      .sequence-panel {
+        padding: 20px 10px;
+      }
+
+      .sequence-panel-head {
+        display: block;
+      }
+
+      .sequence-step-count {
+        display: inline-block;
+        margin-top: 10px;
+      }
+
+      .sequence-diagram {
+        padding: 70px 54px 0;
+      }
+
+      .sequence-actor {
+        width: 84px;
+      }
+
+      .sequence-actor:first-child {
+        left: 0;
+      }
+
+      .sequence-actor:nth-child(2) {
+        right: 0;
+      }
+
+      .sequence-life.left {
+        left: 42px;
+      }
+
+      .sequence-life.right {
+        right: 42px;
+      }
+
+      .exchange-label {
+        font-size: .58rem;
+      }
+
+      .tradeoff-sides {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="topbar" aria-label="Page navigation">
+      <a class="brand" href="tcp-handshake.html"><span class="brand-mark">←</span>Handshakes</a>
+      <span class="top-note">HTTP generations / field comparison</span>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Same semantics, different wire</p>
+        <h1>HTTP <span>1 · 2 · 3</span></h1>
+        <p class="lede">The verbs and status codes remain familiar. What changes is how requests become frames, share a connection, recover from loss, compress headers, and reach the origin.</p>
+      </div>
+      <aside class="hero-aside">
+        <div class="hero-stat"><b>1.1</b><span>Text messages and ordered request-response per connection</span></div>
+        <div class="hero-stat"><b>2</b><span>Binary multiplexed streams on one TCP connection</span></div>
+        <div class="hero-stat"><b>3</b><span>Binary independent streams on QUIC over UDP</span></div>
+      </aside>
+    </header>
+
+    <section class="version-cards" aria-label="HTTP version overview">
+      <article class="version-card">
+        <div class="version-number"><b>1.1</b><span>1997</span></div>
+        <h2>Readable and sequential</h2>
+        <p>Persistent connections reduce setup, but each connection still delivers responses in request order. Browsers open several connections to gain concurrency.</p>
+        <div class="mini-stack"><span>Text</span><span>TCP</span><span>Optional TLS</span><span>No header compression</span></div>
+      </article>
+      <article class="version-card">
+        <div class="version-number"><b>2</b><span>2015</span></div>
+        <h2>One connection, many streams</h2>
+        <p>Binary frames from many streams interleave over one TCP connection. HPACK compresses headers, but one lost TCP packet pauses every stream.</p>
+        <div class="mini-stack"><span>Binary</span><span>TCP</span><span>HPACK</span><span>Multiplexed</span></div>
+      </article>
+      <article class="version-card">
+        <div class="version-number"><b>3</b><span>2022</span></div>
+        <h2>Streams recover independently</h2>
+        <p>QUIC integrates TLS 1.3 and transport over UDP. Loss on one stream does not hold unrelated streams, and connections can survive network changes.</p>
+        <div class="mini-stack"><span>Binary</span><span>QUIC / UDP</span><span>QPACK</span><span>Encrypted</span></div>
+      </article>
+    </section>
+
+    <section aria-labelledby="race-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">01 / Packet race</p>
+          <h2 id="race-title">Watch loss change the result.</h2>
+        </div>
+        <p>Each colored block belongs to a resource stream. Switch to a dropped-packet path to see which unrelated work must wait.</p>
+      </div>
+
+      <div class="race-shell">
+        <div class="race-toolbar">
+          <div class="mode-group" role="group" aria-label="Network condition">
+            <button class="mode active" type="button" data-mode="clear">Clear link</button>
+            <button class="mode" type="button" data-mode="lossy">Drop one packet</button>
+          </div>
+          <button class="race-button" id="run-race" type="button">Run packet race →</button>
+        </div>
+
+        <div class="race" id="race">
+          <div class="race-row h1">
+            <div class="race-label"><b>HTTP/1.1</b><span>Several ordered TCP lanes</span></div>
+            <div class="track">
+              <span class="track-line"></span><span class="track-line"></span><span class="track-line"></span>
+              <span class="loss-marker"></span>
+              <span class="packet" style="--top:2px;--delay:.05s">A1</span>
+              <span class="packet" style="--top:28px;--delay:.08s">B1</span>
+              <span class="packet" style="--top:54px;--delay:.11s">C1</span>
+              <span class="packet" style="--top:80px;--delay:.14s">D1</span>
+              <span class="packet" style="--top:2px;--delay:1.05s">A2</span>
+              <span class="packet" style="--top:28px;--delay:1.08s">B2</span>
+              <span class="packet" style="--top:54px;--delay:1.11s">C2</span>
+              <span class="packet" style="--top:80px;--delay:1.14s">D2</span>
+            </div>
+            <div class="finish"><b>Parallel-ish</b>More sockets</div>
+          </div>
+
+          <div class="race-row h2">
+            <div class="race-label"><b>HTTP/2</b><span>Interleaved on one TCP lane</span></div>
+            <div class="track">
+              <span class="track-line"></span><span class="track-line"></span><span class="track-line"></span>
+              <span class="loss-marker"></span>
+              <span class="packet" style="--top:2px;--delay:.04s">A1</span>
+              <span class="packet" style="--top:28px;--delay:.18s">B1</span>
+              <span class="packet" style="--top:54px;--delay:.32s">C1</span>
+              <span class="packet" style="--top:80px;--delay:.46s">D1</span>
+              <span class="packet" style="--top:2px;--delay:.60s">A2</span>
+              <span class="packet" style="--top:28px;--delay:.74s">B2</span>
+              <span class="packet" style="--top:54px;--delay:.88s">C2</span>
+              <span class="packet" style="--top:80px;--delay:1.02s">D2</span>
+            </div>
+            <div class="finish"><b>Multiplexed</b>One socket</div>
+          </div>
+
+          <div class="race-row h3">
+            <div class="race-label"><b>HTTP/3</b><span>Independent QUIC streams</span></div>
+            <div class="track">
+              <span class="track-line"></span><span class="track-line"></span><span class="track-line"></span>
+              <span class="loss-marker"></span>
+              <span class="packet" style="--top:2px;--delay:.04s">A1</span>
+              <span class="packet" style="--top:28px;--delay:.18s">B1</span>
+              <span class="packet" style="--top:54px;--delay:.32s">C1</span>
+              <span class="packet" style="--top:80px;--delay:.46s">D1</span>
+              <span class="packet" style="--top:2px;--delay:.60s">A2</span>
+              <span class="packet" style="--top:28px;--delay:.74s">B2</span>
+              <span class="packet" style="--top:54px;--delay:.88s">C2</span>
+              <span class="packet" style="--top:80px;--delay:1.02s">D2</span>
+            </div>
+            <div class="finish"><b>Independent</b>Stream-local loss</div>
+          </div>
+        </div>
+        <div class="race-note" id="race-note" aria-live="polite">Clear link: HTTP/2 and HTTP/3 multiplex efficiently. HTTP/1.1 uses more connections to approach parallel delivery.</div>
+      </div>
+    </section>
+
+    <section aria-labelledby="sequence-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">02 / Sequence diagrams</p>
+          <h2 id="sequence-title">The message shape changed.</h2>
+        </div>
+        <p>Step through one application exchange. Connection setup is condensed here so the framing and concurrency differences stay visible.</p>
+      </div>
+
+      <div class="sequence-shell">
+        <div class="sequence-nav" role="tablist" aria-label="HTTP sequence">
+          <span class="kicker">Choose a version</span>
+          <button class="sequence-tab active" type="button" role="tab" aria-selected="true" data-version="one">HTTP/1.1</button>
+          <button class="sequence-tab" type="button" role="tab" aria-selected="false" data-version="two">HTTP/2</button>
+          <button class="sequence-tab" type="button" role="tab" aria-selected="false" data-version="three">HTTP/3</button>
+          <div class="sequence-controls">
+            <button class="sequence-control" id="sequence-reset" type="button">Reset</button>
+            <button class="sequence-control primary" id="sequence-next" type="button">Next step</button>
+          </div>
+        </div>
+
+        <div class="sequence-panel" role="tabpanel">
+          <div class="sequence-panel-head">
+            <div>
+              <h3 id="sequence-name">HTTP/1.1 · ordered messages</h3>
+              <p id="sequence-summary">The client sends a text request and receives its response before reusing the connection for the next exchange.</p>
+            </div>
+            <span class="sequence-step-count" id="sequence-count">0 / 5</span>
+          </div>
+          <div class="sequence-diagram">
+            <div class="sequence-actor">Browser</div>
+            <div class="sequence-actor">Origin</div>
+            <div class="sequence-life left"></div>
+            <div class="sequence-life right"></div>
+            <div id="exchanges"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="matrix-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">03 / Feature matrix</p>
+          <h2 id="matrix-title">The full comparison</h2>
+        </div>
+        <p>HTTP semantics stay stable across versions, which lets clients and servers negotiate newer wire behavior without redesigning the application contract.</p>
+      </div>
+
+      <div class="matrix-wrap">
+        <table>
+          <thead>
+            <tr><th>Capability</th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTP/3</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Transport</td><td>TCP</td><td>TCP</td><td>QUIC over UDP</td></tr>
+            <tr><td>Wire format</td><td>Text start line and headers</td><td>Binary frames</td><td>Binary frames</td></tr>
+            <tr><td>Concurrency</td><td>Ordered per connection</td><td>Multiplexed streams</td><td>Independent multiplexed streams</td></tr>
+            <tr><td>Header compression</td><td>None</td><td>HPACK</td><td>QPACK</td></tr>
+            <tr><td>Loss blocking</td><td>Affected TCP connection waits</td><td>All streams on TCP wait</td><td>Affected QUIC stream waits</td></tr>
+            <tr><td>Encryption</td><td>Optional</td><td>Effectively required by browsers</td><td>Required, TLS 1.3 integrated</td></tr>
+            <tr><td>Fresh setup</td><td>TCP, then optional TLS</td><td>TCP, then TLS with ALPN</td><td>QUIC and TLS together</td></tr>
+            <tr><td>Connection migration</td><td>No</td><td>No</td><td>Yes, via connection IDs</td></tr>
+            <tr><td>Best fit</td><td>Simple and legacy paths</td><td>Broad modern compatibility</td><td>Lossy and mobile networks</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="tradeoffs-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">04 / Tradeoffs</p>
+          <h2 id="tradeoffs-title">Faster is still contextual.</h2>
+        </div>
+        <p>Network quality, proxy support, CPU cost, tooling, and fallback behavior determine which version wins for a particular request path.</p>
+      </div>
+
+      <div class="tradeoffs">
+        <article class="tradeoff">
+          <h3>HTTP/1.1</h3>
+          <div class="tradeoff-sides">
+            <div class="tradeoff-side"><b>Pros</b><ul><li>Readable on the wire</li><li>Universal infrastructure support</li><li>Simple operational model</li></ul></div>
+            <div class="tradeoff-side"><b>Cons</b><ul><li>No multiplexing</li><li>Repeated headers</li><li>More connections for concurrency</li></ul></div>
+          </div>
+        </article>
+        <article class="tradeoff">
+          <h3>HTTP/2</h3>
+          <div class="tradeoff-sides">
+            <div class="tradeoff-side"><b>Pros</b><ul><li>Efficient multiplexing</li><li>HPACK header compression</li><li>Mature client and proxy support</li></ul></div>
+            <div class="tradeoff-side"><b>Cons</b><ul><li>TCP-wide loss blocking</li><li>More complex inspection</li><li>One hot connection can concentrate risk</li></ul></div>
+          </div>
+        </article>
+        <article class="tradeoff">
+          <h3>HTTP/3</h3>
+          <div class="tradeoff-sides">
+            <div class="tradeoff-side"><b>Pros</b><ul><li>Independent loss recovery</li><li>Fast secure setup</li><li>Connection migration</li></ul></div>
+            <div class="tradeoff-side"><b>Cons</b><ul><li>UDP may be blocked</li><li>Higher user-space CPU cost</li><li>TCP fallback remains necessary</li></ul></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <span>Distributed systems / HTTP field comparison</span>
+      <a href="tcp-stack.html">Return to the stack ↑</a>
+    </footer>
+  </main>
+
+  <script>
+    const race = document.getElementById("race");
+    const raceButton = document.getElementById("run-race");
+    const raceNote = document.getElementById("race-note");
+    const modeButtons = [...document.querySelectorAll(".mode")];
+    let raceMode = "clear";
+
+    function setRaceMode(mode) {
+      raceMode = mode;
+      race.classList.toggle("lossy", mode === "lossy");
+      race.classList.remove("running");
+      modeButtons.forEach(button => button.classList.toggle("active", button.dataset.mode === mode));
+      raceNote.textContent = mode === "lossy"
+        ? "Dropped packet: HTTP/2 pauses every stream until TCP repairs the gap. HTTP/3 repairs only the affected QUIC stream."
+        : "Clear link: HTTP/2 and HTTP/3 multiplex efficiently. HTTP/1.1 uses more connections to approach parallel delivery.";
+      raceButton.textContent = "Run packet race →";
+    }
+
+    function runRace() {
+      race.classList.remove("running");
+      void race.offsetWidth;
+      race.classList.add("running");
+      raceButton.textContent = raceMode === "lossy" ? "Watch the stall…" : "Packets moving…";
+      window.setTimeout(() => {
+        raceButton.textContent = "Run again →";
+      }, raceMode === "lossy" ? 5200 : 3800);
+    }
+
+    const sequences = {
+      one: {
+        name: "HTTP/1.1 · ordered messages",
+        summary: "The client sends a text request and receives its response before reusing the connection for the next exchange.",
+        steps: [
+          { label: "TCP established", meta: "persistent connection", reverse: false, color: "var(--coral)" },
+          { label: "GET /index.html HTTP/1.1", meta: "text headers", reverse: false, color: "var(--gold)" },
+          { label: "HTTP/1.1 200 OK + HTML", meta: "response 1", reverse: true, color: "var(--blue)" },
+          { label: "GET /app.css HTTP/1.1", meta: "next request", reverse: false, color: "var(--gold)" },
+          { label: "HTTP/1.1 200 OK + CSS", meta: "response 2", reverse: true, color: "var(--blue)" }
+        ]
+      },
+      two: {
+        name: "HTTP/2 · interleaved frames",
+        summary: "One TCP connection carries frames from several numbered streams. Responses can progress concurrently at the HTTP layer.",
+        steps: [
+          { label: "TLS + ALPN h2 complete", meta: "one TCP connection", reverse: false, color: "var(--coral)" },
+          { label: "HEADERS", meta: "stream 1 · /index.html", reverse: false, color: "var(--gold)" },
+          { label: "HEADERS", meta: "stream 3 · /app.css", reverse: false, color: "var(--green)" },
+          { label: "HEADERS + DATA", meta: "stream 3 · CSS", reverse: true, color: "var(--green)" },
+          { label: "DATA", meta: "stream 1 · HTML", reverse: true, color: "var(--blue)" }
+        ]
+      },
+      three: {
+        name: "HTTP/3 · independent streams",
+        summary: "QUIC carries HTTP/3 streams with independent delivery. One stream can recover lost data while another continues.",
+        steps: [
+          { label: "QUIC + TLS established", meta: "connection ID", reverse: false, color: "var(--coral)" },
+          { label: "HEADERS", meta: "QUIC stream 0 · /index.html", reverse: false, color: "var(--gold)" },
+          { label: "HEADERS", meta: "QUIC stream 4 · /app.css", reverse: false, color: "var(--green)" },
+          { label: "DATA + one packet lost", meta: "stream 0 repairs", reverse: true, color: "var(--coral)" },
+          { label: "HEADERS + DATA", meta: "stream 4 continues", reverse: true, color: "var(--green)" }
+        ]
+      }
+    };
+
+    const sequenceTabs = [...document.querySelectorAll(".sequence-tab")];
+    const sequenceName = document.getElementById("sequence-name");
+    const sequenceSummary = document.getElementById("sequence-summary");
+    const sequenceCount = document.getElementById("sequence-count");
+    const exchanges = document.getElementById("exchanges");
+    const sequenceReset = document.getElementById("sequence-reset");
+    const sequenceNext = document.getElementById("sequence-next");
+    let activeSequence = "one";
+    let activeStep = -1;
+
+    function renderSequence(key) {
+      activeSequence = key;
+      activeStep = -1;
+      const sequence = sequences[key];
+      sequenceTabs.forEach(tab => {
+        const selected = tab.dataset.version === key;
+        tab.classList.toggle("active", selected);
+        tab.setAttribute("aria-selected", selected);
+      });
+      sequenceName.textContent = sequence.name;
+      sequenceSummary.textContent = sequence.summary;
+      sequenceCount.textContent = `0 / ${sequence.steps.length}`;
+      sequenceNext.textContent = "Next step";
+      exchanges.innerHTML = sequence.steps.map((step, index) => `
+        <div class="exchange ${step.reverse ? "reverse" : ""}" data-index="${index}" style="--accent:${step.color}">
+          <div class="exchange-label"><span>${step.label}</span><span>${step.meta}</span></div>
+          <div class="exchange-line"></div>
+        </div>
+      `).join("");
+    }
+
+    function showNextSequenceStep() {
+      const sequence = sequences[activeSequence];
+      if (activeStep >= sequence.steps.length - 1) {
+        renderSequence(activeSequence);
+        return;
+      }
+      activeStep += 1;
+      [...exchanges.children].forEach((exchange, index) => {
+        exchange.classList.toggle("visible", index <= activeStep);
+        exchange.classList.toggle("current", index === activeStep);
+      });
+      sequenceCount.textContent = `${activeStep + 1} / ${sequence.steps.length}`;
+      if (activeStep === sequence.steps.length - 1) sequenceNext.textContent = "Start over";
+    }
+
+    modeButtons.forEach(button => button.addEventListener("click", () => setRaceMode(button.dataset.mode)));
+    raceButton.addEventListener("click", runRace);
+    sequenceTabs.forEach(tab => tab.addEventListener("click", () => renderSequence(tab.dataset.version)));
+    sequenceReset.addEventListener("click", () => renderSequence(activeSequence));
+    sequenceNext.addEventListener("click", showNextSequenceStep);
+    setRaceMode(raceMode);
+    renderSequence(activeSequence);
+  </script>
+</body>
+</html>
