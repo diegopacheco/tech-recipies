@@ -1429,6 +1429,33 @@
         summary: "A JSON Web Token is a signed credential. The client obtains it after authentication, sends it with later requests, and the API verifies it without asking the authentication server about every request. Interactive page: the full sequence, plus what signing does and does not give you.",
         tags: ["JWT", "Signing", "Claims", "Expiry", "AuthZ"],
         diagram: "Client -> auth server -> signed token\n  |\n  +-- token sent with every request\n  +-- API verifies signature locally\n  |\nSigned is not encrypted, claims still need checks"
+      },
+      {
+        title: "TCP/IP Stack Field Map",
+        file: "tcp-stack.html",
+        category: "foundations",
+        focus: "The packet's long way down",
+        summary: "A request begins as meaning, becomes bytes, receives transport and network coordinates, then leaves as a signal. Interactive page: pick a protocol family and send it down the seven layers, with the OSI teaching model held next to what real protocols actually do.",
+        tags: ["OSI", "TCP/IP", "Layers", "QUIC", "Encapsulation"],
+        diagram: "Application meaning\n  |\n  +-- presentation and session shape it\n  +-- transport adds ports, network adds addresses\n  |\nBits leave on a medium"
+      },
+      {
+        title: "TCP and QUIC Handshakes",
+        file: "tcp-handshake.html",
+        category: "foundations",
+        focus: "Round trips before the first byte",
+        summary: "A connection is a short negotiation before application data can flow. Interactive page: step through TCP's three-way handshake, TCP plus TLS 1.3, and QUIC, and compare the round trips each path costs before a request can be sent.",
+        tags: ["Handshake", "SYN/ACK", "TLS 1.3", "QUIC", "RTT"],
+        diagram: "SYN -> SYN-ACK -> ACK\n  |\n  +-- TCP: 1 RTT, then TLS adds another\n  +-- QUIC: transport and TLS together, 1-RTT or 0-RTT\n  |\nSetup cost is paid before the request"
+      },
+      {
+        title: "HTTP/1.1 vs HTTP/2 vs HTTP/3",
+        file: "http-1-2-3.html",
+        category: "messaging",
+        focus: "Same semantics, different wire",
+        summary: "The verbs and status codes stay familiar; what changes is how requests become frames, share a connection, recover from loss, and compress headers. Interactive page: race the three generations with and without packet loss to see where head-of-line blocking actually bites.",
+        tags: ["HTTP/1.1", "HTTP/2", "HTTP/3", "Head-of-line", "HPACK/QPACK"],
+        diagram: "HTTP/1.1: ordered responses per connection\nHTTP/2: interleaved streams on one TCP connection\nHTTP/3: independent streams on QUIC\n\nLoss on one stream stops stalling the rest"
       }
     ];
 
