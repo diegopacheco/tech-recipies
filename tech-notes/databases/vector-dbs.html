@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vector Databases</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#ffffff;--ink:#111827;--muted:#5b6472;--line:#e3e7ed;--soft:#f2f5f9;
+  --blue:#2563eb;--blue-soft:#e8effd;--green:#0f8a5f;--green-soft:#e4f5ee;
+  --red:#d64545;--red-soft:#fdeaea;--amber:#c07a10;--amber-soft:#fdf1dc;
+  --violet:#7c3aed;--violet-soft:#f0eafe;--teal:#0e7490;--teal-soft:#e0f2f7;
+  --mono:"SFMono-Regular",Menlo,Consolas,monospace;
+  --sans:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 22px 48px;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5}
+.wrap{max-width:1320px;margin:0 auto}
+header h1{margin:0;font-size:32px;letter-spacing:-.02em}
+header p{margin:6px 0 0;color:var(--muted);max-width:880px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 18px;border-bottom:1px solid var(--line)}
+.tab{padding:10px 16px;border:1px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;background:none;color:var(--muted);font:600 14px var(--sans);cursor:pointer}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--card);border-color:var(--line);color:var(--ink);box-shadow:0 1px 0 var(--card)}
+.panel{display:none}
+.panel.active{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.pill{padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:600 13px var(--sans);cursor:pointer;transition:.15s}
+.pill:hover{border-color:var(--blue);color:var(--blue)}
+.pill.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.pill .n{font:700 11px var(--mono);opacity:.7;margin-left:6px}
+.grid{display:grid;grid-template-columns:minmax(330px,1fr) minmax(560px,1.1fr);gap:18px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card+.card{margin-top:18px}
+.card h2{margin:0;font-size:22px;letter-spacing:-.01em}
+.card h3{margin:0 0 8px;font:700 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead{margin:10px 0 0;padding:12px 14px;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:0 8px 8px 0;font-size:14px}
+.lead.warn{border-color:var(--amber);background:var(--amber-soft)}
+.lead.bad{border-color:var(--red);background:var(--red-soft)}
+.lead.ok{border-color:var(--green);background:var(--green-soft)}
+.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}
+.meta div{border:1px solid var(--line);border-radius:9px;padding:8px 11px;background:var(--soft)}
+.meta .k{font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.meta .v{font:600 13px var(--sans);margin-top:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.box.pro{background:var(--green-soft);border-color:#c9e8dc}
+.box.con{background:var(--red-soft);border-color:#f6d3d3}
+.box.pro h3{color:var(--green)}
+.box.con h3{color:var(--red)}
+.box ul{margin:0;padding-left:16px;font-size:13px;color:#26303c}
+.box li+li{margin-top:5px}
+pre{margin:14px 0 0;padding:12px 14px;background:#0f172a;color:#e2e8f0;border-radius:10px;font:500 12px/1.6 var(--mono);white-space:pre-wrap;overflow-x:auto}
+pre b{color:#7dd3fc;font-weight:700}
+pre i{color:#fca5a5;font-style:normal}
+pre em{color:#86efac;font-style:normal}
+.stage{position:sticky;top:18px}
+.stage-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.stage-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.counter{padding:5px 10px;border:1px solid var(--line);border-radius:6px;font:700 11px var(--mono);color:var(--muted);white-space:nowrap}
+.modes{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.mode{padding:6px 11px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--muted);font:700 11px var(--mono);cursor:pointer}
+.mode:hover{border-color:var(--blue);color:var(--blue)}
+.mode.active{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.viz{margin-top:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft);overflow:hidden}
+svg{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font:600 11px var(--mono);color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
+.btn{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:600 13px var(--sans);cursor:pointer}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:#000}
+.sw{display:flex;align-items:center;gap:7px;margin-left:auto;font:600 12px var(--mono);color:var(--muted);cursor:pointer}
+.sw .track2{width:32px;height:18px;border-radius:999px;background:var(--line);position:relative;transition:.2s}
+.sw .track2::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on .track2{background:var(--violet)}
+.sw.on .track2::after{transform:translateX(14px)}
+.note{margin-top:12px;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:var(--soft);font:600 12px var(--mono);color:#26303c;min-height:42px}
+.note.ok{border-color:#c9e8dc;background:var(--green-soft);color:#0b6647}
+.note.warn{border-color:#f0d5a8;background:var(--amber-soft);color:#8a5a09}
+.note.bad{border-color:#f0bcbc;background:var(--red-soft);color:#8f2f2f}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.metric{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft)}
+.metric .k{font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.metric .v{font:700 18px var(--mono);margin-top:3px;letter-spacing:-.02em}
+.metric .v.g{color:var(--green)}.metric .v.a{color:var(--amber)}.metric .v.r{color:var(--red)}
+.meter{margin-top:12px}
+.meter .lbl{display:flex;justify-content:space-between;font:700 11px var(--mono);color:var(--muted);margin-bottom:5px}
+.track{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar{height:100%;width:0;background:var(--blue);transition:width .3s}
+.bar.g{background:var(--green)}.bar.a{background:var(--amber)}.bar.r{background:var(--red)}
+.algogrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.kv{border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:var(--soft)}
+.kv .k{font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kv .v{font:600 12px var(--mono);margin-top:2px}
+.tblwrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);max-height:78vh}
+table.cmp{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+table.cmp th,table.cmp td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.cmp thead th{position:sticky;top:0;z-index:3;background:var(--soft);font:700 12px var(--sans);white-space:nowrap;border-bottom:1px solid var(--line)}
+table.cmp thead th .sub{display:block;font:600 10px var(--mono);color:var(--muted);text-transform:none;letter-spacing:0}
+table.cmp tbody th{position:sticky;left:0;z-index:2;background:var(--card);font:700 12px var(--mono);color:var(--muted);letter-spacing:.02em;white-space:nowrap;border-right:1px solid var(--line)}
+table.cmp thead th:first-child{left:0;z-index:4}
+table.cmp tbody tr:hover td{background:var(--soft)}
+table.cmp tbody tr.sec th{background:var(--soft);color:var(--ink);font:700 11px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+table.cmp tbody tr.sec td{background:var(--soft)}
+td.good{background:var(--green-soft)}
+td.warn{background:var(--amber-soft)}
+td.bad{background:var(--red-soft)}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font:700 10px var(--mono);border:1px solid var(--line);background:var(--soft);color:var(--muted)}
+.badge.g{background:var(--green-soft);border-color:#c9e8dc;color:var(--green)}
+.badge.a{background:var(--amber-soft);border-color:#f0d5a8;color:var(--amber)}
+.badge.r{background:var(--red-soft);border-color:#f0bcbc;color:var(--red)}
+.badge.v{background:var(--violet-soft);border-color:#ded1fb;color:var(--violet)}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+.card ul.plain{margin:10px 0 0;padding-left:16px;font-size:13px;color:#26303c}
+.card ul.plain li+li{margin-top:6px}
+@media(max-width:1080px){.grid{grid-template-columns:1fr}.stage{position:static}.cols3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Vector Databases</h1>
+  <p>Traditional indexes answer <b>give me row 12345</b>. Vector indexes answer <b>give me the 10 things most like this thing</b>, and they do it by trading a little recall for a lot of speed. Pick an engine, then step the insert and search animations to see the index it actually builds.</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab" data-tab="engines" aria-selected="true">Engines &amp; algorithms</button>
+  <button class="tab" data-tab="compare" aria-selected="false">Comparison table</button>
+</nav>
+
+<section class="panel active" id="engines">
+  <div class="pills" id="enginePills"></div>
+  <div class="grid">
+    <div>
+      <article class="card">
+        <h2 id="eName"></h2>
+        <p class="lead" id="eLead"></p>
+        <div class="meta" id="eMeta"></div>
+        <div class="two">
+          <div class="box pro"><h3>Pros</h3><ul id="ePros"></ul></div>
+          <div class="box con"><h3>Cons</h3><ul id="eCons"></ul></div>
+        </div>
+        <pre id="eCode"></pre>
+      </article>
+
+      <article class="card">
+        <h3>Index algorithm</h3>
+        <h2 id="aName"></h2>
+        <p class="lead" id="aIdea"></p>
+        <div class="algogrid" id="aFacts"></div>
+        <p class="lead warn" id="aTradeoff"></p>
+      </article>
+
+      <article class="card">
+        <h3>The other algorithms you should be able to name</h3>
+        <ul class="plain">
+          <li><b>HNSW</b> — layered proximity graph, a skip list for high dimensions. Greedy walk from a sparse top layer down to the dense bottom layer. O(log n) search, 95%+ recall, ~2x memory for the edges. The production default.</li>
+          <li><b>IVF</b> — k-means the space into lists, search only the <i>nprobe</i> nearest lists. Cheap to build, cheap to insert, lower recall at the cell borders, and in 1536 dimensions almost everything is a border.</li>
+          <li><b>LSH</b> — random hyperplanes as hash bits, similar vectors collide on purpose. Multiple tables raise the odds. Instant build, natural fit for Hamming distance, beaten by HNSW on recall per millisecond.</li>
+          <li><b>Annoy</b> — a forest of random projection trees, mmap'd from one file so processes share it and the index can exceed RAM. Immutable: adding a vector means rebuilding. Spotify's answer for static catalogs.</li>
+          <li><b>DiskANN / Vamana</b> — one flat graph tuned so the hops are sequential enough to live on SSD, with a compressed copy in RAM for the distance math. The basis of pgvectorscale and most disk-backed tiers.</li>
+          <li><b>Quantization</b> (PQ, scalar int8/int4, binary/BBQ) — shrink each dimension before you compare. 4x to 32x less memory, a rescoring pass on the survivors buys back most of the lost recall.</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="stage">
+      <article class="card">
+        <div class="stage-head">
+          <div>
+            <h2 id="sTitle"></h2>
+            <p id="sSub"></p>
+          </div>
+          <span class="counter" id="sCount">idle</span>
+        </div>
+        <div class="modes" id="modeRow"></div>
+        <div class="viz"><svg id="viz" viewBox="0 0 560 390" preserveAspectRatio="xMidYMid meet"></svg></div>
+        <div class="legend">
+          <span><i style="background:#94a3b8"></i>vector</span>
+          <span><i style="background:#7c3aed"></i>current node</span>
+          <span><i style="background:#c07a10"></i>compared</span>
+          <span><i style="background:#0f8a5f"></i>top-K result</span>
+          <span><i style="background:#d64545"></i>query vector</span>
+          <span><i style="background:#cbd5e1"></i>filtered out</span>
+        </div>
+        <div class="controls">
+          <button class="btn primary" id="bSearch">Search</button>
+          <button class="btn" id="bInsert">Insert vector</button>
+          <button class="btn" id="bStep">Step</button>
+          <button class="btn" id="bReset">Reset</button>
+          <label class="sw" id="bFilter"><span class="track2"></span>metadata filter</label>
+        </div>
+        <div class="note" id="sNote"></div>
+        <div class="metrics">
+          <div class="metric"><div class="k">Comparisons</div><div class="v" id="mComp">0</div></div>
+          <div class="metric"><div class="k">vs brute force</div><div class="v" id="mPct">100%</div></div>
+          <div class="metric"><div class="k">Recall@5</div><div class="v" id="mRecall">–</div></div>
+          <div class="metric"><div class="k">Est. latency</div><div class="v" id="mLat">–</div></div>
+        </div>
+        <div class="meter">
+          <div class="lbl"><span id="wLbl">work done</span><span id="wVal">0 / 96</span></div>
+          <div class="track"><div class="bar" id="wBar"></div></div>
+        </div>
+        <div class="note" id="sFilterNote"></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="compare">
+  <div class="pills">
+    <span class="badge g">strong</span><span class="badge a">depends / caveat</span><span class="badge r">weak spot</span>
+    <span class="badge v">96 vectors in the animation stand in for the millions you would really have</span>
+  </div>
+  <div class="tblwrap">
+    <table class="cmp">
+      <thead><tr id="cmpHead"></tr></thead>
+      <tbody id="cmpBody"></tbody>
+    </table>
+  </div>
+
+  <div class="cols3">
+    <article class="card">
+      <h3>Numbers to know</h3>
+      <ul class="plain">
+        <li>Dimensions: 384 and 768 for open models, 1536 for OpenAI small, 3072 for large.</li>
+        <li>float32 = 4 bytes per dimension. One 1536-dim vector is ~6 KB raw.</li>
+        <li>1M vectors @ 1536 dims ≈ 6 GB of raw floats, ~12 GB once HNSW edges are in RAM.</li>
+        <li>int8 quantization cuts that 4x, binary/BBQ up to 32x, with a rescore pass to recover recall.</li>
+        <li>Well-tuned p50: 1-5 ms in memory, 10-50 ms over a network, 100-500 ms on object storage.</li>
+        <li>Recall target: 0.95 is fine for almost everything. 0.99 costs real latency or memory.</li>
+        <li>HNSW build over 10M vectors: an hour or more. Plan the rebuild, do not improvise it.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Decision guide</h3>
+      <ul class="plain">
+        <li><b>Already on Postgres, &lt;10M vectors</b> → pgvector. One query joins similarity with your relational filters and you add zero systems.</li>
+        <li><b>Already on Elasticsearch, search is the product</b> → kNN there. BM25 + vector with RRF beats either alone.</li>
+        <li><b>Already on Redis, need sub-millisecond and instant write visibility</b> → Redis Vector Search, if the corpus fits in RAM and you can pay for that RAM.</li>
+        <li><b>Prototype or a single-node RAG app</b> → Chroma. <code>pip install</code>, no server.</li>
+        <li><b>Huge cold corpus, cost dominates, sub-second is fine</b> → S3 Vectors.</li>
+        <li><b>&gt;100M vectors, retrieval <i>is</i> the system, no ops appetite</b> → Pinecone (or Milvus / Qdrant / Weaviate if you want to run it yourself).</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Gotchas that bite in production</h3>
+      <ul class="plain">
+        <li>A vector DB is an <b>index, not a source of truth</b>. Authoritative rows live elsewhere; the vector store returns IDs.</li>
+        <li><b>Embedding drift</b>: change the model and every stored vector is incompatible. Version the model id next to the vector or you will silently search the wrong space.</li>
+        <li><b>Deletes are soft</b> almost everywhere. Removed vectors still cost memory and traversal until a compaction or rebuild.</li>
+        <li><b>Filter selectivity decides the plan.</b> Very selective → brute force the survivors. Barely selective → index first. The awkward middle is where the bad plans live.</li>
+        <li><b>Inserts degrade the graph.</b> Vectors added after the build are worse connected than the ones present during it; recall drifts down between rebuilds.</li>
+        <li>Vector search finds <b>similar</b>, never <b>identical</b>. Exact lookup by id stays a job for a normal index.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+</div>
+<script>
+const byId=i=>document.getElementById(i);
+const W=560,H=390,N=96,K=5;
+
+const ENGINES={
+  pgvector:{
+    name:"pgvector",
+    lead:"A Postgres extension that adds a <b>vector</b> column type and two index types. The nearest-neighbour search runs inside the same planner, transaction and backup as the rest of your data — which is why it is almost always the right first answer.",
+    by:"Andrew Kane, open source (PostgreSQL licence)", year:"2021", host:"Postgres extension", scale:"comfortably millions of vectors",
+    modes:[["hnsw","HNSW"],["ivf","IVFFlat"]], lat:1.6, net:0.4,
+    filter:"Postgres planner decides: a selective WHERE makes it filter first and brute-force the survivors, a loose one makes it use the vector index and re-check. There is no filtered graph traversal, so mid-selectivity filters can pick a bad plan.",
+    pros:["ACID, joins, backups, replication and your existing tooling come for free","One SQL query mixes relational filters with similarity — no fan-out, no two systems to keep in sync","Both HNSW and IVFFlat, plus halfvec, binary and sparse vectors","No new service to operate, monitor, secure or pay for"],
+    cons:["Index build is slow and memory hungry; HNSW over millions of rows takes a long time","Vector work competes for RAM and CPU with your OLTP traffic on the same box","2000-dimension ceiling for indexed columns (halfvec raises it to 4000)","No native sharding for vectors — scale-out means read replicas or partitioning by hand"],
+    code:"CREATE EXTENSION vector;\n\nALTER TABLE docs ADD COLUMN embedding <b>vector(768)</b>;\n\nCREATE INDEX ON docs USING <b>hnsw</b> (embedding <em>vector_cosine_ops</em>)\n  WITH (m = 16, ef_construction = 64);\n\nSET hnsw.ef_search = 100;\nSELECT id, title\n  FROM docs\n WHERE <i>in_stock</i>\n ORDER BY embedding <b>&lt;=&gt;</b> $1\n LIMIT 5;"
+  },
+  elastic:{
+    name:"Elasticsearch kNN",
+    lead:"Lucene keeps an HNSW graph <b>per segment</b>, and a shard is a pile of segments. Every search walks every segment's graph and merges the results, which is why merge policy and refresh interval are vector-search tuning knobs here.",
+    by:"Elastic (Lucene HNSW under the hood)", year:"2019 dense_vector, ANN GA in 8.0 (2022)", host:"Elasticsearch / OpenSearch cluster", scale:"billions across shards",
+    modes:[["seg","HNSW per segment"]], lat:2.2, net:1.5,
+    filter:"The filter is applied <b>during</b> graph traversal, not after, so you get K results if K exist. A very restrictive filter makes the walk explore more of the graph, and below a threshold Lucene falls back to exact search over the matching docs.",
+    pros:["Best hybrid search on this list: BM25 and kNN combined with RRF in one request","Filters applied inside the traversal, so K results are guaranteed when they exist","Mature distributed story: shards, replicas, snapshots, rolling upgrades","int8, int4 and BBQ binary quantization cut memory 4x-32x","Aggregations, highlighting and the rest of the search stack apply to vector hits"],
+    cons:["Per-segment graphs mean query cost scales with segment count — force-merge or suffer","Operationally heavy: JVM heap, off-heap graphs, node sizing, shard math","Indexing throughput drops sharply once graph building dominates","dense_vector caps out at 4096 dimensions","Every refresh creates a new tiny graph; freshness and speed pull against each other"],
+    code:"PUT /docs\n{\"mappings\":{\"properties\":{\"embedding\":{\n  \"type\":\"<b>dense_vector</b>\",\"dims\":768,\"index\":true,\n  \"similarity\":\"cosine\",\n  \"index_options\":{\"type\":\"<em>int8_hnsw</em>\",\"m\":16,\"ef_construction\":100}}}}}\n\nPOST /docs/_search\n{\"<b>knn</b>\":{\"field\":\"embedding\",\"query_vector\":[...],\n        \"k\":5,\"num_candidates\":100,\n        \"filter\":{\"term\":{\"<i>in_stock</i>\":true}}},\n \"query\":{\"match\":{\"title\":\"running shoes\"}},\n \"rank\":{\"rrf\":{}}}"
+  },
+  pinecone:{
+    name:"Pinecone",
+    lead:"A fully managed, serverless vector database. You never see an index type: vectors land in clustered slabs on object storage, hot slabs are cached on compute, and metadata filtering is fused into the same pass as the ANN search.",
+    by:"Pinecone Systems (Edo Liberty), founded 2019", year:"2021 GA, serverless from 2024", host:"managed SaaS only", scale:"billions, tens of thousands of namespaces",
+    modes:[["ivf","Clustered slabs (proprietary ANN)"]], lat:8, net:20,
+    filter:"Metadata lives in an inverted index next to the vectors and the filter is intersected <b>during</b> the ANN pass — single stage, no post-filter shortfall. A filter-effort knob trades precision for latency.",
+    pros:["Zero operations: no nodes, no index builds, no rebalancing to schedule","Scales to billions without you thinking about shards","Namespaces give clean per-tenant isolation and cheap per-tenant deletes","Metadata filtering is first class, applied in one pass with the search","Predictable p99 under load, which is the hard part of self-hosting"],
+    cons:["Cost grows with reads, writes and storage, and it is not cheap at scale","Vendor lock-in: proprietary index, proprietary API, no self-host escape hatch","You cannot join against your own relational data — you get IDs back and fetch elsewhere","Opaque internals make tail-latency debugging a support ticket","Cold namespaces pay a first-query penalty; 40 KB metadata cap per vector"],
+    code:"index.<b>upsert</b>(vectors=[\n  (\"doc-1\", emb, {\"<i>in_stock</i>\": True, \"price\": 79})\n], namespace=\"tenant-42\")\n\nres = index.<b>query</b>(\n  vector=emb, top_k=5,\n  namespace=\"tenant-42\",\n  filter={\"<i>in_stock</i>\": True, \"price\": {\"$lt\": 100}},\n  include_metadata=True)"
+  },
+  redis:{
+    name:"Redis Vector Search",
+    lead:"The query engine inside Redis (RediSearch, folded into Redis 8 core) indexes a vector field on a hash or JSON document. Everything sits in RAM, so writes are visible immediately and queries land in the sub-millisecond range.",
+    by:"Redis Ltd — RediSearch 2.4", year:"2022 (core in Redis 8, 2025)", host:"Redis you already run", scale:"as many vectors as you can afford RAM for",
+    modes:[["hnsw","HNSW"],["flat","FLAT (exact)"]], lat:0.35, net:0.2,
+    filter:"Hybrid queries pre-filter on tag and numeric fields, then run KNN over the survivors — or flip to exact FLAT search when the filter is selective enough that brute force wins.",
+    pros:["Lowest latency here: sub-millisecond for FLAT on small sets, low single-digit ms for HNSW","A write is searchable immediately — no refresh, no eventual visibility","FLAT gives exact 100% recall when the candidate set is small","Already in most architectures, and doubles as cache, queue and session store","TTL on vectors, which is genuinely useful for ephemeral embeddings"],
+    cons:["Everything lives in RAM, and RAM is the most expensive byte you can buy","Reloading a large HNSW graph after a restart is slow, and it blocks","Fewer tuning knobs and no quantization story compared with dedicated engines","Cluster mode means one graph per shard and a scatter-gather on every query","Not where you want a hundred-million-vector corpus to live"],
+    code:"FT.CREATE idx ON HASH PREFIX 1 doc: SCHEMA\n  in_stock TAG\n  embedding <b>VECTOR HNSW</b> 10\n    TYPE FLOAT32 DIM 768\n    DISTANCE_METRIC COSINE\n    M 16 EF_CONSTRUCTION 200\n\nFT.SEARCH idx \"(<i>@in_stock:{true}</i>)=&gt;[<b>KNN 5 @embedding $vec</b> AS score]\"\n  PARAMS 2 vec $blob SORTBY score DIALECT 2"
+  },
+  s3:{
+    name:"S3 Vectors",
+    lead:"Vector storage as an S3 primitive: a vector bucket holds vector indexes, and AWS runs the ANN for you against object storage. Queries land in the hundreds of milliseconds instead of single-digit ones, and cost drops by roughly an order of magnitude.",
+    by:"AWS — announced July 2025", year:"2025", host:"S3 API, fully serverless", scale:"tens of millions per index, thousands of indexes per bucket",
+    modes:[["obj","Object-resident ANN"]], lat:60, net:180,
+    filter:"Metadata is stored with each vector and filtered as part of the query call, so only matching vectors are scored. Filtering does not save you the object fetches, which is where the latency actually goes.",
+    pros:["Dramatically cheaper than keeping the same vectors in RAM — this is the entire pitch","No infrastructure at all: no nodes, no index build, no capacity planning","Durability and scale of S3, priced per request and per stored vector","Native wiring into Bedrock Knowledge Bases, and tiering into OpenSearch for the hot slice","Perfect for a huge, mostly-cold archive queried a few times a minute"],
+    cons:["Latency is sub-second, not sub-10ms — wrong tool for interactive ranking","Low QPS ceiling; it is not built to be hammered by a request path","Very few knobs: you cannot tune the index for your recall/latency curve","Writes become queryable eventually, not instantly","Young service, so features and limits are still moving"],
+    code:"aws s3vectors <b>put-vectors</b> \\\n  --vector-bucket-name kb --index-name docs \\\n  --vectors '[{\"key\":\"doc-1\",\"data\":{\"float32\":[...]},\n              \"metadata\":{\"<i>in_stock</i>\":true}}]'\n\naws s3vectors <b>query-vectors</b> \\\n  --vector-bucket-name kb --index-name docs \\\n  --query-vector '{\"float32\":[...]}' --top-k 5 \\\n  --filter '{\"<i>in_stock</i>\":true}'"
+  },
+  chroma:{
+    name:"Chroma",
+    lead:"The embedded option: <code>pip install chromadb</code> and you have a collection with an HNSW index (hnswlib) and SQLite metadata living inside your own process. It optimises for getting a RAG prototype running in four lines, not for running a fleet.",
+    by:"Chroma (Jeff Huber, Anton Troynikov), Apache 2.0", year:"2022", host:"in-process library, local server, or Chroma Cloud", scale:"single node — millions, not billions",
+    modes:[["hnsw","HNSW (hnswlib)"],["flat","Brute force (small sets)"]], lat:0.9, net:0.1,
+    filter:"A <code>where</code> clause on metadata and <code>where_document</code> on text. Selective filters are resolved first and the survivors scored exactly; loose ones let HNSW run and are checked after.",
+    pros:["Fastest path from zero to working retrieval — no server, no schema, no cluster","Runs in-process, so a notebook and production share the same code","Embedding functions built in: hand it text and it calls the model for you","Apache 2.0, tiny surface area, easy to read and reason about","Persists to a directory you can copy, diff and ship"],
+    cons:["Single-node ceiling — the design does not shard across machines","In embedded mode you own durability, backups and HA, and there is none by default","Concurrency is limited; it is not built for a high-QPS request path","Fewer index knobs and no serious quantization story","Prototypes have a habit of becoming production, and this is where that hurts"],
+    code:"import chromadb\nclient = chromadb.PersistentClient(path=\"./store\")\ncol = client.<b>get_or_create_collection</b>(\"docs\",\n        metadata={\"hnsw:space\": \"cosine\"})\n\ncol.<b>add</b>(ids=[\"doc-1\"], documents=[\"...\"],\n        metadatas=[{\"<i>in_stock</i>\": True}])\n\ncol.<b>query</b>(query_texts=[\"red running shoes\"],\n          n_results=5,\n          where={\"<i>in_stock</i>\": True})"
+  }
+};
+
+const ALGOS={
+  hnsw:{
+    name:"HNSW — Hierarchical Navigable Small World",
+    idea:"A proximity graph in layers. Every vector is a node wired to its nearest neighbours; each node is promoted to higher layers with decaying probability. Search starts on the sparse top layer, greedily hops toward the query, drops a layer, repeats — a skip list for high-dimensional space.",
+    facts:[["Search","O(log n) hops, 95%+ recall"],["Build","slow — hours for 10M vectors"],["Memory","vectors + edges ≈ 2x raw"],["Insert","expensive: reconnect at every layer"],["Knobs","m, ef_construction, ef_search"],["Weakness","deletes are soft, graph decays with churn"]],
+    tradeoff:"If you remember one algorithm, remember this one. You buy the best recall-per-millisecond on the market with roughly double the memory and a build you have to schedule rather than improvise."
+  },
+  ivf:{
+    name:"IVF — Inverted File Index",
+    idea:"k-means partitions the vectors into lists, each owning a centroid. A query is compared against the centroids first, then scanned exhaustively inside the <b>nprobe</b> nearest lists. Probe 10 of 1000 lists and you skipped 99% of the comparisons.",
+    facts:[["Search","O(nprobe · n/nlist)"],["Build","fast — one k-means pass"],["Memory","vectors + a list id each"],["Insert","cheap: assign to nearest centroid"],["Knobs","nlist, nprobe"],["Weakness","border effects — and in 1536D everything is a border"]],
+    tradeoff:"Cheap to build and cheap to write, at lower recall for the same latency. Clusters drift as data changes, so IVF quality decays until you re-run k-means and rebuild."
+  },
+  flat:{
+    name:"FLAT — exact brute-force KNN",
+    idea:"No index at all. Compute the distance to every stored vector, keep the best K in a heap, return them. SIMD on CPU or a GPU batch makes this far faster than the O(n) label suggests.",
+    facts:[["Search","O(n · d) — every vector, every time"],["Build","zero, there is no index"],["Memory","the raw vectors, nothing more"],["Insert","append, instantly searchable"],["Knobs","none, which is the point"],["Weakness","cost is linear in corpus size"]],
+    tradeoff:"100% recall and no build, no drift, no rebuild. Perfectly correct up to a few hundred thousand vectors or behind a selective filter — and the honest baseline every ANN index should be measured against."
+  },
+  seg:{
+    name:"Segmented HNSW (Lucene)",
+    idea:"Lucene segments are immutable, so each one carries its own small HNSW graph. A refresh creates a new segment, merges fold small ones into large ones, and a query walks <b>every</b> live segment's graph and merges the per-segment top-K.",
+    facts:[["Search","sum over segments — merge policy is a query knob"],["Build","incremental, per segment"],["Memory","graph per segment, off-heap"],["Insert","buffer, then a new tiny segment at refresh"],["Knobs","refresh_interval, merge policy, num_candidates"],["Weakness","many small segments quietly wreck latency"]],
+    tradeoff:"The price of near-real-time indexing on immutable files. Freshness and query speed pull in opposite directions, and force-merging before a read-heavy phase is a real operational lever."
+  },
+  obj:{
+    name:"Object-resident ANN",
+    idea:"Vectors are packed into partitions stored as objects. A query reads a small routing structure, fetches only the few objects that could hold neighbours, and scores inside them. Compute is stateless and only touches the bytes it needs.",
+    facts:[["Search","dominated by object GETs, not by math"],["Build","managed, incremental on write"],["Memory","none of yours — nothing is resident"],["Insert","batched writes, eventually queryable"],["Knobs","almost none by design"],["Weakness","hundreds of ms, and a low QPS ceiling"]],
+    tradeoff:"Trades two orders of magnitude of latency for roughly one order of magnitude of cost. Right for a giant cold archive, wrong for anything a user is waiting on in a tight loop."
+  }
+};
+
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+
+let pts=[],cents=[],adj=[[],[],[]],query=null;
+const st={eng:"pgvector",mode:"hnsw",steps:[],i:-1,timer:null,filter:false,phase:"idle"};
+
+function build(){
+  const r=rnd(20260724);
+  const seeds=[[120,95],[400,80],[270,190],[130,290],[430,275],[320,325],[210,60]];
+  pts=[];
+  for(let i=0;i<N;i++){
+    const c=seeds[i%seeds.length];
+    let lvl=0,u=r(); if(u<0.30)lvl=1; if(u<0.07)lvl=2;
+    pts.push({id:i,x:clamp(c[0]+(r()-.5)*135,26,W-26),y:clamp(c[1]+(r()-.5)*120,26,H-56),
+              lvl:lvl,match:r()<0.42,seg:0,cell:0,fresh:false});
+  }
+  pts.sort((a,b)=>a.x-b.x).forEach((p,i)=>{p.seg=Math.floor(i/(N/3))});
+  pts.sort((a,b)=>a.id-b.id);
+  kmeans(); linkLayers();
+  query={x:300,y:150};
+}
+function kmeans(){
+  const r=rnd(77);
+  cents=[]; for(let i=0;i<6;i++)cents.push({x:60+r()*(W-120),y:50+r()*(H-120),n:0});
+  for(let it=0;it<8;it++){
+    pts.forEach(p=>{let b=0,bd=1e9;cents.forEach((c,i)=>{const d=dist(p,c);if(d<bd){bd=d;b=i}});p.cell=b});
+    cents.forEach((c,i)=>{
+      const m=pts.filter(p=>p.cell===i);
+      if(!m.length)return;
+      c.x=m.reduce((s,p)=>s+p.x,0)/m.length; c.y=m.reduce((s,p)=>s+p.y,0)/m.length; c.n=m.length;
+    });
+  }
+  cents.forEach((c,i)=>{const m=pts.filter(p=>p.cell===i);c.n=m.length;c.r=m.length?Math.max(28,...m.map(p=>dist(p,c)))+8:0});
+}
+function linkLayers(){
+  adj=[[],[],[]];
+  for(let L=0;L<3;L++){
+    const nodes=pts.filter(p=>p.lvl>=L);
+    const M=L===0?5:4;
+    adj[L]=[];
+    pts.forEach(p=>adj[L][p.id]=[]);
+    nodes.forEach(p=>{
+      const near=nodes.filter(o=>o!==p).sort((a,b)=>dist(p,a)-dist(p,b)).slice(0,M);
+      near.forEach(o=>{
+        if(!adj[L][p.id].includes(o.id))adj[L][p.id].push(o.id);
+        if(!adj[L][o.id].includes(p.id))adj[L][o.id].push(p.id);
+      });
+    });
+  }
+}
+const P=id=>pts.find(p=>p.id===id);
+const eligible=()=>st.filter?pts.filter(p=>p.match):pts;
+function truth(){return eligible().slice().sort((a,b)=>dist(a,query)-dist(b,query)).slice(0,K).map(p=>p.id)}
+function topK(ids){
+  const set=[...new Set(ids)].map(P).filter(p=>!st.filter||p.match);
+  return set.sort((a,b)=>dist(a,query)-dist(b,query)).slice(0,K).map(p=>p.id);
+}
+function frame(o){return Object.assign({text:"",comps:0,hi:[],cand:[],cur:null,path:[],probe:[],res:[],layer:null,tone:"",work:0,ins:null},o)}
+
+function searchHNSW(){
+  const S=[];let comps=0;const path=[],seen=[];
+  const tops=pts.filter(p=>p.lvl>=2);
+  let cur=tops.length?tops[0]:pts[0];
+  S.push(frame({text:"Enter at a layer-2 node. The top layer is sparse, so a few hops cover the whole space.",cur:cur.id,layer:2,comps}));
+  for(let L=2;L>=1;L--){
+    for(let hop=0;hop<9;hop++){
+      const nb=(adj[L][cur.id]||[]);
+      if(!nb.length)break;
+      comps+=nb.length; seen.push(...nb);
+      let best=cur,bd=dist(cur,query);
+      nb.forEach(id=>{const d=dist(P(id),query);if(d<bd){bd=d;best=P(id)}});
+      S.push(frame({text:`Layer ${L}: compare the ${nb.length} neighbours of node ${cur.id}, hop to the closest.`,
+        cur:cur.id,cand:nb,hi:[...seen],path:[...path],layer:L,comps}));
+      if(best.id===cur.id){
+        S.push(frame({text:L>0?`No neighbour at layer ${L} is closer — drop to layer ${L-1}, where the graph is denser.`:"Layer 0 local minimum reached — this is the right neighbourhood.",
+          cur:cur.id,hi:[...seen],path:[...path],layer:L,comps,tone:"warn"}));
+        break;
+      }
+      path.push([cur.id,best.id]); cur=best;
+    }
+  }
+  const ef=14,dq=id=>dist(P(id),query);
+  const visited=new Set([cur.id]);let W2=[cur.id],cands=[cur.id];
+  for(let it=0;it<9;it++){
+    cands.sort((a,b)=>dq(a)-dq(b));
+    const c=cands.shift(); if(c===undefined)break;
+    W2.sort((a,b)=>dq(a)-dq(b));
+    if(W2.length>=ef&&dq(c)>dq(W2[ef-1]))break;
+    const nb=(adj[0][c]||[]).filter(id=>!visited.has(id));
+    nb.forEach(id=>visited.add(id));
+    comps+=nb.length; cands.push(...nb); W2=W2.concat(nb).sort((a,b)=>dq(a)-dq(b)).slice(0,ef);
+    S.push(frame({text:`ef_search = ${ef}: expand node ${c}, add ${nb.length} unseen neighbours to the candidate list, keep the ${Math.min(W2.length,ef)} best found so far.`,
+      cur:c,cand:nb,hi:[...visited],path:[...path],layer:0,comps}));
+  }
+  const res=topK([...visited]);
+  S.push(frame({text:`Top ${res.length} returned after ${comps} distance computations instead of ${eligible().length}. Widen ef_search to buy recall, narrow it to buy latency.`,
+    cur:cur.id,hi:[...visited],path:[...path],res,layer:0,comps,tone:"ok"}));
+  return S;
+}
+function searchIVF(){
+  const S=[];let comps=cents.length;
+  const order=cents.map((c,i)=>({i,d:dist(c,query)})).sort((a,b)=>a.d-b.d);
+  S.push(frame({text:`Compare the query against all ${cents.length} centroids first — that is the whole routing cost.`,probe:[],comps}));
+  const probe=order.slice(0,2).map(o=>o.i);
+  S.push(frame({text:`nprobe = 2: only lists ${probe.join(" and ")} get opened. Everything else is skipped untouched.`,probe,comps,tone:"warn"}));
+  let scanned=[];
+  probe.forEach(ci=>{
+    const m=pts.filter(p=>p.cell===ci&&(!st.filter||p.match));
+    comps+=m.length; scanned=scanned.concat(m.map(p=>p.id));
+    S.push(frame({text:`Scan list ${ci} exhaustively: ${m.length} vectors, no index inside the list.`,probe,cand:m.map(p=>p.id),hi:[...scanned],comps}));
+  });
+  const res=topK(scanned);
+  const miss=truth().filter(id=>!res.includes(id)).length;
+  S.push(frame({text:miss?`Top ${res.length} returned — ${miss} true neighbour(s) sat in an unprobed list. That is the border effect: raise nprobe to trade latency for recall.`
+                        :`Top ${res.length} returned after ${comps} comparisons. Every true neighbour was inside a probed list this time.`,
+    probe,hi:[...scanned],res,comps,tone:miss?"warn":"ok"}));
+  return S;
+}
+function searchFLAT(){
+  const S=[];let comps=0,seen=[];
+  const list=pts.filter(p=>!st.filter||p.match);
+  S.push(frame({text:`No index. ${list.length} vectors, ${list.length} distance computations, guaranteed correct.`,comps}));
+  for(let i=0;i<list.length;i+=12){
+    const batch=list.slice(i,i+12); comps+=batch.length; seen=seen.concat(batch.map(p=>p.id));
+    S.push(frame({text:`Scanning ${comps} / ${list.length} — running top-${K} kept in a heap.`,cand:batch.map(p=>p.id),hi:[...seen],res:topK(seen),comps}));
+  }
+  S.push(frame({text:`Exact top ${K}. Recall is 1.0 by construction — this is the baseline every ANN index is scored against.`,hi:seen,res:topK(seen),comps,tone:"ok"}));
+  return S;
+}
+function searchSEG(){
+  const S=[];let comps=0;const found=[];
+  S.push(frame({text:"A shard is a pile of immutable segments, each carrying its own HNSW graph.",comps}));
+  for(let s=0;s<3;s++){
+    const m=pts.filter(p=>p.seg===s);
+    const el=m.filter(p=>!st.filter||p.match);
+    const walked=el.slice().sort((a,b)=>dist(a,query)-dist(b,query)).slice(0,Math.min(el.length,14));
+    comps+=Math.min(el.length,26);
+    const local=walked.slice(0,K).map(p=>p.id);
+    found.push(...local);
+    S.push(frame({text:`Segment ${s}: walk its graph over ${el.length} live docs${st.filter?" that pass the filter":""}, keep a local top-${K}.`,
+      probe:[s],cand:walked.map(p=>p.id),hi:[...found],res:local,comps}));
+  }
+  const res=topK(found);
+  S.push(frame({text:`Merge the three per-segment top-${K} lists into the global top-${K}. More segments means more graphs to walk — this is why merge policy is a latency knob.`,
+    hi:[...found],res,comps,tone:"ok"}));
+  return S;
+}
+function searchOBJ(){
+  const S=[];let comps=cents.length;
+  const order=cents.map((c,i)=>({i,d:dist(c,query)})).sort((a,b)=>a.d-b.d);
+  S.push(frame({text:"Read the routing metadata for the index. One small request, no vectors touched yet.",comps}));
+  const probe=order.slice(0,2).map(o=>o.i);
+  S.push(frame({text:`Two candidate partitions selected: GET partition-${probe[0]} and partition-${probe[1]} from object storage. This fetch is where the milliseconds go.`,probe,comps,tone:"warn"}));
+  let scanned=[];
+  probe.forEach(ci=>{
+    const m=pts.filter(p=>p.cell===ci&&(!st.filter||p.match));
+    comps+=m.length; scanned=scanned.concat(m.map(p=>p.id));
+    S.push(frame({text:`Object partition-${ci} downloaded: score its ${m.length} vectors in stateless compute, then throw the bytes away.`,probe,cand:m.map(p=>p.id),hi:[...scanned],comps}));
+  });
+  const res=topK(scanned);
+  S.push(frame({text:`Top ${res.length} returned in a few hundred milliseconds, with nothing resident in RAM and nothing to operate. Cheap, not fast.`,
+    probe,hi:[...scanned],res,comps,tone:"ok"}));
+  return S;
+}
+
+function insertSteps(){
+  const r=rnd(Date.now()&0xffff);
+  const np={id:N+pts.filter(p=>p.fresh).length,x:120+r()*(W-240),y:70+r()*(H-160),
+            lvl:st.mode==="hnsw"?(r()<0.3?1:0):0,match:true,fresh:true,seg:2,cell:0};
+  let b=0,bd=1e9;cents.forEach((c,i)=>{const d=dist(np,c);if(d<bd){bd=d;b=i}});np.cell=b;
+  const S=[];
+  const add=frame({text:`New embedding arrives at (${np.x|0}, ${np.y|0}) — in reality 768 numbers out of an embedding model.`,ins:np,cur:np.id,tone:""});
+  S.push(add);
+  if(st.mode==="hnsw"){
+    S.push(frame({text:`Coin flips decide its level: L${np.lvl}. Most vectors stay on layer 0; a few become express lanes.`,ins:np,cur:np.id}));
+    let ic=0;
+    for(let L=np.lvl;L>=0;L--){
+      const nodes=pts.filter(p=>p.lvl>=L&&!p.fresh).sort((a,b2)=>dist(np,a)-dist(np,b2)).slice(0,3);
+      ic+=14;
+      S.push(frame({text:`Layer ${L}: greedy-search for the ${nodes.length} nearest existing nodes and wire bidirectional edges.`,
+        ins:np,cur:np.id,cand:nodes.map(p=>p.id),path:nodes.map(p=>[np.id,p.id]),layer:L,comps:ic}));
+    }
+    S.push(frame({text:"Insert done. Every insert is a small search plus edge surgery — that is why HNSW writes cost far more than reads, and why the graph slowly degrades between rebuilds.",ins:np,cur:np.id,comps:ic,tone:"warn"}));
+  }else if(st.mode==="ivf"){
+    S.push(frame({text:`Compare against the ${cents.length} centroids only — ${cents.length} distance computations, nothing else.`,ins:np,cur:np.id,probe:[],comps:cents.length}));
+    S.push(frame({text:`Assigned to list ${np.cell}. Appended to the end, no graph to repair.`,ins:np,cur:np.id,probe:[np.cell],comps:cents.length}));
+    S.push(frame({text:"Cheapest insert of the lot. The cost is deferred: as the data drifts the centroids stop fitting it and recall slides until you re-run k-means.",ins:np,cur:np.id,comps:cents.length,tone:"warn"}));
+  }else if(st.mode==="flat"){
+    S.push(frame({text:"Appended to the list. There is no index to maintain, so the vector is searchable the instant the write returns.",ins:np,cur:np.id,tone:"ok"}));
+    S.push(frame({text:"O(1) write, O(n) read. The whole tradeoff of FLAT in one line.",ins:np,cur:np.id}));
+  }else if(st.mode==="seg"){
+    S.push(frame({text:"Buffered in memory. Invisible to search until the next refresh — the default is one second.",ins:np,cur:np.id,tone:"warn"}));
+    S.push(frame({text:"Refresh: a new tiny segment is written with its own miniature HNSW graph. Now it is searchable.",ins:np,cur:np.id,probe:[2]}));
+    S.push(frame({text:"Later a merge folds the small segments into a big one and rebuilds that graph. Skip the merges and every query pays for the extra segments.",ins:np,cur:np.id,probe:[0,1,2],tone:"warn"}));
+  }else{
+    S.push(frame({text:"Batched client-side. Single-vector writes to object storage are wasteful, so you accumulate.",ins:np,cur:np.id,tone:"warn"}));
+    S.push(frame({text:`PUT into partition-${np.cell}. AWS re-packs the objects; you build nothing and rebuild nothing.`,ins:np,cur:np.id,probe:[np.cell]}));
+    S.push(frame({text:"Queryable eventually, not immediately. Fine for a corpus you re-embed nightly, wrong for a live feed.",ins:np,cur:np.id,tone:"warn"}));
+  }
+  return S;
+}
+
+function svgEsc(s){return s}
+function render(){
+  const f=st.i>=0&&st.steps[st.i]?st.steps[st.i]:frame({});
+  const e=ENGINES[st.eng];
+  const hi=new Set(f.hi),cand=new Set(f.cand),res=new Set(f.res),probe=new Set(f.probe);
+  const all=f.ins?pts.concat([f.ins]):pts;
+  let g="";
+
+  g+=`<rect x="0" y="0" width="${W}" height="${H}" fill="#f2f5f9"/>`;
+
+  if(st.mode==="ivf"||st.mode==="obj"){
+    cents.forEach((c,i)=>{
+      const on=probe.has(i);
+      g+=`<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${(c.r||40).toFixed(1)}"
+           fill="${on?"rgba(37,99,235,.13)":"rgba(148,163,184,.08)"}" stroke="${on?"#2563eb":"#cbd5e1"}"
+           stroke-width="${on?2:1}" stroke-dasharray="${on?"":"4 4"}"/>`;
+      g+=`<text x="${c.x.toFixed(1)}" y="${(c.y-((c.r||40)-14)).toFixed(1)}" text-anchor="middle"
+           font-family="SFMono-Regular,Menlo,monospace" font-size="10" font-weight="700"
+           fill="${on?"#2563eb":"#94a3b8"}">${st.mode==="obj"?"partition-"+i:"list "+i}</text>`;
+      g+=`<path d="M${(c.x-5).toFixed(1)} ${c.y.toFixed(1)}h10M${c.x.toFixed(1)} ${(c.y-5).toFixed(1)}v10" stroke="${on?"#2563eb":"#94a3b8"}" stroke-width="1.6"/>`;
+    });
+  }
+  if(st.mode==="seg"){
+    for(let s=0;s<3;s++){
+      const on=probe.has(s);
+      const x=s*(W/3);
+      g+=`<rect x="${x+4}" y="8" width="${W/3-8}" height="${H-38}" rx="10"
+           fill="${on?"rgba(37,99,235,.10)":"rgba(148,163,184,.06)"}" stroke="${on?"#2563eb":"#cbd5e1"}"
+           stroke-width="${on?2:1}" stroke-dasharray="${on?"":"5 5"}"/>`;
+      g+=`<text x="${x+16}" y="26" font-family="SFMono-Regular,Menlo,monospace" font-size="10" font-weight="700"
+           fill="${on?"#2563eb":"#94a3b8"}">segment ${s} ${s===2?"(hot)":""}</text>`;
+    }
+  }
+  if(st.mode==="hnsw"){
+    const L=f.layer===null?0:f.layer;
+    pts.forEach(p=>(adj[0][p.id]||[]).forEach(id=>{
+      if(id>p.id){const o=P(id);g+=`<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${o.x.toFixed(1)}" y2="${o.y.toFixed(1)}" stroke="#94a3b8" stroke-width="1" opacity=".16"/>`}
+    }));
+    if(L>0){
+      pts.filter(p=>p.lvl>=L).forEach(p=>(adj[L][p.id]||[]).forEach(id=>{
+        if(id>p.id){const o=P(id);g+=`<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${o.x.toFixed(1)}" y2="${o.y.toFixed(1)}" stroke="#7c3aed" stroke-width="1.6" opacity=".45"/>`}
+      }));
+    }
+    f.cand.forEach(id=>{const o=P(id),c=f.cur!==null?(P(f.cur)||f.ins):null;
+      if(o&&c)g+=`<line x1="${c.x.toFixed(1)}" y1="${c.y.toFixed(1)}" x2="${o.x.toFixed(1)}" y2="${o.y.toFixed(1)}" stroke="#c07a10" stroke-width="1.4" opacity=".8"/>`;});
+    f.path.forEach(([a,b])=>{const A=P(a)||f.ins,B=P(b)||f.ins;
+      if(A&&B)g+=`<line x1="${A.x.toFixed(1)}" y1="${A.y.toFixed(1)}" x2="${B.x.toFixed(1)}" y2="${B.y.toFixed(1)}" stroke="#7c3aed" stroke-width="2.4" opacity=".9"/>`;});
+  }
+
+  if(query&&st.phase!=="insert"){
+    g+=`<circle cx="${query.x}" cy="${query.y}" r="17" fill="none" stroke="#d64545" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/>`;
+  }
+
+  all.forEach(p=>{
+    const dead=st.filter&&!p.match&&st.phase!=="insert";
+    let fill="#94a3b8",r=4,stroke="none",sw=0;
+    if(dead)fill="#cbd5e1";
+    if(st.mode==="hnsw"){
+      if(p.lvl>=1)r=5.5;
+      if(p.lvl>=2){r=7;stroke="#7c3aed";sw=1.4}
+    }
+    if(hi.has(p.id))fill=dead?"#cbd5e1":"#c07a10";
+    if(cand.has(p.id)){fill=dead?"#cbd5e1":"#c07a10";r=Math.max(r,6)}
+    if(res.has(p.id)){fill="#0f8a5f";r=7;stroke="#0f8a5f";sw=0}
+    if(f.cur===p.id||(f.ins&&f.ins.id===p.id)){fill="#7c3aed";r=8;stroke="#7c3aed";sw=2}
+    const fresh=p.fresh?`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r+5}" fill="none" stroke="#7c3aed" stroke-width="1" opacity=".55"/>`:"";
+    g+=fresh+`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" ${sw?`stroke="${stroke}" stroke-width="${sw}" stroke-opacity=".55"`:""}/>`;
+  });
+
+  if(query&&st.phase!=="insert"){
+    g+=`<g><path d="M${query.x-9} ${query.y}h18M${query.x} ${query.y-9}v18" stroke="#d64545" stroke-width="2.4"/>
+        <circle cx="${query.x}" cy="${query.y}" r="5" fill="#d64545"/>
+        <text x="${query.x+13}" y="${query.y-11}" font-family="SFMono-Regular,Menlo,monospace" font-size="10" font-weight="700" fill="#d64545">query</text></g>`;
+  }
+  const layerTxt=st.mode==="hnsw"&&f.layer!==null?`layer ${f.layer}`:"";
+  g+=`<text x="14" y="${H-12}" font-family="SFMono-Regular,Menlo,monospace" font-size="11" font-weight="700" fill="#5b6472">${e.name} · ${ALGOS[st.mode].name.split(" — ")[0]} ${layerTxt?"· "+layerTxt:""}</text>`;
+  byId("viz").innerHTML=svgEsc(g);
+
+  const total=eligible().length;
+  const note=byId("sNote");
+  note.className="note "+(f.tone||"");
+  note.textContent=f.text||"Press Search to run a query, or Insert vector to see what a write costs this index.";
+  byId("sCount").textContent=st.i<0?"idle":`step ${st.i+1} / ${st.steps.length}`;
+  byId("mComp").textContent=f.comps;
+  const pct=total?Math.round(f.comps/total*100):0;
+  byId("mPct").textContent=pct+"%";
+  byId("mPct").className="v "+(pct<25?"g":pct<70?"a":"r");
+  const bar=byId("wBar");
+  bar.style.width=Math.min(100,pct)+"%";
+  bar.className="bar "+(pct<25?"g":pct<70?"a":"r");
+  byId("wVal").textContent=`${f.comps} / ${total} vectors compared`;
+  byId("wLbl").textContent=st.phase==="insert"?"index maintenance":"search work";
+
+  if(f.res&&f.res.length){
+    const t=truth();
+    const hit=f.res.filter(id=>t.includes(id)).length;
+    const rc=t.length?hit/t.length:1;
+    byId("mRecall").textContent=rc.toFixed(2);
+    byId("mRecall").className="v "+(rc>=0.99?"g":rc>=0.8?"a":"r");
+  }else if(st.phase!=="search"){byId("mRecall").textContent="–";byId("mRecall").className="v"}
+  const lat=(e.net+e.lat*(1+f.comps/40)).toFixed(f.net>10?0:1);
+  byId("mLat").textContent=st.i<0?"–":lat+" ms";
+  byId("mLat").className="v "+(lat<10?"g":lat<60?"a":"r");
+}
+
+function stop(){clearInterval(st.timer);st.timer=null;byId("bSearch").textContent="Search"}
+function play(steps,phase){
+  stop(); st.steps=steps; st.i=-1; st.phase=phase; render();
+  st.timer=setInterval(()=>{
+    if(st.i>=st.steps.length-1){stop();return}
+    st.i++;render();
+  },620);
+  byId("bSearch").textContent=phase==="search"?"Restart":"Search";
+}
+function step(){
+  if(!st.steps.length||st.i>=st.steps.length-1){
+    if(st.phase!=="search"||!st.steps.length){st.steps=searchFor();st.phase="search";st.i=-1}
+    else return;
+  }
+  stop(); st.i++; render();
+}
+function searchFor(){
+  return st.mode==="hnsw"?searchHNSW():st.mode==="ivf"?searchIVF():st.mode==="flat"?searchFLAT():st.mode==="seg"?searchSEG():searchOBJ();
+}
+
+function paintEngine(){
+  const e=ENGINES[st.eng],a=ALGOS[st.mode];
+  byId("eName").textContent=e.name;
+  byId("eLead").innerHTML=e.lead;
+  byId("eMeta").innerHTML=[["Created by",e.by],["First shipped",e.year],["Runs as",e.host],["Practical scale",e.scale]]
+    .map(([k,v])=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+  byId("ePros").innerHTML=e.pros.map(p=>`<li>${p}</li>`).join("");
+  byId("eCons").innerHTML=e.cons.map(p=>`<li>${p}</li>`).join("");
+  byId("eCode").innerHTML=e.code;
+  byId("aName").textContent=a.name;
+  byId("aIdea").innerHTML=a.idea;
+  byId("aFacts").innerHTML=a.facts.map(([k,v])=>`<div class="kv"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+  byId("aTradeoff").innerHTML=a.tradeoff;
+  byId("sTitle").textContent=e.name+" — index in motion";
+  byId("sSub").textContent="96 vectors laid out in 2D. Real embeddings have hundreds of dimensions, but the geometry of the search is the same.";
+  byId("modeRow").innerHTML=e.modes.map(([k,l])=>`<button class="mode ${k===st.mode?"active":""}" data-mode="${k}">${l}</button>`).join("");
+  byId("modeRow").querySelectorAll(".mode").forEach(b=>b.onclick=()=>{st.mode=b.dataset.mode;st.steps=[];st.i=-1;st.phase="idle";stop();paintEngine();render()});
+  byId("sFilterNote").className="note"+(st.filter?" warn":"");
+  byId("sFilterNote").innerHTML=(st.filter?"<b>filter on</b> — ":"<b>filter off</b> — ")+e.filter;
+}
+byId("enginePills").innerHTML=Object.entries(ENGINES).map(([k,v],i)=>
+  `<button class="pill ${i===0?"active":""}" data-eng="${k}">${v.name}<span class="n">${v.year.replace(/[^0-9]*(\d{4}).*/,"$1")}</span></button>`).join("");
+byId("enginePills").querySelectorAll(".pill").forEach(b=>b.onclick=()=>{
+  byId("enginePills").querySelectorAll(".pill").forEach(x=>x.classList.toggle("active",x===b));
+  st.eng=b.dataset.eng; st.mode=ENGINES[st.eng].modes[0][0];
+  st.steps=[];st.i=-1;st.phase="idle";stop();paintEngine();render();
+});
+byId("bSearch").onclick=()=>{play(searchFor(),"search")};
+byId("bInsert").onclick=()=>{
+  const S=insertSteps();
+  play(S,"insert");
+  const np=S[0].ins;
+  setTimeout(()=>{if(!pts.some(p=>p.id===np.id)){pts.push(np);if(st.mode==="hnsw"){np.lvl=np.lvl;linkLayers()}}},620*S.length);
+};
+byId("bStep").onclick=step;
+byId("bReset").onclick=()=>{stop();pts=pts.filter(p=>!p.fresh);linkLayers();st.steps=[];st.i=-1;st.phase="idle";render()};
+byId("bFilter").onclick=()=>{
+  st.filter=!st.filter;
+  byId("bFilter").classList.toggle("on",st.filter);
+  stop();st.steps=[];st.i=-1;st.phase="idle";paintEngine();render();
+};
+byId("viz").onclick=ev=>{
+  const r=ev.currentTarget.getBoundingClientRect();
+  query={x:(ev.clientX-r.left)/r.width*W,y:(ev.clientY-r.top)/r.height*H};
+  stop();st.steps=[];st.i=-1;st.phase="idle";render();
+};
+
+const COLS=[["pgvector","Postgres extension"],["Elasticsearch kNN","Lucene HNSW"],["Pinecone","managed SaaS"],["Redis Vector Search","in-memory"],["S3 Vectors","object storage"],["Chroma","embedded"]];
+const ROWS=[
+  ["sec","Identity"],
+  ["Created by",["Andrew Kane|","Elastic|","Pinecone Systems (Edo Liberty)|","Redis Ltd|","AWS|","Chroma Inc|"]],
+  ["First shipped",["2021|","2019 (ANN GA 2022)|","2021 (serverless 2024)|","2022|","2025|","2022|"]],
+  ["Licence",["PostgreSQL, OSS|good","Elastic v2 / SSPL|warn","proprietary|bad","RSALv2 / AGPL|warn","proprietary|bad","Apache 2.0|good"]],
+  ["Deployment",["extension in your Postgres|good","self-host or Elastic Cloud|","SaaS only|bad","self-host or Redis Cloud|","AWS only|bad","in-process, server, or cloud|good"]],
+  ["sec","Index internals"],
+  ["Index algorithms",["HNSW, IVFFlat|good","HNSW per segment|","proprietary clustered ANN|warn","HNSW, FLAT|","managed object-resident ANN|warn","HNSW (hnswlib), brute force|"]],
+  ["Similarity metrics",["L2, cosine, inner product, L1, Hamming, Jaccard|good","cosine, dot, L2, max-inner-product|","cosine, dot, euclidean|","L2, cosine, inner product|","cosine, euclidean|warn","cosine, L2, inner product|"]],
+  ["Quantization",["halfvec, binary, sparse|","int8, int4, BBQ binary|good","managed internally|","none|bad","managed internally|","limited|warn"]],
+  ["Max dimensions",["2000 indexed (4000 halfvec)|warn","4096|","20000|good","32768|good","4096|","unbounded in practice|"]],
+  ["Where vectors live",["Postgres heap + shared buffers|","JVM node, graphs off-heap|","object storage + cached compute|good","RAM, entirely|bad","S3 objects|good","local files / SQLite|"]],
+  ["sec","Query behaviour"],
+  ["Filtering strategy",["planner picks pre- or post-filter|warn","applied during traversal|good","single-stage with the ANN pass|good","pre-filter then KNN|","metadata filter in the query|","where clause, pre or post|"]],
+  ["Hybrid keyword + vector",["tsvector + vector by hand|warn","native BM25 + kNN with RRF|good","sparse-dense vectors|","full-text index + KNN|","none|bad","full-text contains only|warn"]],
+  ["Typical p50 latency",["1-10 ms|good","5-50 ms|","20-100 ms (network)|","0.3-3 ms|good","200-800 ms|bad","1-10 ms|good"]],
+  ["Write visibility",["immediate, transactional|good","after refresh (~1s)|","seconds|","immediate|good","eventual|bad","immediate|good"]],
+  ["Practical scale",["1-10M comfortably|warn","billions across shards|good","billions|good","bounded by RAM|warn","tens of millions per index|","single node, millions|warn"]],
+  ["Concurrency / QPS",["shares OLTP capacity|warn","high, scales with replicas|good","high, managed|good","very high|good","low ceiling|bad","low|bad"]],
+  ["sec","Operating it"],
+  ["Ops burden",["none beyond Postgres|good","high — the usual ES burden|bad","none|good","low if Redis is already there|","none|good","none embedded, yours in prod|"]],
+  ["Index rebuild pain",["hours, blocks or bloats|bad","incremental via merges|good","invisible to you|good","full rebuild on restart|warn","managed|good","rebuild the collection|warn"]],
+  ["Multi-tenancy",["rows + RLS|good","index per tenant or a filter|","namespaces|good","key prefixes|","index per tenant|","collections|"]],
+  ["Backup / DR",["pg_dump, WAL, PITR|good","snapshots|good","managed|good","RDB/AOF, slow reload|warn","S3 durability|good","copy the directory|warn"]],
+  ["Cost model",["your existing Postgres|good","nodes, RAM and heap|bad","reads + writes + storage|warn","RAM, the expensive byte|bad","per request + per vector, cheapest|good","free, it is a library|good"]],
+  ["sec","Fit"],
+  ["Best for",["anything already on Postgres under ~10M vectors|","search products needing hybrid ranking|","huge scale with no ops appetite|","sub-ms lookups on a hot, small corpus|","big cold archives where cost rules|","prototypes and single-node RAG apps|"]],
+  ["Avoid when",["vector search is the whole product at 100M+|","you do not already run Elasticsearch|","cost or lock-in matter|","the corpus does not fit in RAM|","a user is waiting on the response|","you need HA, sharding or high QPS|"]]
+];
+byId("cmpHead").innerHTML=`<th>Property</th>`+COLS.map(([n,s])=>`<th>${n}<span class="sub">${s}</span></th>`).join("");
+byId("cmpBody").innerHTML=ROWS.map(r=>{
+  if(r[0]==="sec")return `<tr class="sec"><th>${r[1]}</th>${COLS.map(()=>"<td></td>").join("")}</tr>`;
+  return `<tr><th>${r[0]}</th>`+r[1].map(c=>{const[t,k]=c.split("|");return `<td class="${k||""}">${t}</td>`}).join("")+"</tr>";
+}).join("");
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  stop();
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",String(x===t)));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===t.dataset.tab));
+});
+
+build();paintEngine();render();
+</script>
+</body>
+</html>

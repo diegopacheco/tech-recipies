@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Geospatial Indexes</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#ffffff;--ink:#111827;--muted:#5b6472;--line:#e3e7ed;--soft:#f2f5f9;
+  --blue:#2563eb;--blue-soft:#e8effd;--green:#0f8a5f;--green-soft:#e4f5ee;
+  --red:#d64545;--red-soft:#fdeaea;--amber:#c07a10;--amber-soft:#fdf1dc;
+  --violet:#7c3aed;--violet-soft:#f0eafe;
+  --mono:"SFMono-Regular",Menlo,Consolas,monospace;
+  --sans:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 22px 48px;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5}
+.wrap{max-width:1220px;margin:0 auto}
+header h1{margin:0;font-size:32px;letter-spacing:-.02em}
+header p{margin:6px 0 0;color:var(--muted);max-width:860px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 18px;border-bottom:1px solid var(--line)}
+.tab{padding:10px 16px;border:1px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;background:none;color:var(--muted);font:600 14px var(--sans);cursor:pointer}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--card);border-color:var(--line);color:var(--ink);box-shadow:0 1px 0 var(--card)}
+.panel{display:none}
+.panel.active{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.pill{padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:600 13px var(--sans);cursor:pointer;transition:.15s}
+.pill:hover{border-color:var(--blue);color:var(--blue)}
+.pill.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.pill .n{font:700 11px var(--mono);opacity:.7;margin-left:6px}
+.grid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(430px,1.1fr);gap:18px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card+.card{margin-top:18px}
+.card h2{margin:0;font-size:22px;letter-spacing:-.01em}
+.card h3{margin:0 0 8px;font:700 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.tag{padding:3px 9px;border:1px solid var(--line);border-radius:6px;background:var(--soft);font:700 11px var(--mono);color:var(--muted)}
+.lead{margin:12px 0 0;padding:12px 14px;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:0 8px 8px 0;font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:12px}
+.two .box{margin-top:0}
+.box.pro{background:var(--green-soft);border-color:#c9e8dc}
+.box.con{background:var(--red-soft);border-color:#f6d3d3}
+.box.pro h3{color:var(--green)}
+.box.con h3{color:var(--red)}
+.box.use{background:var(--violet-soft);border-color:#ded1fb}
+.box.use h3{color:var(--violet)}
+.box ul{margin:0;padding-left:16px;font-size:13px;color:#26303c}
+.box li+li{margin-top:5px}
+.box b{font-family:var(--mono);font-size:12px}
+pre{margin:14px 0 0;padding:12px 14px;background:#0f172a;color:#e2e8f0;border-radius:10px;font:500 12px/1.6 var(--mono);white-space:pre-wrap;overflow-x:auto}
+pre b{color:#7dd3fc;font-weight:700}
+pre i{color:#94a3b8;font-style:normal}
+pre em{color:#86efac;font-style:normal}
+.stage{position:sticky;top:18px}
+.stage-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.stage-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.counter{padding:5px 10px;border:1px solid var(--line);border-radius:6px;font:700 11px var(--mono);color:var(--muted);white-space:nowrap}
+canvas{display:block;width:100%;max-width:560px;height:auto;margin:14px auto 0;border-radius:10px;background:var(--soft);border:1px solid var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font:600 11px var(--mono);color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.controls{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.btn{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:600 13px var(--sans);cursor:pointer}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:#000}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.metric{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft)}
+.metric .k{font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.metric .v{font:700 18px var(--mono);margin-top:3px;letter-spacing:-.02em}
+.note{margin-top:12px;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:var(--soft);font:600 12px var(--mono);color:#26303c;min-height:58px}
+.note.ok{border-color:#c9e8dc;background:var(--green-soft);color:#0b6647}
+.note.warn{border-color:#f0d5a8;background:var(--amber-soft);color:#8a5a09}
+.note.bad{border-color:#f0bcbc;background:var(--red-soft);color:#8f2f2f}
+.note.info{border-color:#c7d8fb;background:var(--blue-soft);color:#1d4ed8}
+.strip{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#0f172a;color:#e2e8f0;font:600 12px/1.7 var(--mono);white-space:pre-wrap;word-break:break-word}
+.strip b{color:#7dd3fc}
+.strip i{color:#fca5a5;font-style:normal}
+.strip em{color:#86efac;font-style:normal}
+table.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp th,.cmp td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.cmp thead th{font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft);white-space:nowrap;position:sticky;top:0;z-index:2}
+.cmp thead th:first-child{left:0;z-index:3}
+.cmp tbody th{font:700 12px var(--mono);color:var(--ink);background:var(--card);white-space:nowrap;border-right:1px solid var(--line);position:sticky;left:0;z-index:1}
+.cmp tbody tr:hover{background:#fafbfd}
+.cmp tbody tr:hover th{background:#fafbfd}
+.cmp td{min-width:150px}
+.scroll{overflow:auto;max-height:78vh;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.badge{display:inline-block;padding:3px 9px;border-radius:6px;font:700 11px var(--mono);white-space:nowrap}
+.badge.y{background:var(--green-soft);color:var(--green)}
+.badge.n{background:var(--red-soft);color:var(--red)}
+.badge.p{background:var(--amber-soft);color:var(--amber)}
+.badge.i{background:var(--blue-soft);color:var(--blue)}
+.badge.v{background:var(--violet-soft);color:var(--violet)}
+.section-title{margin:30px 0 6px;font-size:18px}
+.section-title:first-child{margin-top:0}
+.section-sub{margin:0 0 12px;color:var(--muted);font-size:13px;max-width:860px}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+footer a{color:var(--blue);text-decoration:none}
+footer a:hover{text-decoration:underline}
+@media(max-width:960px){.grid{grid-template-columns:1fr}.stage{position:static}.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.two{grid-template-columns:1fr}body{padding:18px 14px 36px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Geospatial Indexes</h1>
+  <p>Two dimensions have no total order, so a B-tree cannot index them directly. Every structure here solves that in one of two ways: cut the plane into a tree of boxes, or flatten the plane onto a curve and index the resulting integer. Pick a structure and step the search to see what each one actually reads.</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab" data-tab="anim" aria-selected="true">Structures &amp; animations</button>
+  <button class="tab" data-tab="cmp" aria-selected="false">Comparison</button>
+</nav>
+
+<section class="panel active" id="anim">
+  <div class="pills" id="pills"></div>
+  <div class="grid">
+    <article class="card" id="info"></article>
+    <article class="card stage">
+      <div class="stage-head">
+        <div>
+          <h2 id="stName">Search</h2>
+          <p id="stSub"></p>
+        </div>
+        <span class="counter" id="stCount">0 / 0</span>
+      </div>
+      <canvas id="cv" width="1120" height="1120"></canvas>
+      <div class="legend" id="legend"></div>
+      <div class="controls">
+        <button class="btn primary" id="bStep">Step</button>
+        <button class="btn" id="bPlay">Play</button>
+        <button class="btn" id="bReset">Reset</button>
+      </div>
+      <div class="metrics" id="metrics"></div>
+      <div class="note" id="note"></div>
+      <div class="strip" id="strip" hidden></div>
+    </article>
+  </div>
+</section>
+
+<section class="panel" id="cmp">
+  <h3 class="section-title">Feature matrix</h3>
+  <p class="section-sub">Seven structures, side by side. The first split to notice is the middle three (trees you have to implement inside the database) against the last three (cell ids you can store in the B-tree you already have).</p>
+  <div class="scroll">
+    <table class="cmp">
+      <thead><tr>
+        <th>Property</th><th>Quadtree</th><th>k-d tree</th><th>BKD tree</th><th>R-tree</th><th>Geohash</th><th>S2</th><th>H3</th>
+      </tr></thead>
+      <tbody id="cmpBody"></tbody>
+    </table>
+  </div>
+
+  <h3 class="section-title">Cost model</h3>
+  <p class="section-sub">n points, k results, B points per page/block. Query costs are the typical case for 2D point data; every tree here degrades toward a scan when the query window covers most of the data.</p>
+  <div class="scroll">
+    <table class="cmp">
+      <thead><tr>
+        <th>Operation</th><th>Quadtree</th><th>k-d tree</th><th>BKD tree</th><th>R-tree</th><th>Geohash</th><th>S2</th><th>H3</th>
+      </tr></thead>
+      <tbody id="costBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <span>Geospatial indexes — trees over space, curves over space, and the trade you make choosing one.</span>
+  <span><a href="index.html">databases index</a></span>
+</footer>
+</div>
+
+<script>
+const byId = id => document.getElementById(id);
+const N = 560, PADX = 22, SZ = N - 2*PADX;
+const X = u => PADX + u*SZ, Y = v => PADX + v*SZ, W = u => u*SZ;
+const clamp01 = v => Math.max(.012, Math.min(.988, v));
+
+function mkPoints(){
+  let s = 20250724;
+  const r = () => ((s = (s*1664525 + 1013904223) >>> 0) / 4294967296);
+  const g = () => (r()+r()+r())/3*2 - 1;
+  const pts = [];
+  [[.20,.74,.11],[.66,.26,.13],[.82,.80,.09],[.40,.46,.15],[.16,.20,.08]].forEach(c=>{
+    for(let i=0;i<26;i++) pts.push([clamp01(c[0]+g()*c[2]), clamp01(c[1]+g()*c[2])]);
+  });
+  for(let i=0;i<38;i++) pts.push([clamp01(r()), clamp01(r())]);
+  pts.push([.4960,.5210]);
+  pts.push([.5040,.5170]);
+  return pts;
+}
+const PTS = mkPoints();
+const GA = PTS.length-2, GB = PTS.length-1;
+const IDS = PTS.map((_,i)=>i);
+const QR = {x:.30,y:.34,w:.28,h:.26};
+const QP = [.545,.615];
+const QC = {x:.46,y:.52,r:.19};
+
+const inter = (a,b) => a.x < b.x+b.w && b.x < a.x+a.w && a.y < b.y+b.h && b.y < a.y+a.h;
+const covers = (a,b) => a.x <= b.x && a.y <= b.y && a.x+a.w >= b.x+b.w && a.y+a.h >= b.y+b.h;
+const inRect = (p,r) => p[0] >= r.x && p[0] <= r.x+r.w && p[1] >= r.y && p[1] <= r.y+r.h;
+const dist = (a,b) => Math.hypot(a[0]-b[0], a[1]-b[1]);
+const mbrOf = ids => {
+  let x0=1,y0=1,x1=0,y1=0;
+  ids.forEach(i=>{const p=PTS[i]; x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]); x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]);});
+  return {x:x0,y:y0,w:x1-x0,h:y1-y0};
+};
+const RS = {
+  idle:{fill:null,stroke:"#d5dce6",lw:1},
+  lvl:{fill:null,stroke:"#c3b2f2",lw:1.4},
+  hit:{fill:"rgba(192,122,16,.10)",stroke:"#c07a10",lw:1.6},
+  node:{fill:null,stroke:"#c07a10",lw:1.8},
+  prune:{fill:"rgba(214,69,69,.06)",stroke:"#d64545",lw:1.2,dash:[5,4]},
+  in:{fill:"rgba(15,138,95,.17)",stroke:"#0f8a5f",lw:1.6},
+  read:{fill:"rgba(37,99,235,.13)",stroke:"#2563eb",lw:1.6},
+  cover:{fill:"rgba(124,58,237,.15)",stroke:"#7c3aed",lw:1.5},
+  cell:{fill:"rgba(37,99,235,.05)",stroke:"#a9c2f7",lw:1}
+};
+const cvs = byId("cv"), ctx = cvs.getContext("2d");
+ctx.setTransform(2,0,0,-2,0,2*N);
+
+function shape(o,path){
+  const st = RS[o.s] || RS.idle;
+  ctx.save();
+  if(st.dash) ctx.setLineDash(st.dash);
+  ctx.lineWidth = st.lw;
+  ctx.strokeStyle = st.stroke;
+  path();
+  if(st.fill){ ctx.fillStyle = st.fill; ctx.fill(); }
+  ctx.stroke();
+  ctx.restore();
+}
+function hexPath(q,r){
+  const c = axToXY(q,r);
+  ctx.beginPath();
+  for(let i=0;i<6;i++){
+    const a = Math.PI/180*(60*i+30);
+    const px = X(c[0]) + W(HS)*Math.cos(a), py = Y(c[1]) + W(HS)*Math.sin(a);
+    i ? ctx.lineTo(px,py) : ctx.moveTo(px,py);
+  }
+  ctx.closePath();
+}
+function draw(f){
+  ctx.clearRect(0,0,N,N);
+  ctx.strokeStyle = "#dfe4ea"; ctx.lineWidth = 1;
+  ctx.strokeRect(X(0),Y(0),W(1),W(1));
+  (f.path||[]).length && (()=>{
+    ctx.save(); ctx.strokeStyle="#c9d2de"; ctx.lineWidth=1.2; ctx.beginPath();
+    f.path.forEach((p,i)=> i ? ctx.lineTo(X(p[0]),Y(p[1])) : ctx.moveTo(X(p[0]),Y(p[1])));
+    ctx.stroke(); ctx.restore();
+  })();
+  (f.rects||[]).forEach(r=> shape(r, ()=>{ ctx.beginPath(); ctx.rect(X(r.x),Y(r.y),W(r.w),W(r.h)); }));
+  (f.hexes||[]).forEach(h=> shape(h, ()=> hexPath(h.q,h.r)));
+  (f.lines||[]).forEach(l=>{
+    const st = RS[l.s] || RS.idle;
+    ctx.save(); ctx.strokeStyle = st.stroke; ctx.lineWidth = st.lw;
+    ctx.beginPath(); ctx.moveTo(X(l.x1),Y(l.y1)); ctx.lineTo(X(l.x2),Y(l.y2)); ctx.stroke(); ctx.restore();
+  });
+  if(f.circ){
+    ctx.save(); ctx.strokeStyle="#7c3aed"; ctx.lineWidth=1.6; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.arc(X(f.circ.x),Y(f.circ.y),W(f.circ.r),0,7); ctx.stroke(); ctx.restore();
+  }
+  if(f.q === "rect"){
+    ctx.save(); ctx.strokeStyle="#111827"; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+    ctx.strokeRect(X(QR.x),Y(QR.y),W(QR.w),W(QR.h)); ctx.restore();
+  }
+  if(f.q === "circle"){
+    ctx.save(); ctx.strokeStyle="#111827"; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.arc(X(QC.x),Y(QC.y),W(QC.r),0,7); ctx.stroke(); ctx.restore();
+  }
+  const ps = f.ps || {};
+  PTS.forEach((p,i)=>{
+    const s = ps[i];
+    if(s === "hide") return;
+    const px = X(p[0]), py = Y(p[1]);
+    if(s === "found"){ ctx.fillStyle="#0f8a5f"; ctx.beginPath(); ctx.arc(px,py,4.2,0,7); ctx.fill();
+      ctx.strokeStyle="rgba(15,138,95,.35)"; ctx.lineWidth=1.4; ctx.beginPath(); ctx.arc(px,py,7,0,7); ctx.stroke(); }
+    else if(s === "check"){ ctx.fillStyle="#c07a10"; ctx.beginPath(); ctx.arc(px,py,4,0,7); ctx.fill(); }
+    else if(s === "miss"){ ctx.fillStyle="#e8a3a3"; ctx.beginPath(); ctx.arc(px,py,3,0,7); ctx.fill(); }
+    else if(s === "flag"){ ctx.fillStyle="#d64545"; ctx.beginPath(); ctx.arc(px,py,4.6,0,7); ctx.fill();
+      ctx.strokeStyle="#d64545"; ctx.lineWidth=1.4; ctx.beginPath(); ctx.arc(px,py,8,0,7); ctx.stroke(); }
+    else { ctx.fillStyle="#9aa5b4"; ctx.beginPath(); ctx.arc(px,py,2.8,0,7); ctx.fill(); }
+  });
+  if(f.mark){
+    const px = X(f.mark[0]), py = Y(f.mark[1]);
+    ctx.save(); ctx.strokeStyle="#111827"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(px-7,py); ctx.lineTo(px+7,py); ctx.moveTo(px,py-7); ctx.lineTo(px,py+7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(px,py,4,0,7); ctx.stroke(); ctx.restore();
+  }
+}
+
+function stateBag(){
+  const b = {frames:[], rects:[], lines:[], hexes:[], ps:{}, m:{}, extra:{}};
+  b.snap = (note,cls,extra)=>{
+    b.frames.push(Object.assign({
+      note, cls,
+      rects: b.rects.map(o=>({...o})),
+      lines: b.lines.map(o=>({...o})),
+      hexes: b.hexes.map(o=>({...o})),
+      ps: {...b.ps},
+      m: Object.entries(b.m).map(([k,v])=>[k,v])
+    }, b.extra, extra||{}));
+  };
+  return b;
+}
+
+function genQuadtree(){
+  const CAP = 4, MAXD = 7;
+  const root = {x:0,y:0,w:1,h:1,ids:[],kids:null};
+  const quad = (n,p) => (p[0] >= n.x+n.w/2 ? 1 : 0) + (p[1] >= n.y+n.h/2 ? 2 : 0);
+  const split = n => {
+    const hw = n.w/2, hh = n.h/2;
+    n.kids = [{x:n.x,y:n.y},{x:n.x+hw,y:n.y},{x:n.x,y:n.y+hh},{x:n.x+hw,y:n.y+hh}]
+      .map(o=>({x:o.x,y:o.y,w:hw,h:hh,ids:[],kids:null}));
+  };
+  const ins = (n,i,d) => {
+    if(n.kids) return ins(n.kids[quad(n,PTS[i])], i, d+1);
+    n.ids.push(i);
+    if(n.ids.length > CAP && d < MAXD){
+      split(n);
+      const ids = n.ids; n.ids = [];
+      ids.forEach(j=>ins(n,j,d));
+    }
+  };
+  IDS.forEach(i=>ins(root,i,0));
+
+  const leaves = [], all = [];
+  let maxd = 0;
+  (function walk(n,d){ all.push(n); maxd = Math.max(maxd,d); n.kids ? n.kids.forEach(k=>walk(k,d+1)) : leaves.push(n); })(root,0);
+
+  const b = stateBag();
+  b.extra = {q:"rect"};
+  b.m = {"nodes visited":0,"subtrees pruned":0,"points read":0,"found":0};
+  leaves.forEach(l=>b.rects.push({x:l.x,y:l.y,w:l.w,h:l.h,s:"idle"}));
+  b.snap(`Built: ${all.length} nodes, ${leaves.length} leaves, depth ${maxd}, ${CAP} points per leaf. The cells are fixed by space, not by the data — dense clusters get deep, empty regions stay one cell.`, "info");
+  const base = b.rects.slice();
+
+  const collect = n => n.kids ? n.kids.flatMap(collect) : n.ids;
+  (function rec(n){
+    if(!inter(n,QR)){
+      b.m["subtrees pruned"]++;
+      b.rects.push({x:n.x,y:n.y,w:n.w,h:n.h,s:"prune"});
+      b.snap(`Cell does not intersect the window — the whole subtree (${collect(n).length} points) is skipped without reading a single point.`, "bad");
+      return;
+    }
+    b.m["nodes visited"]++;
+    if(covers(QR,n)){
+      b.rects.push({x:n.x,y:n.y,w:n.w,h:n.h,s:"in"});
+      collect(n).forEach(i=>{ b.ps[i]="found"; b.m["found"]++; });
+      b.snap(`Cell is fully inside the window — every point below it qualifies. No per-point test needed, just emit the subtree.`, "ok");
+      return;
+    }
+    b.rects.push({x:n.x,y:n.y,w:n.w,h:n.h,s:n.kids?"node":"hit"});
+    if(n.kids){
+      b.snap(`Cell straddles the window edge — descend into all 4 quadrants.`, "warn");
+      n.kids.forEach(rec);
+    } else {
+      n.ids.forEach(i=>{ b.m["points read"]++; const hit = inRect(PTS[i],QR); b.ps[i] = hit ? "found" : "miss"; if(hit) b.m["found"]++; });
+      b.snap(`Straddling leaf — test its ${n.ids.length} points one by one. Only the edge cells ever cost per-point work.`, "warn");
+    }
+  })(root);
+
+  b.rects = base;
+  b.snap(`Done. ${b.m["found"]} points returned after reading only ${b.m["points read"]} coordinates out of ${PTS.length}. Cost is proportional to the window perimeter, not to the dataset.`, "ok");
+  return b.frames;
+}
+
+function kdBuild(ids, depth, box){
+  if(!ids.length) return null;
+  const ax = depth & 1;
+  const sorted = ids.slice().sort((a,b)=>PTS[a][ax]-PTS[b][ax]);
+  const mid = sorted.length >> 1, pid = sorted[mid], sp = PTS[pid][ax];
+  const bl = ax === 0 ? {x:box.x,y:box.y,w:sp-box.x,h:box.h} : {x:box.x,y:box.y,w:box.w,h:sp-box.y};
+  const br = ax === 0 ? {x:sp,y:box.y,w:box.x+box.w-sp,h:box.h} : {x:box.x,y:sp,w:box.w,h:box.y+box.h-sp};
+  return {ax, sp, pid, box, n:sorted.length,
+    l:kdBuild(sorted.slice(0,mid), depth+1, bl),
+    r:kdBuild(sorted.slice(mid+1), depth+1, br)};
+}
+const kdLine = n => n.ax === 0
+  ? {x1:n.sp,y1:n.box.y,x2:n.sp,y2:n.box.y+n.box.h}
+  : {x1:n.box.x,y1:n.sp,x2:n.box.x+n.box.w,y2:n.sp};
+
+function genKd(){
+  const root = kdBuild(IDS, 0, {x:0,y:0,w:1,h:1});
+  const b = stateBag();
+  b.extra = {mark:QP};
+  b.m = {"nodes visited":0,"subtrees pruned":0,"points read":0,"best distance":"-"};
+  let depth = 0;
+  (function walk(n,d){ if(!n) return; depth = Math.max(depth,d); b.lines.push({...kdLine(n),s:"idle"}); walk(n.l,d+1); walk(n.r,d+1); })(root,1);
+  b.snap(`Built by recursive median split: depth 1 cuts on x, depth 2 on y, alternating all the way down. ${PTS.length} points, depth ${depth}, one point per node, perfectly balanced because it was bulk built.`, "info");
+  const base = b.lines.slice();
+  b.lines = [];
+
+  let best = -1, bd = Infinity;
+  const count = n => n ? 1 + count(n.l) + count(n.r) : 0;
+  (function rec(n){
+    if(!n) return;
+    b.m["nodes visited"]++;
+    b.lines.push({...kdLine(n), s:"hit"});
+    b.m["points read"]++;
+    const d = dist(PTS[n.pid], QP);
+    if(d < bd){
+      if(best >= 0) b.ps[best] = "miss";
+      best = n.pid; bd = d; b.ps[best] = "found";
+      b.m["best distance"] = bd.toFixed(3);
+      b.snap(`New nearest: distance ${bd.toFixed(3)}. The dashed circle is the search radius — everything outside it is now irrelevant.`, "ok", {circ:{x:QP[0],y:QP[1],r:bd}});
+    } else {
+      b.ps[n.pid] = "miss";
+      b.snap(`Node point at ${d.toFixed(3)} — farther than the current best, discarded.`, null, {circ:{x:QP[0],y:QP[1],r:bd}});
+    }
+    const near = QP[n.ax] < n.sp ? n.l : n.r;
+    const far  = QP[n.ax] < n.sp ? n.r : n.l;
+    rec(near);
+    const gap = Math.abs(QP[n.ax] - n.sp);
+    if(gap < bd){
+      b.snap(`The ${n.ax===0?"vertical":"horizontal"} split line is ${gap.toFixed(3)} away, closer than the radius ${bd.toFixed(3)} — a nearer point could hide on the far side, so it must be searched.`, "warn", {circ:{x:QP[0],y:QP[1],r:bd}});
+      rec(far);
+    } else if(far){
+      b.m["subtrees pruned"]++;
+      b.snap(`Split line is ${gap.toFixed(3)} away, beyond the radius ${bd.toFixed(3)} — the far subtree (${count(far)} points) cannot contain anything closer. Pruned.`, "ok", {circ:{x:QP[0],y:QP[1],r:bd}});
+    }
+  })(root);
+
+  b.lines = base;
+  b.snap(`Nearest neighbour found in ${b.m["points read"]} distance computations out of ${PTS.length}, with ${b.m["subtrees pruned"]} subtrees never touched. Backtracking with a shrinking radius is what makes k-d trees the reference structure for kNN.`, "ok", {circ:{x:QP[0],y:QP[1],r:bd}});
+  return b.frames;
+}
+
+function bkdBuild(ids, depth, box, leaf){
+  if(ids.length <= leaf) return {leaf:true, ids, box, mbr:mbrOf(ids)};
+  const ax = depth & 1;
+  const sorted = ids.slice().sort((a,b)=>PTS[a][ax]-PTS[b][ax]);
+  const mid = sorted.length >> 1, sp = PTS[sorted[mid]][ax];
+  const bl = ax === 0 ? {x:box.x,y:box.y,w:sp-box.x,h:box.h} : {x:box.x,y:box.y,w:box.w,h:sp-box.y};
+  const br = ax === 0 ? {x:sp,y:box.y,w:box.x+box.w-sp,h:box.h} : {x:box.x,y:sp,w:box.w,h:box.y+box.h-sp};
+  return {ax, sp, box,
+    l:bkdBuild(sorted.slice(0,mid), depth+1, bl, leaf),
+    r:bkdBuild(sorted.slice(mid), depth+1, br, leaf)};
+}
+
+function genBkd(){
+  const LEAF = 12;
+  const root = bkdBuild(IDS, 0, {x:0,y:0,w:1,h:1}, LEAF);
+  const blocks = [];
+  (function walk(n){ if(n.leaf){ n.blk = blocks.length; blocks.push(n); return; } walk(n.l); walk(n.r); })(root);
+
+  const b = stateBag();
+  b.extra = {q:"rect"};
+  b.m = {"blocks read":0,"blocks skipped":0,"points read":0,"found":0};
+  blocks.forEach(l=>b.rects.push({...l.mbr, s:"idle"}));
+  b.snap(`Bulk loaded: ${PTS.length} points sorted into ${blocks.length} immutable leaf blocks of up to ${LEAF} points. Each block stores the tight min/max box of what it holds — that box is the whole reason blocks can be skipped without being read.`, "info");
+  const base = b.rects.slice();
+  const bid = i => "B" + String(i).padStart(2,"0");
+
+  const read = [], skipped = [];
+  (function rec(n){
+    if(n.leaf){
+      if(!inter(n.mbr, QR)){
+        b.m["blocks skipped"]++;
+        skipped.push(n.blk);
+        b.rects.push({...n.mbr, s:"prune"});
+        b.snap(`${bid(n.blk)}: block box misses the window — skipped. Zero disk reads, the min/max in the parent was enough.`, "bad", {code:strip(read,skipped)});
+        return;
+      }
+      b.m["blocks read"]++;
+      read.push(n.blk);
+      b.rects.push({...n.mbr, s:"read"});
+      n.ids.forEach(i=>{ b.m["points read"]++; const hit = inRect(PTS[i],QR); b.ps[i] = hit ? "found" : "miss"; if(hit) b.m["found"]++; });
+      b.snap(`${bid(n.blk)}: box overlaps — read the block off disk, then test its ${n.ids.length} packed points. One sequential page read.`, "warn", {code:strip(read,skipped)});
+      return;
+    }
+    b.lines.push({...kdLine(n), s:"hit"});
+    const nearFirst = [n.l, n.r];
+    b.snap(`Interior split on ${n.ax===0?"x":"y"} at ${n.sp.toFixed(3)} — the split values live in a tiny in-heap index, so this part of the walk costs no I/O.`, null, {code:strip(read,skipped)});
+    nearFirst.forEach(k=>rec(k));
+  })(root);
+
+  b.rects = base;
+  b.lines = [];
+  b.snap(`Done: ${b.m["blocks read"]} of ${blocks.length} blocks read, ${b.m["points read"]} points decoded, ${b.m["found"]} matched. Writes never touch this tree — new documents build a new segment, and merges rebuild it. That is what makes it cheap on disk and expensive to update in place.`, "ok", {code:strip(read,skipped)});
+  return b.frames;
+
+  function strip(r,s){
+    return `<b>read</b>    ${r.map(bid).join(" ") || "-"}\n<i>skipped</i> ${s.map(bid).join(" ") || "-"}`;
+  }
+}
+
+function genRtree(){
+  const CAP = 6;
+  const union = arr => {
+    let x0=1,y0=1,x1=0,y1=0;
+    arr.forEach(o=>{ x0=Math.min(x0,o.mbr.x); y0=Math.min(y0,o.mbr.y); x1=Math.max(x1,o.mbr.x+o.mbr.w); y1=Math.max(y1,o.mbr.y+o.mbr.h); });
+    return {x:x0,y:y0,w:x1-x0,h:y1-y0};
+  };
+  const cx = o => o.mbr.x + o.mbr.w/2, cy = o => o.mbr.y + o.mbr.h/2;
+  const pack = items => {
+    const P = Math.ceil(items.length/CAP), S = Math.ceil(Math.sqrt(P)), out = [];
+    const byX = items.slice().sort((a,b)=>cx(a)-cx(b));
+    for(let i=0;i<byX.length;i+=S*CAP){
+      const sl = byX.slice(i, i+S*CAP).sort((a,b)=>cy(a)-cy(b));
+      for(let j=0;j<sl.length;j+=CAP){
+        const g = sl.slice(j, j+CAP);
+        out.push({mbr:union(g), kids:g});
+      }
+    }
+    return out;
+  };
+  let level = PTS.map((p,i)=>({mbr:{x:p[0],y:p[1],w:0,h:0}, id:i}));
+  const levels = [];
+  while(level.length > 1){ level = pack(level); levels.push(level); }
+  const root = level[0];
+  const leaves = levels[0];
+  const isLeaf = n => n.kids && n.kids[0].id !== undefined;
+
+  let ovl = 0;
+  leaves.forEach((a,i)=>leaves.forEach((c,j)=>{
+    if(j <= i || !inter(a.mbr,c.mbr)) return;
+    const w = Math.min(a.mbr.x+a.mbr.w, c.mbr.x+c.mbr.w) - Math.max(a.mbr.x,c.mbr.x);
+    const h = Math.min(a.mbr.y+a.mbr.h, c.mbr.y+c.mbr.h) - Math.max(a.mbr.y,c.mbr.y);
+    ovl += w*h;
+  }));
+
+  const b = stateBag();
+  b.extra = {q:"rect"};
+  b.m = {"nodes visited":0,"subtrees pruned":0,"points read":0,"found":0};
+  levels[1] && levels[1].forEach(n=>b.rects.push({...n.mbr, s:"lvl"}));
+  leaves.forEach(n=>b.rects.push({...n.mbr, s:"idle"}));
+  b.snap(`Bulk loaded with sort-tile-recursive packing: ${leaves.length} leaf boxes of up to ${CAP} points, grouped into ${levels[1].length} parents (violet). The boxes hug the data instead of the grid — and because they can overlap (${(ovl*100).toFixed(2)}% of the area here is covered twice), one query can be forced down several branches.`, "info");
+  const base = b.rects.slice();
+
+  const countPts = n => n.id !== undefined ? 1 : n.kids.reduce((s,k)=>s+countPts(k),0);
+  (function rec(n){
+    b.m["nodes visited"]++;
+    b.rects.push({...n.mbr, s:isLeaf(n)?"hit":"node"});
+    if(isLeaf(n)){
+      n.kids.forEach(it=>{ b.m["points read"]++; const hit = inRect(PTS[it.id],QR); b.ps[it.id] = hit ? "found" : "miss"; if(hit) b.m["found"]++; });
+      b.snap(`Leaf box overlaps the window — read its ${n.kids.length} entries and test each one.`, "warn");
+      return;
+    }
+    b.snap(`Box overlaps the window — examine its ${n.kids.length} child boxes.`, null);
+    n.kids.forEach(k=>{
+      if(inter(k.mbr, QR)) return rec(k);
+      b.m["subtrees pruned"]++;
+      b.rects.push({...k.mbr, s:"prune"});
+      b.snap(`Child box is disjoint from the window — ${countPts(k)} points pruned in one comparison.`, "bad");
+    });
+  })(root);
+
+  b.rects = base;
+  b.snap(`Done: ${b.m["found"]} hits, ${b.m["points read"]} points read, ${b.m["nodes visited"]} nodes visited. Same result as the quadtree, reached by testing data boxes instead of space cells — which is why R-trees also index polygons and lines, not just points.`, "ok");
+  return b.frames;
+}
+
+function genGeohash(){
+  const B32 = "0123456789bcdefghjkmnpqrstuvwxyz";
+  const p = PTS[GA];
+  const b = stateBag();
+  b.extra = {mark:p};
+  b.m = {"bits":0,"chars":0,"cell width":"360deg","cell height":"180deg"};
+  let lo = [0,0], hi = [1,1];
+  let lon = [-180,180], lat = [-90,90];
+  let bits = "", chars = "", acc = 0, nb = 0;
+  const cellRect = () => ({x:lo[0], y:lo[1], w:hi[0]-lo[0], h:hi[1]-lo[1], s:"cell"});
+  const code = () => `<b>bits</b>  ${bits.replace(/(.{5})/g,"$1 ") || "-"}\n<b>hash</b>  <em>${chars || "-"}</em>\n<i>lon</i>   [${lon[0].toFixed(2)}, ${lon[1].toFixed(2)}]\n<i>lat</i>   [${lat[0].toFixed(2)}, ${lat[1].toFixed(2)}]`;
+
+  b.rects.push(cellRect());
+  b.snap(`Geohash is not a tree, it is an encoding. Start with the whole world as one cell and interleave one bit of longitude, one bit of latitude, halving a range each time.`, "info", {code:code()});
+
+  for(let i=0;i<10;i++){
+    const ax = i % 2 === 0 ? 0 : 1;
+    const mid = (lo[ax]+hi[ax])/2;
+    const rng = ax === 0 ? lon : lat;
+    const rmid = (rng[0]+rng[1])/2;
+    const one = p[ax] >= mid;
+    if(one){ lo[ax] = mid; rng[0] = rmid; } else { hi[ax] = mid; rng[1] = rmid; }
+    bits += one ? "1" : "0";
+    acc = acc*2 + (one ? 1 : 0); nb++;
+    let note = `bit ${i+1}: ${ax===0?"longitude":"latitude"} — the point is in the ${ax===0?(one?"eastern":"western"):(one?"northern":"southern")} half, so the bit is ${one?1:0} and the cell halves ${ax===0?"horizontally":"vertically"}.`;
+    let cls = null;
+    if(nb === 5){ chars += B32[acc]; acc = 0; nb = 0; note += ` Five bits complete: base32 character "${chars.slice(-1)}" appended.`; cls = "ok"; }
+    b.m["bits"] = i+1; b.m["chars"] = chars.length;
+    b.m["cell width"] = (lon[1]-lon[0]).toFixed(2)+"deg";
+    b.m["cell height"] = (lat[1]-lat[0]).toFixed(2)+"deg";
+    b.rects.forEach(r=>r.s = "idle");
+    b.rects.push(cellRect());
+    b.snap(note, cls, {code:code()});
+  }
+  b.snap(`Two characters after ten bits. Real keys go to 6-9 characters (about 1.2 km down to 5 m). The payoff: the hash is a plain sortable string, so any B-tree, sorted set or row key can index geography with no new index type.`, "ok", {code:code()});
+
+  const GX = 8, GY = 4;
+  const gx = Math.min(GX-1, Math.floor(p[0]*GX)), gy = Math.min(GY-1, Math.floor(p[1]*GY));
+  const cellOf = (i,j) => ({x:i/GX, y:j/GY, w:1/GX, h:1/GY});
+  const charOf = (i,j) => B32[(((i>>2)&1)<<4) | (((j>>1)&1)<<3) | (((i>>1)&1)<<2) | ((j&1)<<1) | (i&1)];
+  b.rects = [];
+  b.lines = [];
+  b.ps = {};
+  b.m = {"cells scanned":0,"points read":0,"found":0,"missed nearby":0};
+  for(let j=0;j<GY;j++) for(let i=0;i<GX;i++) b.rects.push({...cellOf(i,j), s:"idle"});
+  b.snap(`Search phase, drawn at one character (a 8x4 grid) so the cells are visible — production uses 6-9. Every cell is a prefix; a window query becomes prefix range scans.`, "info", {code:`<b>WHERE</b> gh <b>LIKE</b> '<em>${chars[0]}</em>%'   <i>-- one B-tree range scan</i>`});
+
+  const idsIn = (i,j) => IDS.filter(k=>inRect(PTS[k], cellOf(i,j)));
+  b.rects.push({...cellOf(gx,gy), s:"read"});
+  const own = idsIn(gx,gy);
+  own.forEach(k=>{ b.ps[k] = "found"; });
+  b.m["cells scanned"] = 1; b.m["points read"] = own.length; b.m["found"] = own.length;
+  b.snap(`The query point sits in cell "${charOf(gx,gy)}". One range scan on that prefix returns its ${own.length} points — the fast path, no tree traversal at all.`, "ok", {code:`<b>WHERE</b> gh <b>LIKE</b> '<em>${charOf(gx,gy)}</em>%'   <i>-- ${own.length} rows</i>`});
+
+  b.ps[GA] = "found"; b.ps[GB] = "flag";
+  b.m["missed nearby"] = 1;
+  b.snap(`The trap. The red point is the query point's closest neighbour in the whole dataset, but it fell on the other side of a cell boundary, so its hash starts with a different character. A prefix scan misses it completely — and no amount of extra precision fixes it, because every level has boundaries.`, "bad", {code:`<i>query point</i>  <em>${charOf(gx,gy)}</em>...\n<i>neighbour</i>    <i>${charOf(gx+1,gy)}</i>...   <b>adjacent on the ground, unrelated as keys</b>`});
+
+  let extra = 0;
+  for(let dj=-1;dj<=1;dj++) for(let di=-1;di<=1;di++){
+    if(!di && !dj) continue;
+    const i = gx+di, j = gy+dj;
+    if(i<0||j<0||i>=GX||j>=GY) continue;
+    b.rects.push({...cellOf(i,j), s:"cover"});
+    const got = idsIn(i,j);
+    got.forEach(k=>{ if(b.ps[k] !== "found") b.ps[k] = "check"; });
+    b.m["cells scanned"]++; b.m["points read"] += got.length; extra += got.length;
+    b.snap(`Neighbour cell to the ${[dj>0?"north":dj<0?"south":"",di>0?"east":di<0?"west":""].filter(Boolean).join("-")} added — scan ${b.m["cells scanned"]} of 9. Correctness now costs 9 range scans plus a post-filter on real distance.`, "warn", {code:`<b>WHERE</b> gh <b>LIKE ANY</b> (<em>9 prefixes</em>)\n<i>then</i> ST_DWithin(...)  <i>-- exact filter</i>`});
+  }
+  b.ps[GB] = "found";
+  b.m["found"] += extra; b.m["missed nearby"] = 0;
+  b.snap(`With all 8 neighbours scanned the near point is found. That is the geohash deal: trivial to store and shard, but every honest query is 9 scans plus a filter, and cells are rectangles that stretch with latitude.`, "ok", {code:`<b>cells</b> 9   <b>points read</b> ${b.m["points read"]}   <b>found</b> ${b.m["found"]}`});
+  return b.frames;
+}
+
+const HORD = 16;
+function d2xy(n,d){
+  let rx, ry, t = d, x = 0, y = 0;
+  for(let s=1;s<n;s*=2){
+    rx = 1 & (t/2); ry = 1 & (t ^ rx);
+    if(ry === 0){ if(rx === 1){ x = s-1-x; y = s-1-y; } const tmp = x; x = y; y = tmp; }
+    x += s*rx; y += s*ry; t = Math.floor(t/4);
+  }
+  return [x,y];
+}
+function genS2(){
+  const MAXL = 3, n = 16;
+  const path = [], hidx = {};
+  for(let d=0;d<n*n;d++){
+    const c = d2xy(n,d);
+    hidx[c[0]+","+c[1]] = d;
+    path.push([(c[0]+.5)/n, (c[1]+.5)/n]);
+  }
+
+  const b = stateBag();
+  b.extra = {q:"circle", path};
+  b.m = {"cells tested":0,"cover cells":0,"1D ranges":0,"found":0};
+  b.snap(`One S2 face, drawn flat. The grey line is the Hilbert curve: it visits every cell of the face exactly once, so a cell id is a position on a curve — a 64-bit integer that a normal B-tree can index. Neighbouring cells are usually neighbouring integers.`, "info");
+
+  const circIn = r => {
+    const cxs = [r.x, r.x+r.w], cys = [r.y, r.y+r.h];
+    return cxs.every(x=>cys.every(y=>Math.hypot(x-QC.x, y-QC.y) <= QC.r));
+  };
+  const circHit = r => {
+    const dx = Math.max(r.x-QC.x, 0, QC.x-(r.x+r.w));
+    const dy = Math.max(r.y-QC.y, 0, QC.y-(r.y+r.h));
+    return Math.hypot(dx,dy) <= QC.r;
+  };
+  const cover = [];
+  (function rec(cell, lvl){
+    b.m["cells tested"]++;
+    if(!circHit(cell)){
+      b.rects.push({...cell, s:"prune"});
+      b.snap(`Level ${lvl} cell is outside the region — dropped, together with its 4^${MAXL-lvl} descendants.`, "bad");
+      return;
+    }
+    if(circIn(cell) || lvl === MAXL){
+      cover.push({cell, lvl});
+      b.rects.push({...cell, s: circIn(cell) ? "in" : "cover"});
+      b.m["cover cells"] = cover.length;
+      b.snap(circIn(cell)
+        ? `Level ${lvl} cell is fully inside — kept whole. A coarse cell means one short range covering many rows, so the coverer stops early wherever it can.`
+        : `Level ${lvl} cell only clips the boundary and we are at the maximum level — kept as an approximation. These are the cells that force a post-filter.`,
+        circIn(cell) ? "ok" : "warn");
+      return;
+    }
+    b.rects.push({...cell, s:"node"});
+    b.snap(`Level ${lvl} cell straddles the boundary — subdivide into 4 children of level ${lvl+1}.`, null);
+    const hw = cell.w/2, hh = cell.h/2;
+    [[0,0],[1,0],[0,1],[1,1]].forEach(o=>rec({x:cell.x+o[0]*hw, y:cell.y+o[1]*hh, w:hw, h:hh}, lvl+1));
+  })({x:0,y:0,w:1,h:1}, 0);
+
+  const ids = [];
+  cover.forEach(c=>{
+    const step = n >> c.lvl;
+    const x0 = Math.round(c.cell.x*n), y0 = Math.round(c.cell.y*n);
+    let lo = Infinity, hi = -Infinity;
+    for(let x=x0;x<x0+step;x++) for(let y=y0;y<y0+step;y++){
+      const d = hidx[x+","+y]; lo = Math.min(lo,d); hi = Math.max(hi,d);
+    }
+    ids.push([lo,hi]);
+  });
+  ids.sort((a,c)=>a[0]-c[0]);
+  const ranges = [];
+  ids.forEach(r=>{
+    const last = ranges[ranges.length-1];
+    if(last && r[0] === last[1]+1) last[1] = r[1]; else ranges.push([r[0],r[1]]);
+  });
+  b.m["1D ranges"] = ranges.length;
+  b.snap(`The cover is ${cover.length} cells of mixed levels. Because each cell is a contiguous slice of the Hilbert curve, they collapse into ${ranges.length} integer ranges — the query is now that many index range scans, nothing 2D about it.`, "ok",
+    {code:`<b>cellid ranges</b>\n${ranges.map(r=>`[${r[0]}, ${r[1]}]`).join("  ")}\n<i>SELECT ... WHERE cellid BETWEEN ? AND ? (x${ranges.length})</i>`});
+
+  IDS.forEach(i=>{
+    const inCover = cover.some(c=>inRect(PTS[i], c.cell));
+    if(!inCover) return;
+    const real = dist(PTS[i], [QC.x,QC.y]) <= QC.r;
+    b.ps[i] = real ? "found" : "check";
+    if(real) b.m["found"]++;
+  });
+  b.snap(`Rows fetched from those ranges: green are truly inside the circle, amber are false positives from the boundary cells that the exact predicate removes. Tighter covers mean fewer false positives but more ranges — that is the only knob (max cells) S2 asks you to tune.`, "warn",
+    {code:`<b>cover cells</b> ${cover.length}   <b>ranges</b> ${ranges.length}   <b>hits</b> ${b.m["found"]}   <i>false positives</i> ${Object.values(b.ps).filter(v=>v==="check").length}`});
+  return b.frames;
+}
+
+const HS = 0.062;
+function axToXY(q,r){ return [0.5 + HS*Math.sqrt(3)*(q + r/2), 0.5 + HS*1.5*r]; }
+function xyToAx(x,y){
+  const px = (x-0.5)/HS, py = (y-0.5)/HS;
+  const q = Math.sqrt(3)/3*px - py/3, r = 2/3*py;
+  let s = -q-r, rq = Math.round(q), rr = Math.round(r), rs = Math.round(s);
+  const dq = Math.abs(rq-q), dr = Math.abs(rr-r), ds = Math.abs(rs-s);
+  if(dq > dr && dq > ds) rq = -rr-rs; else if(dr > ds) rr = -rq-rs;
+  return [rq,rr];
+}
+const hexDist = (a,b) => {
+  const dq = a[0]-b[0], dr = a[1]-b[1];
+  return Math.max(Math.abs(dq), Math.abs(dr), Math.abs(dq+dr));
+};
+
+function genH3(){
+  const cells = [];
+  for(let r=-12;r<=12;r++) for(let q=-14;q<=14;q++){
+    const c = axToXY(q,r);
+    if(c[0] > -0.02 && c[0] < 1.02 && c[1] > -0.02 && c[1] < 1.02) cells.push([q,r]);
+  }
+  const home = xyToAx(QP[0], QP[1]);
+  const bucket = {};
+  IDS.forEach(i=>{ const a = xyToAx(PTS[i][0], PTS[i][1]); (bucket[a[0]+","+a[1]] = bucket[a[0]+","+a[1]] || []).push(i); });
+
+  const b = stateBag();
+  b.extra = {mark:QP};
+  b.m = {"cells":0,"points read":0,"found":0,"ring":0};
+  cells.forEach(c=>b.hexes.push({q:c[0], r:c[1], s:"idle"}));
+  b.snap(`H3 is a fixed hexagonal grid, not a tree. Hexagons have one property squares do not: all 6 neighbours share an edge and sit at the same distance from the centre. There are no diagonal neighbours to argue about.`, "info");
+  const base = b.hexes.slice();
+
+  b.hexes.push({q:home[0], r:home[1], s:"read"});
+  const own = bucket[home.join(",")] || [];
+  own.forEach(i=>b.ps[i] = "found");
+  b.m["cells"] = 1; b.m["points read"] = own.length; b.m["found"] = own.length;
+  b.snap(`Point to cell is pure arithmetic on the icosahedral projection — no index lookup, no tree descent, O(1). The cell id is a 64-bit integer you store in an ordinary column.`, "ok",
+    {code:`<b>latLngToCell</b>(lat, lng, res) -> <em>0x8928308280fffff</em>\n<i>WHERE h3_8 = ?</i>   <i>-- one equality lookup</i>`});
+
+  for(let k=1;k<=2;k++){
+    const ring = cells.filter(c=>hexDist(c,home) === k);
+    ring.forEach(c=>{
+      b.hexes.push({q:c[0], r:c[1], s: k === 1 ? "cover" : "hit"});
+      const got = bucket[c.join(",")] || [];
+      got.forEach(i=>{ if(b.ps[i] !== "found") b.ps[i] = "found"; b.m["found"]++; });
+      b.m["points read"] += got.length;
+      b.m["cells"]++;
+    });
+    b.m["ring"] = k;
+    b.snap(`kRing(${k}) adds ${ring.length} cells, all exactly ${k} step${k>1?"s":""} away. The neighbourhood is ${b.m["cells"]} ids — a single IN list against the B-tree, and no distance correction because every ring member is equidistant.`, k === 1 ? "ok" : "warn",
+      {code:`<b>gridDisk</b>(cell, ${k}) -> <em>${b.m["cells"]} cell ids</em>\n<i>WHERE h3_8 IN (...)</i>`});
+  }
+
+  b.hexes = base.slice();
+  b.ps = {};
+  b.m = {"cover cells":0,"points read":0,"found":0,"edge error":0};
+  let cover = 0, fp = 0;
+  cells.forEach(c=>{
+    const ctr = axToXY(c[0], c[1]);
+    if(dist(ctr, [QC.x,QC.y]) > QC.r) return;
+    cover++;
+    b.hexes.push({q:c[0], r:c[1], s:"cover"});
+    (bucket[c.join(",")] || []).forEach(i=>{
+      b.m["points read"]++;
+      const real = dist(PTS[i], [QC.x,QC.y]) <= QC.r;
+      b.ps[i] = real ? "found" : "check";
+      real ? b.m["found"]++ : fp++;
+    });
+  });
+  let missed = 0;
+  IDS.forEach(i=>{
+    if(dist(PTS[i], [QC.x,QC.y]) > QC.r || b.ps[i]) return;
+    b.ps[i] = "flag"; missed++;
+  });
+  b.m["cover cells"] = cover;
+  b.m["edge error"] = fp + missed;
+  b.snap(`A region query is the same trick as S2: cover the shape with cells, fetch by id, filter exactly. ${cover} cells, ${fp} false positive${fp===1?"":"s"} inside them, and ${missed} point${missed===1?"":"s"} (red) that are really in the circle but sit in cells the cover dropped. polygonToCells keeps a cell only when its <b>centre</b> falls inside the shape, so a cover both over- and under-shoots the boundary — buffer by a ring, or refine the resolution, if you need containment.`, "warn",
+    {q:"circle", code:`<b>polygonToCells</b>(circle, 8) -> <em>${cover} cells</em>\n<i>WHERE h3_8 IN (...) AND ST_DWithin(...)</i>`});
+  b.snap(`The catch: hexagons cannot nest. A resolution-8 cell is not the union of seven resolution-9 cells, only approximately — so rolling aggregates up the resolutions is lossy. And the sphere cannot be tiled by hexagons alone: H3 carries 12 pentagons, which every serious user has to handle.`, "bad", {q:"circle"});
+  return b.frames;
+}
+
+const SPECS = [
+{id:"quadtree", name:"Quadtree", who:"Raphael Finkel & Jon Bentley", year:"1974", family:"Space-partitioning tree",
+ stage:"Window query over a point quadtree", q:"rect", gen:genQuadtree,
+ lead:"Cut the square into four equal quadrants, and keep cutting any quadrant that holds more points than a leaf can take. The cuts come from space, never from the data, so the same coordinates always land in the same cell — but a dense city becomes a very deep subtree.",
+ pros:["Trivial to implement and to reason about: cell bounds are pure arithmetic","Cells nest exactly 4:1, so precision is a level number","Window queries only pay per-point cost on the cells that straddle the border","Cheap dynamic inserts and deletes, no global rebalance","The region variant compresses rasters and occupancy grids as well as it indexes points"],
+ cons:["Unbalanced by construction — depth follows density, not n","Skewed data makes long thin paths of one-child nodes","Fixed 4-way fan-out is a poor fit for a disk page","Only 4 of 8 touching cells share an edge; the other 4 meet at a corner","Points on a cell boundary need a tie-break rule, forever"],
+ used:["<b>PostgreSQL SP-GiST</b> — quad_point_ops, and PostGIS SP-GiST geometry indexes","<b>Oracle Spatial</b> — quadtree indexes (legacy, superseded by R-tree)","<b>Lucene</b> (historic) — geohash/quad prefix trees for geo_shape","Game engines, collision broad-phase, image and terrain quadtrees"],
+ code:`<i>-- PostGIS: SP-GiST is a quadtree over the geometry</i>\n<b>CREATE INDEX</b> idx_stops_geom <b>ON</b> stops\n  <b>USING</b> <em>spgist</em> (geom);\n\n<b>SELECT</b> id <b>FROM</b> stops\n<b>WHERE</b> geom && <em>ST_MakeEnvelope</em>(-46.7,-23.6,-46.6,-23.5, 4326);\n<i>-- &amp;&amp; is the bounding-box overlap the index answers</i>`},
+
+{id:"kd", name:"k-d Tree", who:"Jon Louis Bentley", year:"1975", family:"Space-partitioning tree",
+ stage:"Nearest-neighbour search with a shrinking radius", q:"point", gen:genKd,
+ lead:"One split per node, alternating axis, placed at the median of the points below it. That makes the tree perfectly balanced when bulk built, and makes the split planes carry information about the data. It is the structure to beat for nearest-neighbour queries — and the structure to avoid if rows keep arriving.",
+ pros:["Balanced when bulk built: depth is log n regardless of clustering","Median splits adapt to skew — no wasted empty cells","Best-in-class kNN: descend, then prune every subtree farther than the current best","Generalises to k dimensions with no change to the idea","Tiny memory footprint, one point per node"],
+ cons:["Dynamic inserts degrade the balance; there is no cheap rebalance","Deletes are awkward — you rebuild, or you tombstone","Node-per-point means random pointer chasing, terrible on disk","kNN degrades quickly above ~10 dimensions","Split values must be stored, so it cannot be reconstructed from geometry alone"],
+ used:["<b>PostgreSQL SP-GiST</b> — kd_point_ops for the point type","<b>SciPy / scikit-learn</b> — KDTree, cKDTree, neighbours and clustering","<b>Lucene</b>'s BKD tree is the disk-resident descendant of this structure","Robotics, ray tracing, ANN libraries (FLANN, nanoflann) as a baseline"],
+ code:`<i>-- PostgreSQL: k-d tree operator class for points</i>\n<b>CREATE INDEX</b> idx_pt <b>ON</b> places\n  <b>USING</b> <em>spgist</em> (pt <b>kd_point_ops</b>);\n\n<i>-- nearest neighbour: the &lt;-&gt; operator drives the index</i>\n<b>SELECT</b> name, pt <em>&lt;-&gt;</em> point(-46.63,-23.55) <b>AS</b> d\n<b>FROM</b> places <b>ORDER BY</b> d <b>LIMIT</b> 10;`},
+
+{id:"bkd", name:"BKD Tree", who:"Procopiuc, Agarwal, Arge & Vitter", year:"2003", family:"Bulk-loaded disk k-d tree",
+ stage:"Window query over immutable leaf blocks", q:"rect", gen:genBkd,
+ lead:"A k-d tree redesigned for disk: points are bulk sorted into fixed-size leaf blocks, the interior split values fit in memory, and each block advertises the tight box of what it holds. Nothing is updated in place — new data becomes a new tree, and merging trees is a merge sort. This is what actually indexes coordinates in Lucene, and therefore in Elasticsearch.",
+ pros:["Bulk load is a sort: sequential I/O, near-optimal packing, no rebalancing","Leaf blocks are pages — one seek yields many points","Per-block min/max lets whole blocks be skipped unread","Same structure indexes 1D numerics, dates, IPs and n-dimensional points","Merge-friendly, so it fits an LSM/segment world naturally"],
+ cons:["Immutable: a single point update means rewriting a segment","Deletes are tombstones until a merge reclaims them","Write amplification from merges, exactly like an LSM tree","Only boxes — polygon and line indexing needs a separate encoding","Query cost is bound to block size, which is a tuning decision"],
+ used:["<b>Apache Lucene</b> — points / dimensional values since Lucene 6 (2016)","<b>Elasticsearch, OpenSearch, Solr</b> — geo_point, numeric and range fields","Any Lucene-based store: Vespa-adjacent tooling, Graylog, Wazuh indices"],
+ code:`<i>// Elasticsearch: geo_point is a BKD tree over (lat,lon)</i>\n<b>PUT</b> /stops { "mappings": { "properties": {\n  "loc": { "type": "<em>geo_point</em>" } } } }\n\n<b>GET</b> /stops/_search { "query": { "<em>geo_bounding_box</em>": {\n  "loc": { "top_left": "-23.50,-46.70",\n           "bottom_right": "-23.60,-46.60" } } } }\n<i>// same tree answers geo_distance and range queries</i>`},
+
+{id:"rtree", name:"R-tree", who:"Antonin Guttman", year:"1984", family:"Data-partitioning tree",
+ stage:"Window query with overlapping bounding boxes", q:"rect", gen:genRtree,
+ lead:"Instead of cutting space, group nearby objects and store the minimum bounding rectangle of each group; group the groups the same way, up to a root. Because the boxes come from the data they can overlap, and overlap is the one number that decides whether an R-tree is fast. It is the only structure here that indexes polygons and lines natively.",
+ pros:["Indexes extents, not just points: polygons, lines, trajectories, boxes","Balanced, page-oriented, B-tree-like height and fan-out","Handles skew well — empty space is simply never covered by a box","Supports dynamic inserts and deletes without rebuilds","Best-first search gives exact kNN and distance ordering cheaply"],
+ cons:["Overlapping siblings force multiple root-to-leaf paths per query","Insert order changes the tree quality; splits are heuristics (linear, quadratic, R*)","Degenerates toward a scan on large or elongated objects","Bounding boxes are a coarse approximation, so every query needs an exact refilter","No canonical form: the same data gives different trees"],
+ used:["<b>PostGIS</b> — GiST indexes are an R-tree over GiST","<b>SQLite</b> — R*Tree virtual table module, and geopoly on top of it","<b>MySQL / MariaDB</b> — SPATIAL INDEX on InnoDB is an R-tree","<b>Oracle Spatial</b>, <b>DuckDB spatial</b>, <b>Tile38</b>, boost::geometry"],
+ code:`<i>-- PostGIS: the default spatial index</i>\n<b>CREATE INDEX</b> idx_zones_geom <b>ON</b> zones\n  <b>USING</b> <em>gist</em> (geom);\n\n<i>-- index gives candidate boxes, ST_Contains does the exact test</i>\n<b>SELECT</b> z.name <b>FROM</b> zones z\n<b>WHERE</b> <em>ST_Contains</em>(z.geom, ST_Point(-46.63,-23.55,4326));\n\n<b>VACUUM ANALYZE</b> zones;  <i>-- selectivity needs stats</i>`},
+
+{id:"geohash", name:"Geohash", who:"Gustavo Niemeyer", year:"2008", family:"Space-filling curve + prefix",
+ stage:"Encoding a point, then the boundary problem", q:"point", gen:genGeohash,
+ lead:"Interleave the bits of longitude and latitude, then write the result in base32. Every prefix is a cell, so a shorter string is a bigger box and a LIKE 'abc%' is a range scan. It needs no new index type at all, which is why it spread everywhere — and it pays for that with rectangular cells, latitude distortion and neighbours that share no prefix.",
+ pros:["A sortable string or 64-bit integer — any B-tree, KV store or sorted set indexes it","Prefix length is precision: one character is one zoom level","Ideal shard or row key: nearby data lands in nearby partitions","Encode and decode are a few lines of bit twiddling, no library needed","Human-readable and shareable (geohash.org, drop characters to blur a location)"],
+ cons:["Boundary problem: two points metres apart can differ in the first character","A correct radius search needs the cell plus 8 neighbours, then an exact filter","Cells are lat-lon rectangles whose real width shrinks toward the poles","Odd-length hashes are 2:1 rectangles, so precision jumps unevenly","Fixed grid, so it cannot adapt levels to data density"],
+ used:["<b>Redis</b> — GEOADD stores a 52-bit geohash as the sorted-set score","<b>MongoDB</b> — legacy 2d indexes","<b>Elasticsearch</b> — geohash_grid aggregation; old geo_shape prefix trees","<b>HBase / Cassandra / DynamoDB</b> — geohash row and partition keys"],
+ code:`<i># Redis: the score IS the interleaved geohash</i>\n<b>GEOADD</b> stops -46.63 -23.55 "se"\n<b>GEOSEARCH</b> stops FROMLONLAT -46.63 -23.55 <em>BYRADIUS</em> 2 km ASC\n\n<i>-- plain SQL, no spatial index needed</i>\n<b>SELECT</b> * <b>FROM</b> stops\n<b>WHERE</b> gh <b>LIKE</b> '<em>6gyf4b</em>%'\n   <b>OR</b> gh <b>LIKE ANY</b> (<i>the 8 neighbour prefixes</i>);`},
+
+{id:"s2", name:"S2", who:"Google (Eric Veach and others)", year:"2011, open sourced 2015", family:"Hilbert curve on a cube",
+ stage:"Covering a region with mixed-level cells", q:"circle", gen:genS2,
+ lead:"Project the sphere onto the six faces of a circumscribed cube, correct the distortion, then order each face with a Hilbert curve. A cell is a 64-bit id that encodes face, position and level, up to level 30 (about a centimetre). Queries become a small set of integer ranges — the database only ever sees a B-tree.",
+ pros:["Cell ids are sortable integers: one ordinary index, one ordinary range scan","Hilbert ordering keeps spatial neighbours close in the key space","Cells are near-equal area (about 1.4x spread), far better than lat-lon boxes","Exact 4:1 nesting, so levels aggregate and roll up cleanly","A region coverer trades cell count against false positives with one knob","Spherical geometry library included: no projection bugs at the poles or the antimeridian"],
+ cons:["Only an approximation of the region — an exact refilter is still required","Quadrilateral cells: edge neighbours and corner neighbours differ in distance","Cube face seams make some neighbourhoods span distant ids","Covering is a heuristic; a bad max-cells choice means many ranges or many false hits","Conceptually heavy — faces, levels, coverers, ids — before the first query runs"],
+ used:["<b>MongoDB</b> — 2dsphere indexes are built on S2","<b>CockroachDB</b> — spatial indexes are S2 coverings stored in a normal index","<b>Google</b> — Maps, Earth, and the geo stack it came from","Foursquare, Grab and many geo backends via s2geometry bindings"],
+ code:`<i>// MongoDB 2dsphere = S2 cell covering</i>\ndb.stops.createIndex({ loc: "<em>2dsphere</em>" })\ndb.stops.find({ loc: { <b>$geoWithin</b>: { <b>$centerSphere</b>:\n  [[-46.63,-23.55], 2/6378.1] } } })\n\n<i>-- what the engine really runs</i>\n<b>SELECT</b> id <b>FROM</b> stops\n<b>WHERE</b> cell_id <b>BETWEEN</b> <em>?</em> <b>AND</b> <em>?</em>  <i>-- x N ranges</i>\n  <b>AND</b> ST_DWithin(loc, ?, 2000);`},
+
+{id:"h3", name:"H3", who:"Uber (Isaac Brodsky and others)", year:"2018 (open sourced)", family:"Discrete global grid, hexagons",
+ stage:"Cell lookup, k-rings, and covering a circle", q:"circle", gen:genH3,
+ lead:"Project the sphere onto an icosahedron and tile every face with hexagons, 16 resolutions deep. Hexagons buy one thing no square grid can: all six neighbours are edge neighbours at the same distance, which makes spatial smoothing, flow and demand analysis behave. The price is that hexagons do not nest exactly, and the sphere needs 12 pentagons.",
+ pros:["Uniform neighbour distance — no edge-versus-corner ambiguity in any analysis","Near-uniform cell area within a resolution, so counts per cell are comparable","Point to cell is O(1) arithmetic; k-rings and cell distance are pure integer math","Cell ids are 64-bit integers indexed by any plain B-tree","Excellent for aggregation, heatmaps, surge/demand surfaces and ML features","Rich mature API: rings, paths, compaction, polygon fill, cell boundaries"],
+ cons:["Children do not fit parents exactly — hierarchical roll-ups are approximate","12 pentagons on the globe are permanent special cases","Ids are not spatially sorted, so range scans do not work; queries are IN lists of cells","Fixed resolution per query, so dense and sparse areas share one cell size","An aggregation grid first and an index second — it never answers a query alone"],
+ used:["<b>Uber</b> — pricing, dispatch, demand forecasting (its origin)","<b>ClickHouse</b> — native h3 functions (geoToH3, h3kRing, ...)","<b>PostgreSQL</b> — h3-pg extension; <b>DuckDB</b> h3 extension","<b>Databricks, BigQuery, Snowflake</b> via CARTO / community libraries, Kepler.gl"],
+ code:`<i>-- ClickHouse: aggregate rides on a hex grid</i>\n<b>SELECT</b> <em>geoToH3</em>(lon, lat, 8) <b>AS</b> h3, <b>count</b>() <b>AS</b> rides\n<b>FROM</b> trips <b>GROUP BY</b> h3 <b>ORDER BY</b> rides <b>DESC</b>;\n\n<i>-- neighbourhood = an IN list, not a range scan</i>\n<b>SELECT</b> * <b>FROM</b> trips\n<b>WHERE</b> h3_8 <b>IN</b> <em>h3kRing</em>(geoToH3(-46.63,-23.55,8), 2);`}
+];
+
+const LEGEND = [
+  ["#d64545","pruned / skipped / missed"],["#c07a10","visited, must be checked"],["#2563eb","read"],
+  ["#0f8a5f","match"],["#7c3aed","cover cell"],["#111827","query"]
+];
+
+const CMP = [
+["Created by","Raphael Finkel &amp; Jon Bentley","Jon Louis Bentley","Procopiuc, Agarwal, Arge, Vitter","Antonin Guttman","Gustavo Niemeyer","Google (Eric Veach et al.)","Uber"],
+["Year","1974","1975","2003 (Lucene 2016)","1984 (R* 1990)","2008","2011, OSS 2015","2018"],
+["Family","Space-partitioning tree","Space-partitioning tree","Bulk-loaded disk k-d tree","Data-partitioning tree","Space-filling curve + prefix","Hilbert curve on cube faces","Discrete global grid"],
+["Partition driven by",'<span class="badge i">space</span>','<span class="badge p">data (medians)</span>','<span class="badge p">data (medians)</span>','<span class="badge p">data (objects)</span>','<span class="badge i">space</span>','<span class="badge i">space</span>','<span class="badge i">space</span>'],
+["Cell / node shape","Equal squares","Half-planes, alternating axis","Blocks with tight min/max boxes","Arbitrary, overlapping MBRs","Lat-lon rectangles","Near-square quads on 6 faces","Hexagons + 12 pentagons"],
+["Balanced",'<span class="badge n">no — depth follows density</span>','<span class="badge y">yes if bulk built</span>','<span class="badge y">yes</span>','<span class="badge y">yes</span>','<span class="badge i">n/a — fixed grid</span>','<span class="badge i">n/a — fixed grid</span>','<span class="badge i">n/a — fixed grid</span>'],
+["Cells / nodes can overlap",'<span class="badge y">never</span>','<span class="badge y">never</span>','<span class="badge p">boxes may overlap</span>','<span class="badge n">yes — the main cost</span>','<span class="badge y">never</span>','<span class="badge y">never</span>','<span class="badge y">never</span>'],
+["Needs a dedicated index type",'<span class="badge n">yes</span>','<span class="badge n">yes</span>','<span class="badge n">yes</span>','<span class="badge n">yes</span>','<span class="badge y">no — B-tree / KV</span>','<span class="badge y">no — B-tree on int64</span>','<span class="badge y">no — B-tree on int64</span>'],
+["Key is sortable / shardable",'<span class="badge n">no</span>','<span class="badge n">no</span>','<span class="badge n">no</span>','<span class="badge n">no</span>','<span class="badge y">yes — prefix</span>','<span class="badge y">yes — Hilbert order</span>','<span class="badge p">ids not spatially sorted</span>'],
+["Insert / update",'<span class="badge y">cheap</span>','<span class="badge n">degrades balance</span>','<span class="badge n">immutable, new segment</span>','<span class="badge y">cheap</span>','<span class="badge y">cheap</span>','<span class="badge y">cheap</span>','<span class="badge y">cheap</span>'],
+["Delete",'<span class="badge y">local</span>','<span class="badge n">rebuild or tombstone</span>','<span class="badge p">tombstone + merge</span>','<span class="badge y">local, may condense</span>','<span class="badge y">row delete</span>','<span class="badge y">row delete</span>','<span class="badge y">row delete</span>'],
+["Indexes polygons / lines",'<span class="badge p">via boxes; region variant for rasters</span>','<span class="badge n">points only</span>','<span class="badge p">points and n-dim ranges</span>','<span class="badge y">native</span>','<span class="badge p">cell cover</span>','<span class="badge p">cell cover</span>','<span class="badge p">cell cover</span>'],
+["Window / range query",'<span class="badge y">good</span>','<span class="badge y">good</span>','<span class="badge y">excellent on disk</span>','<span class="badge y">excellent</span>','<span class="badge p">prefix scan + 8 neighbours</span>','<span class="badge y">few integer ranges</span>','<span class="badge p">IN list of cells</span>'],
+["kNN / nearest",'<span class="badge y">good</span>','<span class="badge y">best in class</span>','<span class="badge p">workable</span>','<span class="badge y">best-first, exact</span>','<span class="badge n">awkward, expand precision</span>','<span class="badge y">ring expansion</span>','<span class="badge y">k-ring expansion</span>'],
+["Exact answer or approximation",'<span class="badge y">exact after point test</span>','<span class="badge y">exact</span>','<span class="badge y">exact after point test</span>','<span class="badge p">candidates, needs refilter</span>','<span class="badge p">approximate + filter</span>','<span class="badge p">approximate + filter</span>','<span class="badge p">approximate + filter</span>'],
+["Boundary artifacts",'<span class="badge y">none</span>','<span class="badge y">none</span>','<span class="badge y">none</span>','<span class="badge y">none</span>','<span class="badge n">severe — neighbours lose the prefix</span>','<span class="badge p">mild — face seams</span>','<span class="badge p">mild — 12 pentagons</span>'],
+["Neighbours equidistant",'<span class="badge p">4 edge + 4 corner</span>','<span class="badge i">n/a</span>','<span class="badge i">n/a</span>','<span class="badge i">n/a</span>','<span class="badge n">no, and 8 of them</span>','<span class="badge n">edge vs corner</span>','<span class="badge y">yes — 6 edges</span>'],
+["Hierarchy nests exactly",'<span class="badge y">yes, 4:1</span>','<span class="badge y">yes</span>','<span class="badge y">yes</span>','<span class="badge n">no</span>','<span class="badge y">yes, 32:1 per char</span>','<span class="badge y">yes, 4:1</span>','<span class="badge n">no — approximate children</span>'],
+["Cell area uniformity",'<span class="badge y">uniform in the plane</span>','<span class="badge i">n/a</span>','<span class="badge i">n/a</span>','<span class="badge i">n/a</span>','<span class="badge n">varies with latitude</span>','<span class="badge y">about 1.4x spread</span>','<span class="badge y">about 2x spread</span>'],
+["Skew tolerance",'<span class="badge n">poor — deep in clusters</span>','<span class="badge y">good</span>','<span class="badge y">good</span>','<span class="badge y">good</span>','<span class="badge n">poor — fixed grid</span>','<span class="badge y">good — adaptive levels</span>','<span class="badge p">one resolution per query</span>'],
+["Disk / page friendly",'<span class="badge p">medium</span>','<span class="badge n">poor — pointer chasing</span>','<span class="badge y">excellent</span>','<span class="badge y">good</span>','<span class="badge y">excellent</span>','<span class="badge y">excellent</span>','<span class="badge y">excellent</span>'],
+["Precision control","Level","Depth is data-driven","Block size","Fan-out and split heuristic","Prefix length (1-12 chars)","Level 0-30","Resolution 0-15"],
+["Used by","PostgreSQL SP-GiST, PostGIS SP-GiST, Oracle Spatial (legacy), game engines, image quadtrees","PostgreSQL SP-GiST kd_point_ops, SciPy, scikit-learn, ANN libraries","Lucene, Elasticsearch, OpenSearch, Solr","PostGIS GiST, SQLite R*Tree, MySQL SPATIAL, Oracle Spatial, DuckDB spatial, Tile38","Redis GEO, MongoDB 2d, Elasticsearch geohash_grid, HBase / Cassandra keys","MongoDB 2dsphere, CockroachDB, Google Maps","Uber, ClickHouse, h3-pg, DuckDB h3, CARTO, Kepler.gl"],
+["Pick it when","You want a simple in-process index over points and control the whole stack","You bulk build once and need the best nearest-neighbour search","You are on Lucene, or you need billions of points on disk with cheap merges","You index shapes, not points, and you need exact spatial predicates","You have no spatial index and want geo in a KV store, cache or shard key","You need correct spherical geometry and range scans in an existing B-tree","You aggregate over an area: heatmaps, demand, coverage, ML features"],
+["Main weakness","Unbalanced under clustering","Cannot take writes","Rewrites instead of updates","Overlap turns one query into many paths","Boundary problem and 9 scans","Approximate cover plus tuning","No exact hierarchy, no range scans"]
+];
+
+const COST = [
+["Build / bulk load","O(n log n) inserts","O(n log n) sorts","O(n log n) external sort, sequential I/O","O(n log n) STR packing, or n inserts","O(n) encode","O(n) encode","O(n) encode"],
+["Point lookup","O(depth)","O(log n)","O(log n) + 1 block read","O(log n) paths","O(log n) B-tree","O(log n) B-tree","O(1) hash to cell + O(log n) B-tree"],
+["Window query","O(perimeter cells + k), bad under clustering","O(sqrt n + k)","O(sqrt n) block reads + k","O(log n + k) typical, O(n) with heavy overlap","9 prefix scans + O(k) filter","O(ranges * log n + k) + false positives","O(cells) lookups + false positives"],
+["kNN","Best-first with a priority queue","O(log n) average, the reference","Block-at-a-time, coarser pruning","Best-first, exact and incremental","Expand precision and retry","Expand ring of cells","gridDisk with growing k"],
+["Insert","O(depth), may split a leaf","O(log n) but balance rots","Not supported — new segment + merge","O(log n) + split heuristic","O(log n) B-tree insert","O(log n) B-tree insert","O(log n) B-tree insert"],
+["Space overhead","4 child pointers per node, empty cells cost","One node per point","Packed blocks, near-zero slack","MBR per node plus fan-out slack","8-12 bytes per row","8 bytes per row","8 bytes per row"],
+["Concurrency","Node locks, splits are local","Rebuild under a lock","Read-only trees, no locking on query","Page locks, splits propagate","Whatever the B-tree does","Whatever the B-tree does","Whatever the B-tree does"],
+["Extra work per query","Point test on straddling cells","None","Point test in read blocks","Exact geometry refilter","9 scans + exact distance filter","Exact predicate on boundary cells","Exact predicate on fringe cells"]
+];
+
+let cur = SPECS[0], step = 0, frames = [], timer = null;
+const cache = {};
+
+function renderPills(){
+  byId("pills").innerHTML = SPECS.map((s,i)=>
+    `<button class="pill${i?"":" active"}" data-i="${i}">${s.name}<span class="n">${s.year.slice(0,4)}</span></button>`).join("");
+  byId("pills").onclick = e => {
+    const p = e.target.closest(".pill");
+    if(!p) return;
+    document.querySelectorAll("#pills .pill").forEach(x=>x.classList.toggle("active", x === p));
+    select(SPECS[+p.dataset.i]);
+  };
+}
+function renderLegend(){
+  byId("legend").innerHTML = LEGEND.map(l=>`<span><i style="background:${l[0]}"></i>${l[1]}</span>`).join("");
+}
+function renderInfo(s){
+  byId("info").innerHTML = `
+    <h2>${s.name}</h2>
+    <div class="meta"><span class="tag">${s.who}</span><span class="tag">${s.year}</span><span class="tag">${s.family}</span></div>
+    <p class="lead">${s.lead}</p>
+    <div class="two">
+      <div class="box pro"><h3>Pros</h3><ul>${s.pros.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+      <div class="box con"><h3>Cons</h3><ul>${s.cons.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    </div>
+    <div class="box use"><h3>Where it is used</h3><ul>${s.used.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <pre>${s.code}</pre>`;
+}
+function paint(){
+  const f = frames[step];
+  draw(f);
+  byId("stCount").textContent = `step ${step+1} / ${frames.length}`;
+  byId("note").className = "note" + (f.cls ? " "+f.cls : "");
+  byId("note").innerHTML = f.note;
+  byId("metrics").innerHTML = (f.m||[]).map(m=>`<div class="metric"><div class="k">${m[0]}</div><div class="v">${m[1]}</div></div>`).join("");
+  const st = byId("strip");
+  st.hidden = !f.code;
+  if(f.code) st.innerHTML = f.code;
+}
+function select(s){
+  stop();
+  cur = s; step = 0;
+  frames = cache[s.id] || (cache[s.id] = s.gen());
+  byId("stName").textContent = s.name + " search";
+  byId("stSub").textContent = s.stage;
+  renderInfo(s);
+  paint();
+}
+function stop(){ if(timer){ clearInterval(timer); timer = null; byId("bPlay").textContent = "Play"; } }
+byId("bStep").onclick = ()=>{ stop(); step = (step+1) % frames.length; paint(); };
+byId("bReset").onclick = ()=>{ stop(); step = 0; paint(); };
+byId("bPlay").onclick = ()=>{
+  if(timer) return stop();
+  byId("bPlay").textContent = "Pause";
+  timer = setInterval(()=>{
+    if(step >= frames.length-1) return stop();
+    step++; paint();
+  }, 620);
+};
+document.querySelectorAll(".tab").forEach(t=>t.onclick = ()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", String(x === t)));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active", p.id === t.dataset.tab));
+});
+byId("cmpBody").innerHTML = CMP.map(r=>`<tr><th>${r[0]}</th>${r.slice(1).map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+byId("costBody").innerHTML = COST.map(r=>`<tr><th>${r[0]}</th>${r.slice(1).map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+renderPills();
+renderLegend();
+select(SPECS[0]);
+</script>
+</body>
+</html>
