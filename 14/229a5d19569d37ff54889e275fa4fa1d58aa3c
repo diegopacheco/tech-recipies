@@ -1,0 +1,23 @@
+tech-notes/sv/index.html
+  s_78e564f2c54d9a::t_66cb6ac138f6df 1441
+  s_78e564f2c54d9a::t_97795df1e994d5 992,999,1169-1183,1263
+tech-notes/sv/power-laws.md
+  s_78e564f2c54d9a::t_2cd7c093fdefaf 1-143,146-224
+  s_78e564f2c54d9a::t_1e4056143b8020 144-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "14229a5d19569d37ff54889e275fa4fa1d58aa3c",
+  "prompts": {},
+  "sessions": {
+    "s_78e564f2c54d9a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9a9c-a3a1-7630-b002-26b608b8f065",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
