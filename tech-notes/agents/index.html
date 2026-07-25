@@ -972,6 +972,8 @@
     .node.claude { background: #edf4ea; }
     .node.platforms { background: #f8efe3; }
     .node.patterns { background: #f1edf6; }
+    .node.ecosystem { background: #f6e9e6; }
+    .node.aws { background: #e6f2f1; }
 </style>
 </head>
 <body>
@@ -980,24 +982,25 @@
       <div>
         <div class="eyebrow">Agent Engineering notes index</div>
         <h1>Agent protocols, harnesses, and platforms in one map.</h1>
-        <p class="lead">A visual guide to the Markdown notes in this folder, grouped into protocols & payments, claude & codex, platforms & frameworks, patterns & infra.</p>
+        <p class="lead">A visual guide to the Markdown notes in this folder and its subfolders, grouped into protocols & payments, coding agent clis, platforms & frameworks, patterns & infra, claude ecosystem, aws agentcore.</p>
         <div class="hero-actions">
           <a class="btn" href="#topics">Browse topics</a>
           <a class="btn secondary" href="#map">View map</a>
+          <a class="btn secondary" href="../index.html">All tech notes</a>
         </div>
       </div>
       <aside class="atlas" aria-label="Topic preview">
         <div class="atlas-title">
           <span>Content clusters</span>
-          <span>20 files</span>
+          <span>83 files</span>
         </div>
         <div class="atlas-grid" id="heroNodes"></div>
       </aside>
     </section>
 
     <section class="stats" aria-label="Summary counts">
-      <div class="stat"><strong>20</strong><span>Markdown notes in this folder</span></div>
-      <div class="stat"><strong>4</strong><span>clusters for quick navigation</span></div>
+      <div class="stat"><strong>83</strong><span>Markdown notes in this folder and its subfolders</span></div>
+      <div class="stat"><strong>6</strong><span>clusters for quick navigation</span></div>
       <div class="stat"><strong>100%</strong><span>of notes readable inside the page</span></div>
       <div class="stat"><strong>1</strong><span>self-contained HTML page, no build step</span></div>
     </section>
@@ -1005,7 +1008,7 @@
     <section class="section" id="map">
       <div class="section-head">
         <h2>Topic Map</h2>
-        <p>Notes grouped into 4 clusters. Pick a cluster, then open any note.</p>
+        <p>Notes grouped into 6 clusters. Pick a cluster, then open any note.</p>
       </div>
       <div class="map" id="topicMap"></div>
     </section>
@@ -1075,7 +1078,7 @@
   },
   {
     "id": "claude",
-    "name": "Claude & Codex",
+    "name": "Coding Agent CLIs",
     "color": "green"
   },
   {
@@ -1087,6 +1090,16 @@
     "id": "patterns",
     "name": "Patterns & Infra",
     "color": "violet"
+  },
+  {
+    "id": "ecosystem",
+    "name": "Claude Ecosystem",
+    "color": "red"
+  },
+  {
+    "id": "aws",
+    "name": "AWS AgentCore",
+    "color": "teal"
   }
 ];
 
@@ -1096,7 +1109,7 @@
     "file": "agent-payments-protocol.md",
     "category": "protocols",
     "focus": "The problem it solves",
-    "summary": "The Agent Payments Protocol (AP2) is Google's open standard for the authorization layer of agentic commerce — the part that proves a user actually gave an agent the authority to make a specific purchase.",
+    "summary": "The Agent Payments Protocol (AP2) is Google's open standard for the authorization layer of agentic commerce \u2014 the part that proves a user actually gave an agent the authority to make a specific purchase.",
     "tags": [
       "Why it matters",
       "Links"
@@ -1108,7 +1121,7 @@
     "file": "agentic-commerce-protocol.md",
     "category": "protocols",
     "focus": "The problem it solves",
-    "summary": "The Agentic Commerce Protocol (ACP) is an open standard for the checkout itself — the interaction model that connects a buyer, their AI agent, and a business so a purchase can complete inside the agent's surface instead of on the merchant's website.",
+    "summary": "The Agentic Commerce Protocol (ACP) is an open standard for the checkout itself \u2014 the interaction model that connects a buyer, their AI agent, and a business so a purchase can complete inside the agent's surface instead of on the merchant's website.",
     "tags": [
       "Why it matters",
       "Links"
@@ -1116,199 +1129,11 @@
     "diagram": "Agentic Commerce Protocol (ACP)\n  |\n  +-- The problem it solves\n  +-- The spec is moving fast\n  +-- Who is using it\n  +-- Where it sits versus the others"
   },
   {
-    "title": "Claude Code Sandboxing",
-    "file": "cc-sandbox.md",
-    "category": "claude",
-    "focus": "Claude Code local /sandbox",
-    "summary": "\"Sandbox for Claude\" is not one product or one setting. It is a spectrum of containment that decides how much damage an agent can do when it runs commands, writes files, and calls the network on your behalf.",
-    "tags": [
-      "Devcontainers",
-      "claude.ai code execution",
-      "Anthropic / Claude",
-      "What Anthropic does",
-      "The horizon"
-    ],
-    "diagram": "Claude Code Sandboxing\n  |\n  +-- Starting point: Simon Willison on Fly Sprites.dev\n  +-- What Anthropic does\n  +-- Sandbox for the Claude CLI (Claude Code)\n  +-- Sandbox for Claude Desktop (Cowork)"
-  },
-  {
-    "title": "Claude Code Auto Mode",
-    "file": "claude-auto-mode.md",
-    "category": "claude",
-    "focus": "Input layer - prompt-injection probe",
-    "summary": "Auto mode is a permission mode for Claude Code that delegates approval decisions to model-based classifiers instead of asking the human for every action. Anthropic published it on Mar 25, 2026.",
-    "tags": [
-      "Why it exists",
-      "Deny-and-continue",
-      "Results",
-      "Links"
-    ],
-    "diagram": "Claude Code Auto Mode\n  |\n  +-- The tradeoff space it fills\n  +-- Why it exists\n  +-- The three tiers - what actually reaches the classifier\n  +-- What the classifier blocks"
-  },
-  {
-    "title": "Claude Code",
-    "file": "claude-code.md",
-    "category": "claude",
-    "focus": "1. CLAUDE.md - Behavioral Guidelines",
-    "summary": "<!-- START doctoc generated TOC please keep comment here to allow auto update -->",
-    "tags": [
-      "1. Global Instructions",
-      "2. Prompt Advice",
-      "6. Advanced Pipelines",
-      "8. Custom Agents",
-      "9. ultrathink"
-    ],
-    "diagram": "Claude Code\n  |\n  +-- 1. Global Instructions\n  +-- 2. Prompt Advice\n  +-- 3. Create custom commands\n  +-- 4. Excluding Files from Claude Context"
-  },
-  {
-    "title": "Claude Dispatch",
-    "file": "claude-dispatch.md",
-    "category": "claude",
-    "focus": "Computer Use",
-    "summary": "<!-- START doctoc generated TOC please keep comment here to allow auto update -->",
-    "tags": [
-      "Computer Use",
-      "Memory",
-      "Task Routing",
-      "3. Requirements",
-      "4. Getting Started"
-    ],
-    "diagram": "Claude Dispatch\n  |\n  +-- 1. What is Claude Dispatch?\n  +-- 2. How It Works\n  +-- 3. Requirements\n  +-- 4. Getting Started"
-  },
-  {
-    "title": "Claude Code Dynamic Workflows",
-    "file": "claude-dynamic-workflows.md",
-    "category": "claude",
-    "focus": "The core idea - move the plan into code",
-    "summary": "Dynamic workflows let Claude write a JavaScript orchestration script for a task you describe, then hand that script to a separate runtime that executes it in the background - spinning up tens to hundreds of parallel subagents in a single session and checking its own work before anything reaches…",
-    "tags": [
-      "Permissions",
-      "Behavior and limits",
-      "What it costs",
-      "Why it matters",
-      "Requirements"
-    ],
-    "diagram": "Claude Code Dynamic Workflows\n  |\n  +-- The core idea - move the plan into code\n  +-- How a run works\n  +-- Two ways to start a workflow\n  +-- Bundled workflow: /deep-research"
-  },
-  {
-    "title": "Claude Finance Agents",
-    "file": "claude-finance-agents.md",
-    "category": "claude",
-    "focus": "Research and client coverage",
-    "summary": "On May 5, 2026 Anthropic released ten ready-to-run agent templates for financial services - pre-built Claude agents for the most time-consuming work in finance: building pitchbooks, screening KYC files, closing the books at month-end, and more.",
-    "tags": [
-      "Finance and operations",
-      "The ten agents",
-      "The data ecosystem",
-      "Why it matters",
-      "Links"
-    ],
-    "diagram": "Claude Finance Agents\n  |\n  +-- What an agent template actually is\n  +-- The ten agents\n  +-- Two ways to deploy\n  +-- Claude across Microsoft 365"
-  },
-  {
-    "title": "Codex via Bedrock",
-    "file": "codex-via-bedrock.md",
-    "category": "claude",
-    "focus": "What is Codex via Bedrock?",
-    "summary": "Codex via Bedrock is the integration that lets OpenAI's Codex coding agent run on top of OpenAI models served from Amazon Bedrock instead of OpenAI's own API.",
-    "tags": [
-      "Supported Models",
-      "Requirements",
-      "Setup",
-      "What You Get"
-    ],
-    "diagram": "Codex via Bedrock\n  |\n  +-- What is Codex via Bedrock?\n  +-- Supported Models\n  +-- Requirements\n  +-- Setup"
-  },
-  {
-    "title": "Git Worktrees",
-    "file": "git-worktrees.md",
-    "category": "patterns",
-    "focus": "Create a worktree with a new branch",
-    "summary": "A git worktree allows you to have multiple working directories attached to a single repository. Each worktree has its own checked-out branch, index, and working directory, but they all share the same .git repository data.",
-    "tags": [
-      "List all worktrees",
-      "Remove a worktree",
-      "How to Setup"
-    ],
-    "diagram": "Git Worktrees\n  |\n  +-- What is a Git Worktree?\n  +-- How to Setup\n  +-- Create a worktree with a new branch\n  +-- Create a worktree with an existing branch"
-  },
-  {
-    "title": "Harness",
-    "file": "harness.md",
-    "category": "claude",
-    "focus": "What is a Harness?",
-    "summary": "In the context of AI agents and LLMs, a harness is the runtime scaffolding that wraps a model and turns it into an agent. The model itself only produces tokens; the harness is what gives those tokens consequences in the real world.",
-    "tags": [
-      "Examples of Harnesses",
-      "Configuring a Harness",
-      "Why Harnesses Matter"
-    ],
-    "diagram": "Harness\n  |\n  +-- What is a Harness?\n  +-- What a Harness Provides\n  +-- Harness vs Model vs Agent\n  +-- Examples of Harnesses"
-  },
-  {
-    "title": "Hermes Agent",
-    "file": "hermes-agent.md",
-    "category": "platforms",
-    "focus": "The learning loop",
-    "summary": "Hermes Agent is an open-source, self-hosted AI agent from Nous Research, released on 25 February 2026 under the MIT license. Its tagline is \"the agent that grows with you.\" Unlike a stateless coding assistant that forgets everything between sessions, Hermes is designed to live on your own machine…",
-    "tags": [
-      "The learning loop",
-      "Deployment backends",
-      "Memory Architecture",
-      "Why It Matters",
-      "Links"
-    ],
-    "diagram": "Hermes Agent\n  |\n  +-- What is Hermes Agent?\n  +-- Memory Architecture\n  +-- Tooling and the Nous Tool Gateway\n  +-- Hermes Agent vs Other Agents"
-  },
-  {
-    "title": "LangChain Managed Deep Agents",
-    "file": "langchain-managed-deep-agents.md",
-    "category": "platforms",
-    "focus": "Managed runtime",
-    "summary": "Managed Deep Agents is an API-first hosted runtime for creating, running, and operating deep agents, announced by LangChain (Victor Moreira) on May 13, 2026 in private beta.",
-    "tags": [
-      "Managed runtime",
-      "Tools and sandboxes",
-      "Where it sits",
-      "Why it matters",
-      "Availability"
-    ],
-    "diagram": "LangChain Managed Deep Agents\n  |\n  +-- Background: open-source Deep Agents\n  +-- What the managed layer adds\n  +-- Where it sits\n  +-- Why it matters"
-  },
-  {
-    "title": "Late-Bound Sagas",
-    "file": "late-bound-sagas.md",
-    "category": "patterns",
-    "focus": "What is a Late-Bound Saga?",
-    "summary": "A Late-Bound Saga is a workflow whose execution graph does not exist when the workflow starts. The LLM synthesizes the graph one edge at a time at runtime, and each edge is committed to a durable ledger at the moment it is proposed - before it executes. The graph is append-only.",
-    "tags": [
-      "The Two-Plane Separation",
-      "The Four-Write Bracket",
-      "Why It Matters",
-      "Reference"
-    ],
-    "diagram": "Late-Bound Sagas\n  |\n  +-- What is a Late-Bound Saga?\n  +-- Agent as a Loop vs Agent as a Saga\n  +-- Durability is Not Continuity\n  +-- The Two-Plane Separation"
-  },
-  {
-    "title": "LiteLLM Agent Platform",
-    "file": "litellm-agent-platform.md",
-    "category": "platforms",
-    "focus": "lap CLI",
-    "summary": "LiteLLM Agent Platform (LAP) is self-hosted infrastructure for running coding agents - Claude Code, Codex, Hermes, anything - inside isolated Kubernetes sandboxes fronted by a credential vault.",
-    "tags": [
-      "lap CLI",
-      "Self-hosting (local dev)",
-      "Other surfaces",
-      "Architecture",
-      "Supported harnesses"
-    ],
-    "diagram": "LiteLLM Agent Platform\n  |\n  +-- The core trick: vault proxy\n  +-- Architecture\n  +-- How you use it\n  +-- Supported harnesses"
-  },
-  {
     "title": "MCP Enterprise-Managed Authorization (EMA)",
     "file": "mcp-enterprise-managed-auth.md",
     "category": "protocols",
     "focus": "The problem it solves",
-    "summary": "Enterprise-Managed Authorization (EMA) is an extension to the Model Context Protocol that lets an organization decide centrally which MCP servers its people can reach - through the identity provider (IdP) it already runs - instead of every employee separately clicking through an OAuth consent…",
+    "summary": "Enterprise-Managed Authorization (EMA) is an extension to the Model Context Protocol that lets an organization decide centrally which MCP servers its people can reach - through the identity provider (IdP) it already runs - instead of every employee separately clicking through an OAuth consent\u2026",
     "tags": [
       "Why it matters",
       "Links"
@@ -1331,6 +1156,302 @@
     "diagram": "Merge Gateway\n  |\n  +-- The problem it solves\n  +-- The three pillars\n  +-- Other features\n  +-- Pricing"
   },
   {
+    "title": "Trusted Agent Protocol (TAP)",
+    "file": "trusted-agent-protocol.md",
+    "category": "protocols",
+    "focus": "The problem it solves",
+    "summary": "Trusted Agent Protocol (TAP) is an open specification that lets a merchant cryptographically answer one question on every incoming request: is this AI agent a known, accountable agent acting for a real consumer, or just another anonymous bot? Visa unveiled it on October 14, 2025, developed in\u2026",
+    "tags": [
+      "Why it matters",
+      "Links"
+    ],
+    "diagram": "Trusted Agent Protocol (TAP)\n  |\n  +-- The problem it solves\n  +-- Who is using it\n  +-- The landscape \u2014 alternatives and how they fit\n  +-- Why it matters"
+  },
+  {
+    "title": "x402 and the Machine Payments Protocol (MPP)",
+    "file": "x402-machine-payments.md",
+    "category": "protocols",
+    "focus": "The problem they solve",
+    "summary": "These are the settlement layer of agentic commerce \u2014 two efforts that revive the long-dormant HTTP 402 Payment Required status code so that software, not a human at a checkout, can pay for things over HTTP.",
+    "tags": [
+      "How x402 works",
+      "Why it matters",
+      "Links"
+    ],
+    "diagram": "x402 and the Machine Payments Protocol (MPP)\n  |\n  +-- The problem they solve\n  +-- How x402 works\n  +-- How MPP works (and how it differs)\n  +-- Where they sit in the stack"
+  },
+  {
+    "title": "BS Command",
+    "file": "cluade-code-custom-commands/bs.md",
+    "category": "claude",
+    "focus": "Fact checking",
+    "summary": "A custom command that checks a piece of content for lies, false facts, and hallucinations, and fixes the English.",
+    "tags": [
+      "No hallucinations",
+      "Fact checking",
+      "English review"
+    ],
+    "diagram": "BS Command\n  |\n  +-- Fact checking\n  +-- No hallucinations\n  +-- Fact checking\n  +-- English review"
+  },
+  {
+    "title": "Claude Code",
+    "file": "claude-code.md",
+    "category": "claude",
+    "focus": "1. CLAUDE.md - Behavioral Guidelines",
+    "summary": "<!-- START doctoc generated TOC please keep comment here to allow auto update -->",
+    "tags": [
+      "1. Global Instructions",
+      "2. Prompt Advice",
+      "6. Advanced Pipelines",
+      "8. Custom Agents",
+      "9. ultrathink"
+    ],
+    "diagram": "Claude Code\n  |\n  +-- 1. Global Instructions\n  +-- 2. Prompt Advice\n  +-- 3. Create custom commands\n  +-- 4. Excluding Files from Claude Context"
+  },
+  {
+    "title": "Claude Code Auto Mode",
+    "file": "claude-auto-mode.md",
+    "category": "claude",
+    "focus": "Input layer - prompt-injection probe",
+    "summary": "Auto mode is a permission mode for Claude Code that delegates approval decisions to model-based classifiers instead of asking the human for every action. Anthropic published it on Mar 25, 2026.",
+    "tags": [
+      "Why it exists",
+      "Deny-and-continue",
+      "Results",
+      "Links"
+    ],
+    "diagram": "Claude Code Auto Mode\n  |\n  +-- The tradeoff space it fills\n  +-- Why it exists\n  +-- The three tiers - what actually reaches the classifier\n  +-- What the classifier blocks"
+  },
+  {
+    "title": "Claude Code Custom Commands",
+    "file": "cluade-code-custom-commands/README.md",
+    "category": "claude",
+    "focus": "Command placement",
+    "summary": "Where custom slash commands live: ~/.claude/commands/ for global commands and .claude/commands/ inside a project for project-specific ones.",
+    "tags": [
+      "Global commands",
+      "Project commands"
+    ],
+    "diagram": "Claude Code Custom Commands\n  |\n  +-- Command placement\n  +-- Global commands\n  +-- Project commands"
+  },
+  {
+    "title": "Claude Code Dynamic Workflows",
+    "file": "claude-dynamic-workflows.md",
+    "category": "claude",
+    "focus": "The core idea - move the plan into code",
+    "summary": "Dynamic workflows let Claude write a JavaScript orchestration script for a task you describe, then hand that script to a separate runtime that executes it in the background - spinning up tens to hundreds of parallel subagents in a single session and checking its own work before anything reaches\u2026",
+    "tags": [
+      "Permissions",
+      "Behavior and limits",
+      "What it costs",
+      "Why it matters",
+      "Requirements"
+    ],
+    "diagram": "Claude Code Dynamic Workflows\n  |\n  +-- The core idea - move the plan into code\n  +-- How a run works\n  +-- Two ways to start a workflow\n  +-- Bundled workflow: /deep-research"
+  },
+  {
+    "title": "Claude Code Sandboxing",
+    "file": "cc-sandbox.md",
+    "category": "claude",
+    "focus": "Claude Code local /sandbox",
+    "summary": "\"Sandbox for Claude\" is not one product or one setting. It is a spectrum of containment that decides how much damage an agent can do when it runs commands, writes files, and calls the network on your behalf.",
+    "tags": [
+      "Devcontainers",
+      "claude.ai code execution",
+      "Anthropic / Claude",
+      "What Anthropic does",
+      "The horizon"
+    ],
+    "diagram": "Claude Code Sandboxing\n  |\n  +-- Starting point: Simon Willison on Fly Sprites.dev\n  +-- What Anthropic does\n  +-- Sandbox for the Claude CLI (Claude Code)\n  +-- Sandbox for Claude Desktop (Cowork)"
+  },
+  {
+    "title": "Claude Dispatch",
+    "file": "claude-dispatch.md",
+    "category": "claude",
+    "focus": "Computer Use",
+    "summary": "<!-- START doctoc generated TOC please keep comment here to allow auto update -->",
+    "tags": [
+      "Computer Use",
+      "Memory",
+      "Task Routing",
+      "3. Requirements",
+      "4. Getting Started"
+    ],
+    "diagram": "Claude Dispatch\n  |\n  +-- 1. What is Claude Dispatch?\n  +-- 2. How It Works\n  +-- 3. Requirements\n  +-- 4. Getting Started"
+  },
+  {
+    "title": "Claude Finance Agents",
+    "file": "claude-finance-agents.md",
+    "category": "claude",
+    "focus": "Research and client coverage",
+    "summary": "On May 5, 2026 Anthropic released ten ready-to-run agent templates for financial services - pre-built Claude agents for the most time-consuming work in finance: building pitchbooks, screening KYC files, closing the books at month-end, and more.",
+    "tags": [
+      "Finance and operations",
+      "The ten agents",
+      "The data ecosystem",
+      "Why it matters",
+      "Links"
+    ],
+    "diagram": "Claude Finance Agents\n  |\n  +-- What an agent template actually is\n  +-- The ten agents\n  +-- Two ways to deploy\n  +-- Claude across Microsoft 365"
+  },
+  {
+    "title": "Codex AGENTS.md",
+    "file": "codex/AGENTS.md",
+    "category": "claude",
+    "focus": "General Guidelines",
+    "summary": "Diego Pacheco Codex AGENTS global guidelines.",
+    "tags": [
+      "Github Pull Request(PR) Guidelines",
+      "When Writing BASH scripts",
+      "Dockerfile/Containerfile",
+      "podman-compose"
+    ],
+    "diagram": "Codex AGENTS.md\n  |\n  +-- General Guidelines\n  +-- Github Pull Request(PR) Guidelines\n  +-- When Writing BASH scripts\n  +-- Dockerfile/Containerfile"
+  },
+  {
+    "title": "Codex CLI",
+    "file": "codex/README.md",
+    "category": "claude",
+    "focus": "AGENTS.md",
+    "summary": "Create a file AGENTs.md and add on ~/.codex/AGENTS.md for global instructions.",
+    "tags": [
+      "Custom Commands"
+    ],
+    "diagram": "Codex CLI\n  |\n  +-- AGENTS.md\n  +-- Custom Commands"
+  },
+  {
+    "title": "Codex Custom Command",
+    "file": "codex/CMD.md",
+    "category": "claude",
+    "focus": "Codebase explanation",
+    "summary": "A custom Codex command that reads a codebase and explains its architecture, tech stack, key features, test coverage, opportunities to improve, and usage.",
+    "tags": [
+      "Architecture",
+      "Tech stack",
+      "Test coverage",
+      "Usage instructions"
+    ],
+    "diagram": "Codex Custom Command\n  |\n  +-- Codebase explanation\n  +-- Architecture\n  +-- Tech stack\n  +-- Test coverage"
+  },
+  {
+    "title": "Codex via Bedrock",
+    "file": "codex-via-bedrock.md",
+    "category": "claude",
+    "focus": "What is Codex via Bedrock?",
+    "summary": "Codex via Bedrock is the integration that lets OpenAI's Codex coding agent run on top of OpenAI models served from Amazon Bedrock instead of OpenAI's own API.",
+    "tags": [
+      "Supported Models",
+      "Requirements",
+      "Setup",
+      "What You Get"
+    ],
+    "diagram": "Codex via Bedrock\n  |\n  +-- What is Codex via Bedrock?\n  +-- Supported Models\n  +-- Requirements\n  +-- Setup"
+  },
+  {
+    "title": "Copilot Instructions",
+    "file": "copilot/copilot-instructions.md",
+    "category": "claude",
+    "focus": "General Guidelines",
+    "summary": "The instruction file itself: general guidelines, pull request rules, bash script rules, and container rules that Copilot follows on every task.",
+    "tags": [
+      "Pull requests",
+      "Bash scripts",
+      "Containerfile",
+      "README"
+    ],
+    "diagram": "Copilot Instructions\n  |\n  +-- General Guidelines\n  +-- Pull requests\n  +-- Bash scripts\n  +-- Containerfile"
+  },
+  {
+    "title": "Copilot Instructions Setup",
+    "file": "copilot/README.md",
+    "category": "claude",
+    "focus": "Global instructions",
+    "summary": "Create a copilot-instructions.md file and place it at $HOME/.copilot/copilot-instructions.md to give GitHub Copilot global instructions.",
+    "tags": [
+      "copilot-instructions.md",
+      "Global setup"
+    ],
+    "diagram": "Copilot Instructions Setup\n  |\n  +-- Global instructions\n  +-- copilot-instructions.md\n  +-- Global setup"
+  },
+  {
+    "title": "CR Command",
+    "file": "cluade-code-custom-commands/cr.md",
+    "category": "claude",
+    "focus": "Code review",
+    "summary": "A custom code review command covering bugs, edge cases, performance, security, style, error handling, and passing tests.",
+    "tags": [
+      "Bugs and edge cases",
+      "Performance",
+      "Security",
+      "Style",
+      "Tests"
+    ],
+    "diagram": "CR Command\n  |\n  +-- Code review\n  +-- Bugs and edge cases\n  +-- Performance\n  +-- Security"
+  },
+  {
+    "title": "Custom Agents",
+    "file": "custom-agents-cc/README.md",
+    "category": "claude",
+    "focus": "Marketing Agent",
+    "summary": "Claude code allow you to create custom agents that can perform specific tasks by leveraging the capabilities of the Claude AI model. Below are some examples of custom agents you can create: sec analysis, data extraction, content generation, and more.",
+    "tags": [
+      "Marketing Agent"
+    ],
+    "diagram": "Custom Agents\n  |\n  +-- Marketing Agent"
+  },
+  {
+    "title": "Gemini CLI",
+    "file": "gemini/README.md",
+    "category": "claude",
+    "focus": "GEMINI.md",
+    "summary": "Create a GEMINI.md at ~/.gemini/GEMINI.md for global instructions, and add TOML custom commands under ~/.gemini/commands/.",
+    "tags": [
+      "Custom commands",
+      "TOML commands"
+    ],
+    "diagram": "Gemini CLI\n  |\n  +-- GEMINI.md\n  +-- Custom commands\n  +-- TOML commands"
+  },
+  {
+    "title": "GEMINI.md for Gemini CLI",
+    "file": "gemini/GEMINI.md",
+    "category": "claude",
+    "focus": "General Guidelines",
+    "summary": "Diego Pacheco Gemini global guidelines.",
+    "tags": [
+      "Github Pull Request(PR) Guidelines",
+      "When Writing BASH scripts",
+      "Dockerfile/Containerfile",
+      "podman-compose"
+    ],
+    "diagram": "GEMINI.md for Gemini CLI\n  |\n  +-- General Guidelines\n  +-- Github Pull Request(PR) Guidelines\n  +-- When Writing BASH scripts\n  +-- Dockerfile/Containerfile"
+  },
+  {
+    "title": "Harness",
+    "file": "harness.md",
+    "category": "claude",
+    "focus": "What is a Harness?",
+    "summary": "In the context of AI agents and LLMs, a harness is the runtime scaffolding that wraps a model and turns it into an agent. The model itself only produces tokens; the harness is what gives those tokens consequences in the real world.",
+    "tags": [
+      "Examples of Harnesses",
+      "Configuring a Harness",
+      "Why Harnesses Matter"
+    ],
+    "diagram": "Harness\n  |\n  +-- What is a Harness?\n  +-- What a Harness Provides\n  +-- Harness vs Model vs Agent\n  +-- Examples of Harnesses"
+  },
+  {
+    "title": "Marketing Agent",
+    "file": "custom-agents-cc/marketing-agent.md",
+    "category": "claude",
+    "focus": "Plain language translation",
+    "summary": "A custom subagent that translates technical content into plain language for executives, customers, and sales teams without losing accuracy.",
+    "tags": [
+      "Audience adaptation",
+      "Jargon removal",
+      "Concrete examples"
+    ],
+    "diagram": "Marketing Agent\n  |\n  +-- Plain language translation\n  +-- Audience adaptation\n  +-- Jargon removal\n  +-- Concrete examples"
+  },
+  {
     "title": "Prompting Guide for GPT and Claude",
     "file": "prompts.md",
     "category": "claude",
@@ -1346,29 +1467,830 @@
     "diagram": "Prompting Guide for GPT and Claude\n  |\n  +-- 1. Bad vs Good Prompt Examples\n  +-- 2. Prompt Frameworks\n  +-- 3. AI Slop: What It Is and How to Avoid It\n  +-- 4. Prompt Patterns and Techniques"
   },
   {
-    "title": "Trusted Agent Protocol (TAP)",
-    "file": "trusted-agent-protocol.md",
-    "category": "protocols",
-    "focus": "The problem it solves",
-    "summary": "Trusted Agent Protocol (TAP) is an open specification that lets a merchant cryptographically answer one question on every incoming request: is this AI agent a known, accountable agent acting for a real consumer, or just another anonymous bot? Visa unveiled it on October 14, 2025, developed in…",
+    "title": "Tests Command",
+    "file": "cluade-code-custom-commands/tests.md",
+    "category": "claude",
+    "focus": "Test generation",
+    "summary": "A custom command that generates tests for a target covering happy paths, edge cases, error conditions, and boundary values, then runs them.",
     "tags": [
-      "Why it matters",
-      "Links"
+      "Happy path",
+      "Edge cases",
+      "Error conditions",
+      "Boundary values"
     ],
-    "diagram": "Trusted Agent Protocol (TAP)\n  |\n  +-- The problem it solves\n  +-- Who is using it\n  +-- The landscape — alternatives and how they fit\n  +-- Why it matters"
+    "diagram": "Tests Command\n  |\n  +-- Test generation\n  +-- Happy path\n  +-- Edge cases\n  +-- Error conditions"
   },
   {
-    "title": "x402 and the Machine Payments Protocol (MPP)",
-    "file": "x402-machine-payments.md",
-    "category": "protocols",
-    "focus": "The problem they solve",
-    "summary": "These are the settlement layer of agentic commerce — two efforts that revive the long-dormant HTTP 402 Payment Required status code so that software, not a human at a checkout, can pay for things over HTTP.",
+    "title": "User Management System - Plain Language Guide",
+    "file": "custom-agents-cc/non-tech.md",
+    "category": "claude",
+    "focus": "What This System Does",
+    "summary": "Think of this as a digital address book that works over the internet. Instead of keeping business cards or contact lists on your phone, this system lets you store and manage user information (names, email addresses, and ages) on a server that multiple people can access through web requests.",
     "tags": [
-      "How x402 works",
-      "Why it matters",
+      "The Two Versions: Basic vs. Secure",
+      "Problems These Applications Solve",
+      "Key Features in Simple Terms",
+      "How the Testing Helps",
+      "Real-World Analogy"
+    ],
+    "diagram": "User Management System - Plain Language Guide\n  |\n  +-- What This System Does\n  +-- The Two Versions: Basic vs. Secure\n  +-- Problems These Applications Solve\n  +-- Key Features in Simple Terms"
+  },
+  {
+    "title": "AgentKit",
+    "file": "agent-ui-low-code-normies/agent-kit.md",
+    "category": "platforms",
+    "focus": "Inngest AgentKit",
+    "summary": "There are two distinct projects named \"AgentKit\". This document covers both.",
+    "tags": [
+      "Coinbase AgentKit",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "AgentKit\n  |\n  +-- Inngest AgentKit\n  +-- Coinbase AgentKit\n  +-- Alternatives\n  +-- Link to Code"
+  },
+  {
+    "title": "CrewAI",
+    "file": "frameworks/crew-ai.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "CrewAI is an open-source Python framework for orchestrating multiple autonomous AI agents in role-based, collaborative workflows.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "CrewAI\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "Dapr Agents",
+    "file": "frameworks/dapr-agents.md",
+    "category": "platforms",
+    "focus": "How it Works?",
+    "summary": "Dapr Agents is a developer framework for building durable and resilient AI agent systems powered by Large Language Models (LLMs).",
+    "tags": [
+      "Features",
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Who is Using It?"
+    ],
+    "diagram": "Dapr Agents\n  |\n  +-- How it Works?\n  +-- Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "DSPy",
+    "file": "frameworks/DSPy.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "DSPy (Declarative Self-improving Python) is an open-source framework from Stanford NLP for programming -- not prompting -- language models. Instead of manually writing and tuning prompt strings, you define typed input/output signatures and let DSPy compile and optimize the prompts (or fine-tune weights) automatically.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "DSPy\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "FlowiseAI (Flowise)",
+    "file": "agent-ui-low-code-normies/flowsise.md",
+    "category": "platforms",
+    "focus": "How It Works",
+    "summary": "Flowise is an open-source, low-code tool for building LLM applications using a visual drag-and-drop interface. Built on LangChain and LlamaIndex, it lets users create AI workflows, chatbots, and agents without writing extensive code. Written in TypeScript/JavaScript on Node.js with 30,000+ GitHub stars.",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "FlowiseAI (Flowise)\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "Google Agent Development Kit (ADK)",
+    "file": "frameworks/google-adk.md",
+    "category": "platforms",
+    "focus": "How it Works?",
+    "summary": "Google ADK (Agent Development Kit) is an open-source framework released by Google in April 2025 for building, deploying, and orchestrating AI agents.",
+    "tags": [
+      "PROS",
+      "CONS",
+      "Comparison",
+      "Use Cases",
+      "Who is Using it?"
+    ],
+    "diagram": "Google Agent Development Kit (ADK)\n  |\n  +-- How it Works?\n  +-- PROS\n  +-- CONS\n  +-- Comparison"
+  },
+  {
+    "title": "Hermes Agent",
+    "file": "hermes-agent.md",
+    "category": "platforms",
+    "focus": "The learning loop",
+    "summary": "Hermes Agent is an open-source, self-hosted AI agent from Nous Research, released on 25 February 2026 under the MIT license. Its tagline is \"the agent that grows with you.\" Unlike a stateless coding assistant that forgets everything between sessions, Hermes is designed to live on your own machine\u2026",
+    "tags": [
+      "The learning loop",
+      "Deployment backends",
+      "Memory Architecture",
+      "Why It Matters",
       "Links"
     ],
-    "diagram": "x402 and the Machine Payments Protocol (MPP)\n  |\n  +-- The problem they solve\n  +-- How x402 works\n  +-- How MPP works (and how it differs)\n  +-- Where they sit in the stack"
+    "diagram": "Hermes Agent\n  |\n  +-- What is Hermes Agent?\n  +-- Memory Architecture\n  +-- Tooling and the Nous Tool Gateway\n  +-- Hermes Agent vs Other Agents"
+  },
+  {
+    "title": "LangChain",
+    "file": "frameworks/lang-chain.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "LangChain is an open-source framework (primarily Python, with JavaScript/TypeScript support) for building applications powered by large language models (LLMs). It provides composable primitives -- prompts, models, memory, tools, retrievers -- and higher-level patterns like chains, agents, and graphs to orchestrate LLM-powered workflows.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "LangChain\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "LangChain Managed Deep Agents",
+    "file": "langchain-managed-deep-agents.md",
+    "category": "platforms",
+    "focus": "Managed runtime",
+    "summary": "Managed Deep Agents is an API-first hosted runtime for creating, running, and operating deep agents, announced by LangChain (Victor Moreira) on May 13, 2026 in private beta.",
+    "tags": [
+      "Managed runtime",
+      "Tools and sandboxes",
+      "Where it sits",
+      "Why it matters",
+      "Availability"
+    ],
+    "diagram": "LangChain Managed Deep Agents\n  |\n  +-- Background: open-source Deep Agents\n  +-- What the managed layer adds\n  +-- Where it sits\n  +-- Why it matters"
+  },
+  {
+    "title": "LangFlow",
+    "file": "agent-ui-low-code-normies/lang-flow.md",
+    "category": "platforms",
+    "focus": "How It Works",
+    "summary": "LangFlow is an open-source, visual framework for building multi-agent and RAG (Retrieval-Augmented Generation) applications. It provides a drag-and-drop UI to design, prototype, and deploy AI workflows without writing extensive code. Originally built on LangChain, it has evolved to support a broader ecosystem.",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "LangFlow\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "LangGraph",
+    "file": "frameworks/langgraph.md",
+    "category": "platforms",
+    "focus": "How it Works?",
+    "summary": "LangGraph is a framework by LangChain for building stateful, multi-agent applications using a graph-based architecture. Instead of linear chains, you define your agent logic as a directed graph where nodes are functions (LLM calls, tool executions, custom logic) and edges define the flow between them.",
+    "tags": [
+      "PROS",
+      "CONS",
+      "Comparison",
+      "Use Cases",
+      "Who is Using it?"
+    ],
+    "diagram": "LangGraph\n  |\n  +-- How it Works?\n  +-- PROS\n  +-- CONS\n  +-- Comparison"
+  },
+  {
+    "title": "LiteLLM",
+    "file": "llm-routing/litellm.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "LiteLLM is an open-source Python SDK and AI Gateway (proxy server) developed by BerriAI that provides a unified, OpenAI-compatible API to call 100+ LLM providers.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "LiteLLM\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "LiteLLM Agent Platform",
+    "file": "litellm-agent-platform.md",
+    "category": "platforms",
+    "focus": "lap CLI",
+    "summary": "LiteLLM Agent Platform (LAP) is self-hosted infrastructure for running coding agents - Claude Code, Codex, Hermes, anything - inside isolated Kubernetes sandboxes fronted by a credential vault.",
+    "tags": [
+      "lap CLI",
+      "Self-hosting (local dev)",
+      "Other surfaces",
+      "Architecture",
+      "Supported harnesses"
+    ],
+    "diagram": "LiteLLM Agent Platform\n  |\n  +-- The core trick: vault proxy\n  +-- Architecture\n  +-- How you use it\n  +-- Supported harnesses"
+  },
+  {
+    "title": "Mastra",
+    "file": "frameworks/Mastra.md",
+    "category": "platforms",
+    "focus": "How it Works?",
+    "summary": "Mastra is an open-source TypeScript framework for building AI-powered applications and agents. It was created by the team behind Gatsby (Abhi Aiyer, Sam Bhagwat, and Shane Thomas) and is backed by Y Combinator with a $13M seed round.",
+    "tags": [
+      "Features",
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Who is Using It?"
+    ],
+    "diagram": "Mastra\n  |\n  +-- How it Works?\n  +-- Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "n8n",
+    "file": "agent-ui-low-code-normies/n8n.md",
+    "category": "platforms",
+    "focus": "How It Works",
+    "summary": "n8n (pronounced \"nodemation\") is an open-source workflow automation platform that connects services, APIs, and applications through visual workflows. It is a self-hostable, source-available alternative to Zapier and Make. Built with TypeScript on Node.js, maintained by n8n GmbH (Berlin).",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "n8n\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "OpenRouter",
+    "file": "llm-routing/openrouter.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "OpenRouter is a fully managed, hosted API gateway and marketplace that provides a single unified endpoint to access 400+ large language models from dozens of providers including OpenAI, Anthropic, Google, Meta, Mistral, Cohere, and many open-source model hosts.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "OpenRouter\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "Portkey",
+    "file": "llm-routing/portkey.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "Portkey AI Gateway is an open-source, blazing-fast AI gateway written in TypeScript that acts as a unified control plane for routing, observing, and governing requests to 1,600+ LLMs and AI providers.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "Portkey\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "RouteLLM",
+    "file": "llm-routing/routerllm.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "RouteLLM is an open-source framework for intelligently routing LLM queries between a strong (expensive) model and a weak (cheap) model based on query complexity.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "RouteLLM\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "Spring AI",
+    "file": "frameworks/spring-ai.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "Spring AI is an application framework for AI engineering, built by the Spring team (VMware/Broadcom). It brings Spring ecosystem conventions -- dependency injection, auto-configuration, portable abstractions -- to the domain of generative AI.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "Spring AI\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "Strands Agents",
+    "file": "frameworks/strands-agents.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "Strands Agents is an open-source AI agents SDK developed by AWS, released in May 2025 under the Apache 2.0 license. It takes a model-driven approach to building AI agents, meaning you define agents with just three components: a model, a system prompt, and a set of tools.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "Strands Agents\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "Swarms-rs",
+    "file": "frameworks/swarms-rs.md",
+    "category": "platforms",
+    "focus": "Main Features",
+    "summary": "Swarms-rs is an enterprise-grade, production-ready multi-agent orchestration framework built in Rust. Created by The Swarm Corporation (Kye Gomez), it leverages Rust's zero-cost abstractions, fearless concurrency, and memory safety guarantees to deliver high-performance multi-agent systems.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "Swarms-rs\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "Agent",
+    "file": "concepts/what-is-a-agent.md",
+    "category": "patterns",
+    "focus": "Agent Anatomy",
+    "summary": "Google Definition:",
+    "tags": [
+      "Memory",
+      "Where to Deploy agents?"
+    ],
+    "diagram": "Agent\n  |\n  +-- Agent Anatomy\n  +-- Memory\n  +-- Where to Deploy agents?"
+  },
+  {
+    "title": "Agent 2 Agent Protocol (A2A)",
+    "file": "concepts/a2a.md",
+    "category": "patterns",
+    "focus": "How it Works?",
+    "summary": "A2A (Agent2Agent) is an open protocol created by Google in April 2025 that enables AI agents to communicate with each other, exchange information, and coordinate actions across different platforms and vendors. The protocol was contributed to the Linux Foundation in June 2025, making it a vendor-neutral open standard.",
+    "tags": [
+      "PROS",
+      "CONS",
+      "Use Cases",
+      "Who is Using it?",
+      "Code Sample with Java"
+    ],
+    "diagram": "Agent 2 Agent Protocol (A2A)\n  |\n  +-- How it Works?\n  +-- PROS\n  +-- CONS\n  +-- Use Cases"
+  },
+  {
+    "title": "Agent Evaluation",
+    "file": "concepts/agent-evaluation.md",
+    "category": "patterns",
+    "focus": "Why is it Hard?",
+    "summary": "Agent evaluation is the practice of systematically measuring how well an AI agent performs its intended tasks. Unlike evaluating a simple LLM (where you check if the output text is correct), evaluating agents requires assessing multi-step reasoning, tool usage, decision-making, error recovery, and end-to-end task completion.",
+    "tags": [
+      "What to Evaluate",
+      "Evaluation Methods",
+      "Evaluation Frameworks and Tools",
+      "Key Metrics",
+      "Code Sample - Simple Agent Eval Framework (Python)"
+    ],
+    "diagram": "Agent Evaluation\n  |\n  +-- Why is it Hard?\n  +-- What to Evaluate\n  +-- Evaluation Methods\n  +-- Evaluation Frameworks and Tools"
+  },
+  {
+    "title": "Agent Memory",
+    "file": "concepts/agent-memory.md",
+    "category": "patterns",
+    "focus": "Types of Memory",
+    "summary": "Agent memory is the ability of an AI agent to store, retrieve, and use information across interactions. Without memory, an agent starts fresh every conversation -- it forgets past context, user preferences, and learned knowledge. Memory gives agents continuity, personalization, and the ability to build on prior work.",
+    "tags": [
+      "Memory Architectures",
+      "PROS of Memory Systems",
+      "CONS of Memory Systems",
+      "Implementation Approaches",
+      "Real-World Memory Implementations"
+    ],
+    "diagram": "Agent Memory\n  |\n  +-- Types of Memory\n  +-- Memory Architectures\n  +-- PROS of Memory Systems\n  +-- CONS of Memory Systems"
+  },
+  {
+    "title": "Agent Sandboxing",
+    "file": "concepts/agent-sandboxing.md",
+    "category": "patterns",
+    "focus": "Why is it Needed?",
+    "summary": "Agent sandboxing is the practice of running AI agent code execution in isolated environments that prevent the agent from accessing or modifying the host system. When an agent generates and runs code, it needs a place to execute it safely.",
+    "tags": [
+      "Sandboxing Approaches",
+      "E2B (Environment to Binary)",
+      "Daytona",
+      "Container-Based Sandboxing (Podman)",
+      "Comparison"
+    ],
+    "diagram": "Agent Sandboxing\n  |\n  +-- Why is it Needed?\n  +-- Sandboxing Approaches\n  +-- E2B (Environment to Binary)\n  +-- Daytona"
+  },
+  {
+    "title": "Agent Security",
+    "file": "concepts/agent-security.md",
+    "category": "patterns",
+    "focus": "Threat Landscape",
+    "summary": "Agent security covers the threats, vulnerabilities, and defenses specific to AI agent systems. Traditional application security (OWASP Top 10) still applies, but agents introduce new attack surfaces: they make autonomous decisions, call external tools, process untrusted inputs through LLMs, and operate with delegated permissions.",
+    "tags": [
+      "Prompt Injection in Detail",
+      "Guardrails",
+      "Security Principles for Agents",
+      "OWASP Top 10 for LLM Applications",
+      "Practical Security Checklist"
+    ],
+    "diagram": "Agent Security\n  |\n  +-- Threat Landscape\n  +-- Prompt Injection in Detail\n  +-- Guardrails\n  +-- Security Principles for Agents"
+  },
+  {
+    "title": "AI Agent Gateway",
+    "file": "concepts/ai-agent-gateway.md",
+    "category": "patterns",
+    "focus": "Guardrails",
+    "summary": "Concerns:",
+    "tags": [
+      "Routing",
+      "Auditing"
+    ],
+    "diagram": "AI Agent Gateway\n  |\n  +-- Guardrails\n  +-- Routing\n  +-- Auditing"
+  },
+  {
+    "title": "AI Agents Design Patterns",
+    "file": "concepts/ai-agents-design-patterns.md",
+    "category": "patterns",
+    "focus": "ReAct and Chain-of-Thought",
+    "summary": "A catalog of the recurring agent design patterns, from ReAct and Chain-of-Thought through orchestrator-worker, router, and human-in-the-loop.",
+    "tags": [
+      "Reflection",
+      "Tool use",
+      "Multi-agent",
+      "RAG",
+      "Orchestrator-Worker"
+    ],
+    "diagram": "AI Agents Design Patterns\n  |\n  +-- ReAct and Chain-of-Thought\n  +-- Reflection\n  +-- Tool use\n  +-- Multi-agent"
+  },
+  {
+    "title": "AI coding Agents Evolution",
+    "file": "concepts/ai-coding-agents-evolution.md",
+    "category": "patterns",
+    "focus": "Wave 2 - Frameworks on top of AI Coding Tools",
+    "summary": "Not necessarily in perfect timeline order, but we can see the evolution of AI coding agents in 4 waves, with some retrofitting in between.",
+    "tags": [
+      "Wave 3 - Multi-Agent Solutions",
+      "Wave 4 - Threads",
+      "Retrofit",
+      "AI Evolution",
+      "What you think about this doc: Opus 4.6 / Claude Code?"
+    ],
+    "diagram": "AI coding Agents Evolution\n  |\n  +-- Wave 2 - Frameworks on top of AI Coding Tools\n  +-- Wave 3 - Multi-Agent Solutions\n  +-- Wave 4 - Threads\n  +-- Retrofit"
+  },
+  {
+    "title": "Git Worktrees",
+    "file": "git-worktrees.md",
+    "category": "patterns",
+    "focus": "Create a worktree with a new branch",
+    "summary": "A git worktree allows you to have multiple working directories attached to a single repository. Each worktree has its own checked-out branch, index, and working directory, but they all share the same .git repository data.",
+    "tags": [
+      "List all worktrees",
+      "Remove a worktree",
+      "How to Setup"
+    ],
+    "diagram": "Git Worktrees\n  |\n  +-- What is a Git Worktree?\n  +-- How to Setup\n  +-- Create a worktree with a new branch\n  +-- Create a worktree with an existing branch"
+  },
+  {
+    "title": "Late-Bound Sagas",
+    "file": "late-bound-sagas.md",
+    "category": "patterns",
+    "focus": "What is a Late-Bound Saga?",
+    "summary": "A Late-Bound Saga is a workflow whose execution graph does not exist when the workflow starts. The LLM synthesizes the graph one edge at a time at runtime, and each edge is committed to a durable ledger at the moment it is proposed - before it executes. The graph is append-only.",
+    "tags": [
+      "The Two-Plane Separation",
+      "The Four-Write Bracket",
+      "Why It Matters",
+      "Reference"
+    ],
+    "diagram": "Late-Bound Sagas\n  |\n  +-- What is a Late-Bound Saga?\n  +-- Agent as a Loop vs Agent as a Saga\n  +-- Durability is Not Continuity\n  +-- The Two-Plane Separation"
+  },
+  {
+    "title": "Model Context Protocol (MCP)",
+    "file": "concepts/mcp.md",
+    "category": "patterns",
+    "focus": "How it Works?",
+    "summary": "MCP (Model Context Protocol) is an open protocol created by Anthropic in November 2024 that standardizes how AI applications connect to external data sources, tools, and services.",
+    "tags": [
+      "PROS",
+      "CONS",
+      "Use Cases",
+      "Who is Using it?",
+      "Code Sample - Building an MCP Server (TypeScript)"
+    ],
+    "diagram": "Model Context Protocol (MCP)\n  |\n  +-- How it Works?\n  +-- PROS\n  +-- CONS\n  +-- Use Cases"
+  },
+  {
+    "title": "Workflows and Skills",
+    "file": "concepts/workflows-skills.md",
+    "category": "patterns",
+    "focus": "Best Practices for Skills",
+    "summary": "A skill should do one thing well. When a skill tries to handle too many concerns it becomes fragile and hard to maintain. A skill that creates a backend API endpoint should not also handle frontend components, database migrations, and deployment. Split responsibilities into separate skills.",
+    "tags": [
+      "Anti-Patterns for Skills",
+      "Workflows",
+      "How to Keep Improving Prompts, Skills, and Workflows"
+    ],
+    "diagram": "Workflows and Skills\n  |\n  +-- Best Practices for Skills\n  +-- Anti-Patterns for Skills\n  +-- Workflows\n  +-- How to Keep Improving Prompts, Skills, and Workflows"
+  },
+  {
+    "title": "BMAD",
+    "file": "claude-ecosystem/BMAD.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "BMAD stands for Breakthrough Method for Agile AI-Driven Development. It is an open-source framework and methodology that transforms AI coding assistants (Claude Code, Cursor, Windsurf, VS Code) into a simulated agile development team.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "BMAD\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "Claude Agent Teams",
+    "file": "claude-ecosystem/Claude-Agent-Teams.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "Claude Agent Teams is a built-in experimental feature in Claude Code CLI that lets you coordinate multiple Claude Code instances working together as a team. One session acts as the team lead, coordinating work, assigning tasks, and synthesizing results.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "Claude Agent Teams\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "claude-flow",
+    "file": "claude-ecosystem/claude-flow.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "claude-flow is an open-source multi-agent orchestration platform built for Claude Code, created by Reuven Cohen (GitHub: ruvnet). Distributed as an npm package and CLI tool, it transforms Claude Code from a single AI assistant into a coordinated multi-agent platform.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "claude-flow\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "ContinuousClaude",
+    "file": "claude-ecosystem/ContinuousClaude.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "There are two distinct projects called \"ContinuousClaude\" / \"Continuous Claude\":",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "ContinuousClaude\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "GasTown",
+    "file": "claude-ecosystem/GasTown.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "GasTown is a multi-agent orchestration framework created by Steve Yegge, released on January 1, 2026. It is written in Go (~189k LOC) and built on top of a git-backed issue tracking system called \"Beads.\" GasTown presents itself as a Claude Code-like single-agent interface, but behind the scenes it spawns and manages 20-30+ specialized...",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "GasTown\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "GetShitDone",
+    "file": "claude-ecosystem/GetShitDone.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "Get Shit Done (GSD) is a lightweight meta-prompting, context engineering, and spec-driven development system for Claude Code (and also OpenCode and Gemini CLI).",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "GetShitDone\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "My Custom Agent Skill Multi-Agent System",
+    "file": "claude-ecosystem/my-custom-agent-skill-multi-agent-system.md",
+    "category": "ecosystem",
+    "focus": "Agents",
+    "summary": "I wrote a simple tool in Rust, capable of deploying agents into Claude code, I called it RAD (Rust Agent Deployer).",
+    "tags": [
+      "The Original Agent Skill",
+      "The Final Version of the Skill",
+      "The evolution in waves",
+      "Comparison V1 and V5(Final)",
+      "Summary of Leassons Learned"
+    ],
+    "diagram": "My Custom Agent Skill Multi-Agent System\n  |\n  +-- Agents\n  +-- The Original Agent Skill\n  +-- The Final Version of the Skill\n  +-- The evolution in waves"
+  },
+  {
+    "title": "oh-my-claudecode (OMC)",
+    "file": "claude-ecosystem/oh-my-claude-code.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "oh-my-claudecode (OMC) is a teams-first multi-agent orchestration layer built on top of Claude Code CLI. Created by Yeachan Heo, it transforms a single Claude Code session into a coordinated swarm of specialized agents that plan, execute, verify, and fix code autonomously.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "oh-my-claudecode (OMC)\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "Ralph",
+    "file": "claude-ecosystem/Ralph.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "Ralph (formally known as \"Ralph Wiggum\") is an autonomous AI agent loop technique and tool that runs AI coding agents (primarily Claude Code) repeatedly in a loop until all tasks defined in a PRD (Product Requirements Document) are complete.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "Ralph\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "StrongDM Attractor",
+    "file": "claude-ecosystem/strongdm-attractor.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "Attractor is an open-source, non-interactive coding agent specification created by StrongDM, designed for use in software factories.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "StrongDM Attractor\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "SuperClaude",
+    "file": "claude-ecosystem/SuperClaude.md",
+    "category": "ecosystem",
+    "focus": "Main Features",
+    "summary": "SuperClaude is a meta-programming configuration framework that enhances Claude Code by injecting structured behavioral instructions through .md configuration files.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "SuperClaude\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "AgentCore Stack Summary",
+    "file": "aws-agent-core/summary.md",
+    "category": "aws",
+    "focus": "4 AgentCore Services",
+    "summary": "A one-page map of the four AgentCore services (Runtime, Memory, Gateway, Identity) and the three related LLM infrastructure tools that surround them.",
+    "tags": [
+      "Runtime",
+      "Memory",
+      "Gateway",
+      "Identity",
+      "LLM infrastructure"
+    ],
+    "diagram": "AgentCore Stack Summary\n  |\n  +-- 4 AgentCore Services\n  +-- Runtime\n  +-- Memory\n  +-- Gateway"
+  },
+  {
+    "title": "Amazon Bedrock AgentCore Gateway",
+    "file": "aws-agent-core/agent-core-gateway.md",
+    "category": "aws",
+    "focus": "How It Works",
+    "summary": "Amazon Bedrock AgentCore Gateway is a managed service that transforms existing REST APIs, OpenAPI specs, Smithy models, and Lambda functions into MCP (Model Context Protocol) tools that AI agents can use. It acts as a bridge between traditional APIs and AI agents, handling schema translation, authentication, and tool discovery.",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "Amazon Bedrock AgentCore Gateway\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "Amazon Bedrock AgentCore Identity",
+    "file": "aws-agent-core/agent-core-identity.md",
+    "category": "aws",
+    "focus": "How It Works",
+    "summary": "Amazon Bedrock AgentCore Identity is a service that provides authentication and authorization capabilities for AI agents. It enables agents to securely authenticate with AWS services and third-party APIs using OAuth2 flows, API keys, and AWS IAM JWT tokens.",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "Amazon Bedrock AgentCore Identity\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "Amazon Bedrock AgentCore Memory",
+    "file": "aws-agent-core/agent-core-memory.md",
+    "category": "aws",
+    "focus": "How It Works",
+    "summary": "Amazon Bedrock AgentCore Memory is a managed service that provides persistent knowledge and context management for AI agents across sessions. It is part of the Amazon Bedrock AgentCore platform. Memory enables agents to remember user preferences, past interactions, and extracted knowledge, making them more effective over time.",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "Amazon Bedrock AgentCore Memory\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "Amazon Bedrock AgentCore Runtime",
+    "file": "aws-agent-core/agent-core-runtime.md",
+    "category": "aws",
+    "focus": "How It Works",
+    "summary": "Amazon Bedrock AgentCore Runtime is a secure, serverless runtime for deploying and scaling AI agents and tools as part of the Amazon Bedrock AgentCore platform. It supports any framework (Strands Agents, LangChain, LangGraph, CrewAI, Autogen, custom) and any model (Amazon Bedrock or external).",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "Amazon Bedrock AgentCore Runtime\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "AWS Agent Core (Amazon Bedrock AgentCore)",
+    "file": "aws-agent-core/aws-agent-core.md",
+    "category": "aws",
+    "focus": "Main Features",
+    "summary": "Amazon Bedrock AgentCore is a fully managed, modular platform from AWS for deploying, operating, and scaling AI agents in production. It is not an agent-building framework itself, but rather the infrastructure layer that sits beneath any agent framework.",
+    "tags": [
+      "Pros",
+      "Cons",
+      "Comparison",
+      "Why is it unique?",
+      "Simple Usage"
+    ],
+    "diagram": "AWS Agent Core (Amazon Bedrock AgentCore)\n  |\n  +-- Main Features\n  +-- Pros\n  +-- Cons\n  +-- Comparison"
+  },
+  {
+    "title": "LangFuse",
+    "file": "aws-agent-core/lang-fuse.md",
+    "category": "aws",
+    "focus": "How It Works",
+    "summary": "LangFuse is an open-source LLM engineering platform for observability, tracing, evaluation, prompt management, and analytics for LLM-powered applications. It captures every interaction between your application and LLMs, providing full visibility into complex LLM pipelines, RAG systems, and AI agents.",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "LangFuse\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "LiteLLM (AgentCore Stack)",
+    "file": "aws-agent-core/litellm.md",
+    "category": "aws",
+    "focus": "How It Works",
+    "summary": "LiteLLM is an open-source Python library and proxy server by BerriAI that provides a unified interface to call 100+ LLM APIs using the OpenAI API format.",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "LiteLLM (AgentCore Stack)\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
+  },
+  {
+    "title": "OpenRouter (AgentCore Stack)",
+    "file": "aws-agent-core/openrouter.md",
+    "category": "aws",
+    "focus": "How It Works",
+    "summary": "OpenRouter is a unified API gateway for accessing large language models from multiple providers through a single endpoint. It routes requests between your application and dozens of AI providers including OpenAI, Anthropic, Google, Meta, Mistral, Cohere, and others.",
+    "tags": [
+      "Main Features",
+      "Pros",
+      "Cons",
+      "Alternatives",
+      "Link to Code"
+    ],
+    "diagram": "OpenRouter (AgentCore Stack)\n  |\n  +-- How It Works\n  +-- Main Features\n  +-- Pros\n  +-- Cons"
   }
 ];
 

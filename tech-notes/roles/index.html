@@ -25,6 +25,7 @@
     .brand { display: flex; align-items: center; gap: 12px; font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
     .brand-mark { width: 28px; height: 28px; border: 1px solid var(--ink); display: grid; place-items: center; transform: rotate(-4deg); }
     .counter { color: var(--muted); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; }
+    .home-link { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); }
     .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 48px; padding: 86px 0 64px; align-items: end; }
     .eyebrow { margin: 0 0 18px; color: var(--accent); font-size: .76rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
     h1 { margin: 0; max-width: 780px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.7rem, 8vw, 7.7rem); font-weight: 400; letter-spacing: -.065em; line-height: .82; }
@@ -96,7 +97,7 @@
 <body>
   <header class="shell topbar">
     <div class="brand"><span class="brand-mark">R</span><span>Engineering Field Guide</span></div>
-    <div class="counter">08 roles · one deck</div>
+    <div class="counter">08 roles · one deck · <a class="home-link" href="../index.html">All tech notes</a></div>
   </header>
   <main class="shell">
     <section class="hero" aria-labelledby="page-title">
