@@ -1,0 +1,24 @@
+tech-notes/distributed-systems/http-1-2-3.html
+  s_73377c0c6ecba3::t_42995e786b5ba0 1-1432
+tech-notes/distributed-systems/tcp-stack.html
+  s_73377c0c6ecba3::t_f951bc4c1bf45d 919
+  s_73377c0c6ecba3::t_95e8d6b78c5785 1-918,920-1151
+tech-notes/distributed-systems/tcp-handshake.html
+  s_73377c0c6ecba3::t_eea6210ff7049c 1-1015
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "e12bc31338990ff58114f73e09a9ae14cf7c9113",
+  "prompts": {},
+  "sessions": {
+    "s_73377c0c6ecba3": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9abe-f47b-7742-baf5-ecf5f7e448de",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
