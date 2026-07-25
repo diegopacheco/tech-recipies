@@ -1,0 +1,19 @@
+tech-notes/ai-transformation/graphs-instead-of-loops.md
+  s_f65c5e40eca02d::t_48efd3d73ff989 1-492
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "e460aaf6353c3a8759fc05bf98f609c1b3e5ed1d",
+  "prompts": {},
+  "sessions": {
+    "s_f65c5e40eca02d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9b3d-fa6e-7e73-ada4-a3aeb594f0d0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
