@@ -1,0 +1,1160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Principles &amp; GoF Patterns</title>
+<style>
+:root{
+  --paper:#f8f7f2;
+  --ink:#202426;
+  --muted:#657078;
+  --line:#d4d7cf;
+  --soft:#eef0e8;
+  --white:#ffffff;
+  --blue:#2e6f8f;
+  --green:#3f7858;
+  --amber:#a76522;
+  --red:#ac4639;
+  --teal:#247a75;
+  --violet:#67568a;
+  --shadow:0 20px 46px rgba(32,36,38,.12);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:
+    linear-gradient(90deg,rgba(46,111,143,.06) 1px,transparent 1px) 0 0/42px 42px,
+    linear-gradient(0deg,rgba(63,120,88,.05) 1px,transparent 1px) 0 0/42px 42px,
+    radial-gradient(circle at 12% 14%,rgba(167,101,34,.10),transparent 30%),
+    var(--paper);
+  color:var(--ink);
+  font-family:Georgia,"Times New Roman",serif;
+}
+.shell{max-width:1280px;margin:0 auto;padding:26px}
+.hero{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:34px 32px;
+  box-shadow:var(--shadow);
+}
+.hero h1{margin:0 0 8px;font-size:38px;letter-spacing:-.5px}
+.hero p{margin:0;color:var(--muted);font-size:17px;max-width:76ch;line-height:1.6}
+.kicker{
+  display:inline-block;margin-bottom:14px;padding:5px 12px;border-radius:999px;
+  background:var(--soft);border:1px solid var(--line);
+  font:600 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--blue);
+}
+.tabs{
+  position:sticky;top:0;z-index:20;margin:22px 0 24px;padding:10px;
+  display:flex;flex-wrap:wrap;gap:8px;
+  background:rgba(248,247,242,.94);backdrop-filter:blur(6px);
+  border:1px solid var(--line);border-radius:14px;
+}
+.tabs button{
+  font:600 13px/1 ui-sans-serif,system-ui,sans-serif;
+  padding:9px 14px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line);background:var(--white);color:var(--muted);
+  transition:all .15s ease;
+}
+.tabs button:hover{color:var(--ink);border-color:var(--blue)}
+.tabs button.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.panel{display:none}
+.panel.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel>h2{
+  margin:0 0 6px;font-size:30px;letter-spacing:-.4px;
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+}
+.panel>h2 .sub{font:400 15px/1.3 ui-sans-serif,system-ui,sans-serif;color:var(--muted)}
+.what{
+  margin:0 0 20px;max-width:96ch;font-size:17px;line-height:1.62;color:var(--ink);
+  border-left:4px solid var(--blue);background:var(--white);
+  padding:14px 18px;border-radius:0 12px 12px 0;border-top:1px solid var(--line);
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media(max-width:980px){.pair{grid-template-columns:1fr}}
+.card{
+  background:var(--white);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;box-shadow:0 10px 24px rgba(32,36,38,.06);
+}
+.card h3{
+  margin:0;padding:10px 14px;border-bottom:1px solid var(--line);
+  font:700 12px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;
+}
+.card.bad{border-top:4px solid var(--red)}
+.card.bad h3{color:var(--red);background:rgba(172,70,57,.06)}
+.card.good{border-top:4px solid var(--green)}
+.card.good h3{color:var(--green);background:rgba(63,120,88,.06)}
+.card p.tell{margin:0;padding:10px 14px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:14px;line-height:1.5}
+pre{
+  margin:0;padding:12px 14px;overflow-x:auto;background:#fcfcf8;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.62;
+}
+code .cl{display:block;white-space:pre}
+code .cl>i{
+  display:inline-block;width:2.1em;margin-right:1em;text-align:right;
+  font-style:normal;color:var(--muted);opacity:.5;user-select:none;
+}
+.k{color:var(--violet);font-weight:600}
+.b{color:var(--blue)}
+.s{color:var(--green)}
+.n{color:var(--amber)}
+.f{color:var(--teal);font-weight:600}
+.d{color:var(--amber);font-weight:600}
+.gof{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px}
+.gof .card h3{
+  display:flex;gap:10px;align-items:center;color:var(--ink);
+  font:700 14px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.02em;text-transform:none;
+}
+.gof .card h3 em{
+  font-style:normal;background:var(--soft);border:1px solid var(--line);
+  border-radius:6px;padding:3px 7px;font-size:11px;color:var(--blue);
+}
+.gof .card{border-top:4px solid var(--teal)}
+.gof .card p.intent{
+  margin:0;padding:10px 14px;border-bottom:1px solid var(--line);
+  color:var(--muted);font-size:14px;line-height:1.55;
+}
+.group{
+  margin:26px 0 14px;font:700 12px/1 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--amber);
+}
+.group:first-of-type{margin-top:8px}
+table{
+  width:100%;border-collapse:collapse;background:var(--white);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  font:400 14.5px/1.55 ui-sans-serif,system-ui,sans-serif;
+}
+th,td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(238,240,232,.4)}
+td.name{font-weight:700;white-space:nowrap;color:var(--ink)}
+.wrap{overflow-x:auto;border-radius:14px}
+.note{
+  margin:18px 0 0;padding:12px 16px;background:rgba(167,101,34,.07);
+  border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;
+  font:400 14.5px/1.6 ui-sans-serif,system-ui,sans-serif;color:var(--ink);
+}
+footer{margin:34px 0 10px;color:var(--muted);font:400 13px/1.5 ui-sans-serif,system-ui,sans-serif;text-align:center}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="hero">
+  <span class="kicker">Tech Notes</span>
+  <h1>Design Principles &amp; GoF Patterns</h1>
+  <p>Ten principles that keep code cheap to change, each one shown as the wrong shape next to the right shape in Python, plus every Gang of Four pattern written as small as it can be written. One tab per principle, a comparison table at the end.</p>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="kiss" class="on">KISS</button>
+  <button data-tab="dry">DRY</button>
+  <button data-tab="yagni">YAGNI</button>
+  <button data-tab="soc">SoC</button>
+  <button data-tab="demeter">Demeter</button>
+  <button data-tab="srp">SRP</button>
+  <button data-tab="ocp">OCP</button>
+  <button data-tab="lsp">LSP</button>
+  <button data-tab="isp">ISP</button>
+  <button data-tab="dip">DIP</button>
+  <button data-tab="gof">GoF 24</button>
+  <button data-tab="compare">Comparison</button>
+</nav>
+
+<main>
+
+<section class="panel on" id="kiss">
+  <h2>KISS <span class="sub">Keep It Simple, Stupid</span></h2>
+  <p class="what">Pick the plainest construct that solves the problem in front of you.
+  Complexity has to be paid for by a requirement, not by a hunch.
+  Indirection you cannot justify in one sentence is cost with no return.
+  The reader, not the writer, decides whether code is simple.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">class EvenChecker:
+    def __init__(self, strategy):
+        self.strategy = strategy
+
+    def check(self, n):
+        return self.strategy.apply(n)
+
+class ModuloStrategy:
+    def apply(self, n):
+        return n % 2 == 0
+
+def is_even(n):
+    return EvenChecker(ModuloStrategy()).check(n)</code></pre>
+      <p class="tell">Two classes and an injection point to hide one operator. Nothing here can ever vary.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">def is_even(n):
+    return n % 2 == 0</code></pre>
+      <p class="tell">The whole behaviour is visible in one line and needs no navigation to understand.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="dry">
+  <h2>DRY <span class="sub">Don't Repeat Yourself</span></h2>
+  <p class="what">Every piece of knowledge should have one authoritative home in the system.
+  Duplication is dangerous because copies drift apart when only one is fixed.
+  It is about duplicated <em>decisions</em>, not about text that happens to look alike.
+  Two rules that merely coincide today should stay separate.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">def create_user(name, email):
+    if not name or len(name) &gt; 50:
+        raise ValueError("bad name")
+    if "@" not in email:
+        raise ValueError("bad email")
+    return {"name": name, "email": email}
+
+def update_user(user, name, email):
+    if not name or len(name) &gt; 50:
+        raise ValueError("bad name")
+    if "@" not in email:
+        raise ValueError("bad email")
+    user.update({"name": name, "email": email})
+    return user</code></pre>
+      <p class="tell">Raise the name limit to 80 and one of the two paths keeps rejecting valid users.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">def validate(name, email):
+    if not name or len(name) &gt; 50:
+        raise ValueError("bad name")
+    if "@" not in email:
+        raise ValueError("bad email")
+
+def create_user(name, email):
+    validate(name, email)
+    return {"name": name, "email": email}
+
+def update_user(user, name, email):
+    validate(name, email)
+    user.update({"name": name, "email": email})
+    return user</code></pre>
+      <p class="tell">The rule lives in one place, so it changes in one place.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="yagni">
+  <h2>YAGNI <span class="sub">You Aren't Gonna Need It</span></h2>
+  <p class="what">Build the feature when the requirement arrives, not when you first imagine it.
+  Speculative options still cost tests, docs, bugs and review time today.
+  Guessed abstractions usually guess wrong and then block the real requirement.
+  Deleting unused flexibility is far harder than adding it later.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">class Report:
+    def __init__(self, rows, fmt="csv", compress=False,
+                 encrypt=False, plugins=None):
+        self.rows = rows
+        self.fmt = fmt
+        self.compress = compress
+        self.encrypt = encrypt
+        self.plugins = plugins or []
+
+    def render(self):
+        if self.fmt == "csv":
+            out = "\n".join(",".join(r) for r in self.rows)
+        elif self.fmt == "xml":
+            out = "&lt;todo/&gt;"
+        elif self.fmt == "pdf":
+            raise NotImplementedError
+        for p in self.plugins:
+            out = p(out)
+        return out</code></pre>
+      <p class="tell">Four knobs nobody asked for, two formats that do not work, one plugin hook with no plugins.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">def render_csv(rows):
+    return "\n".join(",".join(r) for r in rows)</code></pre>
+      <p class="tell">CSV was the requirement. XML gets its own function on the day someone needs XML.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="soc">
+  <h2>SoC <span class="sub">Separation of Concerns</span></h2>
+  <p class="what">Different kinds of decisions belong in different units of code.
+  Business rules, persistence and presentation change for unrelated reasons and at different speeds.
+  Keeping them apart lets you test the rules with no database and swap the output with no rewrite.
+  Tangled concerns force you to touch everything to change anything.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">import sqlite3
+
+def handle_order(payload):
+    conn = sqlite3.connect("shop.db")
+    total = sum(i["price"] * i["qty"] for i in payload["items"])
+    conn.execute("insert into orders values (?, ?)",
+                 (payload["id"], total))
+    conn.commit()
+    print(f"Order {payload['id']} total {total:.2f}")</code></pre>
+      <p class="tell">Pricing cannot be tested without a database and a captured stdout.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">def total_of(items):
+    return sum(i["price"] * i["qty"] for i in items)
+
+def save_order(conn, order_id, total):
+    conn.execute("insert into orders values (?, ?)",
+                 (order_id, total))
+    conn.commit()
+
+def format_order(order_id, total):
+    return f"Order {order_id} total {total:.2f}"</code></pre>
+      <p class="tell">Three concerns, three functions, each testable and replaceable on its own.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="demeter">
+  <h2>Law of Demeter <span class="sub">Talk to friends, not to strangers</span></h2>
+  <p class="what">An object should only call methods on itself, its own fields, its parameters and things it created.
+  Long chains like <em>a.b.c.d()</em> hard-code the shape of objects you do not own.
+  Ask the neighbour for the answer instead of reaching through it for the data.
+  The payoff is that internal structure can change without breaking distant callers.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">def label(order):
+    return order.customer.address.city.name.upper()</code></pre>
+      <p class="tell">One function now depends on four classes. Any of them can break it by renaming a field.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">class Address:
+    def city_name(self):
+        return self.city.name
+
+class Customer:
+    def city_name(self):
+        return self.address.city_name()
+
+class Order:
+    def city_name(self):
+        return self.customer.city_name()
+
+def label(order):
+    return order.city_name().upper()</code></pre>
+      <p class="tell">Each object answers for its own neighbour, so the caller knows only <em>Order</em>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="srp">
+  <h2>SRP <span class="sub">Single Responsibility Principle</span></h2>
+  <p class="what">A class should have one reason to change, meaning one stakeholder driving its changes.
+  Accounting, the web team and the mailing system are three reasons, so they belong in three classes.
+  When one class serves several audiences, every release risks breaking someone else's need.
+  The test is simple: who asks for this to change?</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">class Invoice:
+    def __init__(self, lines):
+        self.lines = lines
+
+    def total(self):
+        return sum(self.lines)
+
+    def to_html(self):
+        return f"&lt;b&gt;{self.total()}&lt;/b&gt;"
+
+    def save(self, path):
+        open(path, "w").write(self.to_html())
+
+    def email(self, smtp, to):
+        smtp.send(to, self.to_html())</code></pre>
+      <p class="tell">A styling tweak, a storage change and a tax change all edit the same class.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">class Invoice:
+    def __init__(self, lines):
+        self.lines = lines
+
+    def total(self):
+        return sum(self.lines)
+
+class InvoiceView:
+    def to_html(self, invoice):
+        return f"&lt;b&gt;{invoice.total()}&lt;/b&gt;"
+
+class InvoiceStore:
+    def save(self, path, html):
+        open(path, "w").write(html)</code></pre>
+      <p class="tell">Money rules, rendering and storage each move on their own schedule.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="ocp">
+  <h2>OCP <span class="sub">Open/Closed Principle</span></h2>
+  <p class="what">Code should be open to new behaviour but closed to modification of what already works.
+  Adding a case should mean adding code, not editing a switch that ships with every other case.
+  Polymorphism and registries turn a growing conditional into an extension point.
+  Fewer edits to proven code means fewer regressions.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">def area(shape):
+    if shape["kind"] == "circle":
+        return 3.14159 * shape["r"] ** 2
+    if shape["kind"] == "square":
+        return shape["side"] ** 2
+    raise ValueError("unknown shape")</code></pre>
+      <p class="tell">Every new shape reopens a function that already works for circles and squares.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">class Circle:
+    def __init__(self, r):
+        self.r = r
+
+    def area(self):
+        return 3.14159 * self.r ** 2
+
+class Square:
+    def __init__(self, side):
+        self.side = side
+
+    def area(self):
+        return self.side ** 2
+
+def area(shape):
+    return shape.area()</code></pre>
+      <p class="tell">A triangle is a new file. Nothing that already passes its tests gets touched.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="lsp">
+  <h2>LSP <span class="sub">Liskov Substitution Principle</span></h2>
+  <p class="what">A subtype must be usable anywhere its base type is expected, with no surprises.
+  Subclasses may not strengthen what callers must provide or weaken what callers are promised.
+  Inheriting only to reuse code is how substitutability quietly breaks.
+  If a caller has to ask which subclass it holds, the hierarchy is wrong.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">class Rectangle:
+    def set_width(self, w):
+        self.w = w
+
+    def set_height(self, h):
+        self.h = h
+
+    def area(self):
+        return self.w * self.h
+
+class Square(Rectangle):
+    def set_width(self, w):
+        self.w = self.h = w
+
+    def set_height(self, h):
+        self.w = self.h = h
+
+def grow(r):
+    r.set_width(2)
+    r.set_height(3)
+    assert r.area() == 6</code></pre>
+      <p class="tell"><em>grow</em> holds for every rectangle and fails for a square. The subclass broke the contract.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">class Shape:
+    def area(self):
+        raise NotImplementedError
+
+class Rectangle(Shape):
+    def __init__(self, w, h):
+        self.w, self.h = w, h
+
+    def area(self):
+        return self.w * self.h
+
+class Square(Shape):
+    def __init__(self, side):
+        self.side = side
+
+    def area(self):
+        return self.side ** 2</code></pre>
+      <p class="tell">They share the promise they can both keep, <em>area</em>, and nothing else.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="isp">
+  <h2>ISP <span class="sub">Interface Segregation Principle</span></h2>
+  <p class="what">No client should be forced to depend on methods it does not use.
+  Fat interfaces push implementers into writing stubs that raise or return nothing.
+  Several small role interfaces let each caller depend on exactly what it calls.
+  Stubbed-out methods are the visible symptom of the violation.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">class Worker:
+    def work(self):
+        raise NotImplementedError
+
+    def eat(self):
+        raise NotImplementedError
+
+    def sleep(self):
+        raise NotImplementedError
+
+class Robot(Worker):
+    def work(self):
+        return "welding"
+
+    def eat(self):
+        raise NotImplementedError("robots do not eat")
+
+    def sleep(self):
+        raise NotImplementedError("robots do not sleep")</code></pre>
+      <p class="tell">Two thirds of the interface is a lie the robot has to keep telling.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">from typing import Protocol
+
+class Workable(Protocol):
+    def work(self): ...
+
+class Feedable(Protocol):
+    def eat(self): ...
+
+class Robot:
+    def work(self):
+        return "welding"
+
+class Human:
+    def work(self):
+        return "coding"
+
+    def eat(self):
+        return "lunch"</code></pre>
+      <p class="tell">A shift scheduler takes <em>Workable</em>; a canteen takes <em>Feedable</em>. Neither over-asks.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="dip">
+  <h2>DIP <span class="sub">Dependency Inversion Principle</span></h2>
+  <p class="what">High-level policy should not depend on low-level detail; both depend on an abstraction.
+  The abstraction is owned by the policy, so the database plugs into the domain and not the reverse.
+  Constructing your own collaborators welds the two layers together permanently.
+  Injecting them makes the policy testable with a five-line fake.</p>
+  <div class="pair">
+    <div class="card bad">
+      <h3>Bad</h3>
+      <pre><code class="py">class MySQLUsers:
+    def all(self):
+        return [{"id": 1}]
+
+class UserReport:
+    def __init__(self):
+        self.repo = MySQLUsers()
+
+    def run(self):
+        return len(self.repo.all())</code></pre>
+      <p class="tell">Reporting cannot run, or be tested, without MySQL being reachable.</p>
+    </div>
+    <div class="card good">
+      <h3>Good</h3>
+      <pre><code class="py">from typing import Protocol
+
+class Users(Protocol):
+    def all(self): ...
+
+class UserReport:
+    def __init__(self, repo: Users):
+        self.repo = repo
+
+    def run(self):
+        return len(self.repo.all())
+
+class FakeUsers:
+    def all(self):
+        return [{"id": 1}]</code></pre>
+      <p class="tell">The report knows only the port. MySQL, Postgres or a fake all satisfy it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="gof">
+  <h2>Gang of Four <span class="sub">23 catalogue patterns plus Object Pool</span></h2>
+  <p class="what">The original catalogue names 23 patterns across three families: creational patterns decide how objects are made,
+  structural patterns decide how they are composed, behavioural patterns decide how they collaborate.
+  Object Pool is not in the book but is the pattern most often counted as the 24th, so it is included and marked.
+  Each one below is written as small as the idea allows.</p>
+
+  <p class="group">Creational</p>
+  <div class="gof">
+    <div class="card">
+      <h3><em>01</em> Singleton</h3>
+      <p class="intent">One instance for the whole process, reachable from a single access point.</p>
+      <pre><code class="py">class Config:
+    _inst = None
+
+    def __new__(cls):
+        if cls._inst is None:
+            cls._inst = super().__new__(cls)
+        return cls._inst</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>02</em> Factory Method</h3>
+      <p class="intent">A base class defines the workflow and lets subclasses choose the concrete product.</p>
+      <pre><code class="py">class HtmlButton:
+    def paint(self):
+        return "&lt;button&gt;"
+
+class Dialog:
+    def create_button(self):
+        raise NotImplementedError
+
+    def render(self):
+        return self.create_button().paint()
+
+class WebDialog(Dialog):
+    def create_button(self):
+        return HtmlButton()</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>03</em> Abstract Factory</h3>
+      <p class="intent">Create whole families of related products without naming their concrete classes.</p>
+      <pre><code class="py">class DarkFactory:
+    def button(self):
+        return "dark button"
+
+    def checkbox(self):
+        return "dark checkbox"
+
+class LightFactory:
+    def button(self):
+        return "light button"
+
+    def checkbox(self):
+        return "light checkbox"
+
+def build_ui(factory):
+    return factory.button(), factory.checkbox()</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>04</em> Builder</h3>
+      <p class="intent">Assemble a complex object step by step so the same steps can yield different results.</p>
+      <pre><code class="py">class Pizza:
+    def __init__(self):
+        self.parts = []
+
+class PizzaBuilder:
+    def __init__(self):
+        self.pizza = Pizza()
+
+    def add(self, part):
+        self.pizza.parts.append(part)
+        return self
+
+    def build(self):
+        return self.pizza
+
+pizza = PizzaBuilder().add("cheese").add("basil").build()</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>05</em> Prototype</h3>
+      <p class="intent">Produce new objects by copying an existing one instead of constructing from scratch.</p>
+      <pre><code class="py">import copy
+
+class Node:
+    def __init__(self, tags):
+        self.tags = tags
+
+    def clone(self):
+        return copy.deepcopy(self)</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>06</em> Object Pool <em>not GoF</em></h3>
+      <p class="intent">Reuse expensive instances from a pool instead of creating and destroying them.</p>
+      <pre><code class="py">class Pool:
+    def __init__(self, factory, size):
+        self.free = [factory() for _ in range(size)]
+
+    def acquire(self):
+        return self.free.pop()
+
+    def release(self, item):
+        self.free.append(item)</code></pre>
+    </div>
+  </div>
+
+  <p class="group">Structural</p>
+  <div class="gof">
+    <div class="card">
+      <h3><em>07</em> Adapter</h3>
+      <p class="intent">Wrap an incompatible interface so a client can use it unchanged.</p>
+      <pre><code class="py">class LegacyPrinter:
+    def print_text(self, s):
+        return f"legacy:{s}"
+
+class PrinterAdapter:
+    def __init__(self, legacy):
+        self.legacy = legacy
+
+    def send(self, s):
+        return self.legacy.print_text(s)</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>08</em> Bridge</h3>
+      <p class="intent">Split abstraction from implementation so the two hierarchies vary independently.</p>
+      <pre><code class="py">class SvgRenderer:
+    def draw(self, name):
+        return f"&lt;svg:{name}&gt;"
+
+class Shape:
+    def __init__(self, renderer):
+        self.renderer = renderer
+
+class Circle(Shape):
+    def render(self):
+        return self.renderer.draw("circle")</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>09</em> Composite</h3>
+      <p class="intent">Treat a single object and a tree of objects through the same interface.</p>
+      <pre><code class="py">class File:
+    def __init__(self, size):
+        self.size = size
+
+    def total(self):
+        return self.size
+
+class Folder:
+    def __init__(self, children):
+        self.children = children
+
+    def total(self):
+        return sum(c.total() for c in self.children)</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>10</em> Decorator</h3>
+      <p class="intent">Add behaviour by wrapping an object that keeps the same interface.</p>
+      <pre><code class="py">class Text:
+    def render(self):
+        return "hello"
+
+class Bold:
+    def __init__(self, inner):
+        self.inner = inner
+
+    def render(self):
+        return f"&lt;b&gt;{self.inner.render()}&lt;/b&gt;"</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>11</em> Facade</h3>
+      <p class="intent">Offer one simple entry point over a complicated set of subsystems.</p>
+      <pre><code class="py">class Computer:
+    def __init__(self, cpu, disk, ram):
+        self.cpu, self.disk, self.ram = cpu, disk, ram
+
+    def start(self):
+        self.cpu.boot()
+        self.ram.load(self.disk.read())
+        return "running"</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>12</em> Flyweight</h3>
+      <p class="intent">Share immutable state between many objects to cut memory use.</p>
+      <pre><code class="py">class Glyph:
+    def __init__(self, char):
+        self.char = char
+
+class GlyphFactory:
+    def __init__(self):
+        self.cache = {}
+
+    def get(self, char):
+        if char not in self.cache:
+            self.cache[char] = Glyph(char)
+        return self.cache[char]</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>13</em> Proxy</h3>
+      <p class="intent">Stand in for another object to control access, defer cost or add caching.</p>
+      <pre><code class="py">class Image:
+    def __init__(self, path):
+        self.path = path
+
+    def show(self):
+        return f"pixels:{self.path}"
+
+class LazyImage:
+    def __init__(self, path):
+        self.path = path
+        self.real = None
+
+    def show(self):
+        if self.real is None:
+            self.real = Image(self.path)
+        return self.real.show()</code></pre>
+    </div>
+  </div>
+
+  <p class="group">Behavioural</p>
+  <div class="gof">
+    <div class="card">
+      <h3><em>14</em> Chain of Responsibility</h3>
+      <p class="intent">Pass a request along a chain until one handler deals with it.</p>
+      <pre><code class="py">class Handler:
+    def __init__(self, nxt=None):
+        self.nxt = nxt
+
+    def handle(self, req):
+        return self.nxt.handle(req) if self.nxt else "ok"
+
+class Auth(Handler):
+    def handle(self, req):
+        if not req.get("user"):
+            return "401"
+        return super().handle(req)</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>15</em> Command</h3>
+      <p class="intent">Turn a request into an object so it can be queued, logged or undone.</p>
+      <pre><code class="py">class Light:
+    def on(self):
+        return "on"
+
+class OnCommand:
+    def __init__(self, light):
+        self.light = light
+
+    def execute(self):
+        return self.light.on()
+
+class Remote:
+    def __init__(self):
+        self.history = []
+
+    def run(self, command):
+        self.history.append(command)
+        return command.execute()</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>16</em> Interpreter</h3>
+      <p class="intent">Represent a small language as a tree of nodes that evaluate themselves.</p>
+      <pre><code class="py">class Num:
+    def __init__(self, v):
+        self.v = v
+
+    def eval(self):
+        return self.v
+
+class Add:
+    def __init__(self, left, right):
+        self.left, self.right = left, right
+
+    def eval(self):
+        return self.left.eval() + self.right.eval()
+
+Add(Num(2), Num(3)).eval()</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>17</em> Iterator</h3>
+      <p class="intent">Walk a collection element by element without exposing how it is stored.</p>
+      <pre><code class="py">class Countdown:
+    def __init__(self, n):
+        self.n = n
+
+    def __iter__(self):
+        while self.n &gt; 0:
+            yield self.n
+            self.n -= 1</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>18</em> Mediator</h3>
+      <p class="intent">Route communication through one hub so peers never reference each other.</p>
+      <pre><code class="py">class ChatRoom:
+    def __init__(self):
+        self.users = []
+
+    def join(self, user):
+        user.room = self
+        self.users.append(user)
+
+    def send(self, sender, msg):
+        return [u.receive(sender, msg)
+                for u in self.users if u is not sender]
+
+class User:
+    def __init__(self, name):
+        self.name = name
+
+    def receive(self, sender, msg):
+        return f"{self.name} got {msg} from {sender.name}"</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>19</em> Memento</h3>
+      <p class="intent">Capture and restore an object's state without exposing its internals.</p>
+      <pre><code class="py">class Editor:
+    def __init__(self):
+        self.text = ""
+
+    def save(self):
+        return self.text
+
+    def restore(self, snapshot):
+        self.text = snapshot</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>20</em> Observer</h3>
+      <p class="intent">Notify any number of subscribers whenever the subject changes.</p>
+      <pre><code class="py">class Subject:
+    def __init__(self):
+        self.observers = []
+
+    def subscribe(self, fn):
+        self.observers.append(fn)
+
+    def emit(self, event):
+        return [fn(event) for fn in self.observers]</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>21</em> State</h3>
+      <p class="intent">Let an object change its behaviour by swapping the state object it delegates to.</p>
+      <pre><code class="py">class Published:
+    def publish(self, doc):
+        return "already published"
+
+class Draft:
+    def publish(self, doc):
+        doc.state = Published()
+        return "published"
+
+class Document:
+    def __init__(self):
+        self.state = Draft()
+
+    def publish(self):
+        return self.state.publish(self)</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>22</em> Strategy</h3>
+      <p class="intent">Make interchangeable algorithms selectable at runtime behind one interface.</p>
+      <pre><code class="py">def by_price(items):
+    return sorted(items, key=lambda i: i["price"])
+
+def by_name(items):
+    return sorted(items, key=lambda i: i["name"])
+
+class Catalog:
+    def __init__(self, strategy):
+        self.strategy = strategy
+
+    def list(self, items):
+        return self.strategy(items)</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>23</em> Template Method</h3>
+      <p class="intent">Fix the skeleton of an algorithm and let subclasses fill in the steps.</p>
+      <pre><code class="py">class Report:
+    def run(self):
+        return self.render(self.fetch())
+
+    def fetch(self):
+        raise NotImplementedError
+
+    def render(self, data):
+        return ",".join(data)
+
+class UsersReport(Report):
+    def fetch(self):
+        return ["ana", "bob"]</code></pre>
+    </div>
+    <div class="card">
+      <h3><em>24</em> Visitor</h3>
+      <p class="intent">Add new operations to a stable object structure without editing its classes.</p>
+      <pre><code class="py">class Circle:
+    def accept(self, visitor):
+        return visitor.circle(self)
+
+class Square:
+    def accept(self, visitor):
+        return visitor.square(self)
+
+class AreaVisitor:
+    def circle(self, c):
+        return "pi r squared"
+
+    def square(self, s):
+        return "side squared"</code></pre>
+    </div>
+  </div>
+
+  <p class="note">Python collapses several of these. Strategy, Command and Template Method are often a plain function or a
+  default argument; Iterator is a generator; Decorator overlaps with the <em>@</em> syntax; Singleton is usually just a module.
+  Reach for the class-based form only when the pattern needs state or several methods.</p>
+</section>
+
+<section class="panel" id="compare">
+  <h2>Comparison <span class="sub">what each principle buys and what it costs when overdone</span></h2>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Principle</th>
+          <th>Core idea</th>
+          <th>Smell it fights</th>
+          <th>Unit it applies to</th>
+          <th>Overdone it produces</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="name">KISS</td>
+          <td>Pick the plainest thing that works</td>
+          <td>Unjustified indirection</td>
+          <td>Any code</td>
+          <td>Naive code that ignores real constraints</td>
+        </tr>
+        <tr>
+          <td class="name">DRY</td>
+          <td>One home per piece of knowledge</td>
+          <td>Copy-paste drift</td>
+          <td>Rules and decisions</td>
+          <td>Coupling of things that only looked alike</td>
+        </tr>
+        <tr>
+          <td class="name">YAGNI</td>
+          <td>Build it when it is required</td>
+          <td>Speculative options and hooks</td>
+          <td>Features</td>
+          <td>Painful retrofits of the genuinely foreseeable</td>
+        </tr>
+        <tr>
+          <td class="name">SoC</td>
+          <td>Split unrelated kinds of decisions</td>
+          <td>Rules tangled with I/O</td>
+          <td>Modules and layers</td>
+          <td>Layer sprawl and pass-through code</td>
+        </tr>
+        <tr>
+          <td class="name">Law of Demeter</td>
+          <td>Ask a neighbour, do not reach through it</td>
+          <td>Long a.b.c.d() chains</td>
+          <td>Calls between objects</td>
+          <td>Delegation methods that only forward</td>
+        </tr>
+        <tr>
+          <td class="name">SRP</td>
+          <td>One reason to change per class</td>
+          <td>God classes</td>
+          <td>Classes and modules</td>
+          <td>Anemic one-method classes everywhere</td>
+        </tr>
+        <tr>
+          <td class="name">OCP</td>
+          <td>Extend without editing what works</td>
+          <td>Growing type switches</td>
+          <td>Extension points</td>
+          <td>Plugin machinery with one plugin</td>
+        </tr>
+        <tr>
+          <td class="name">LSP</td>
+          <td>Subtypes must honour the contract</td>
+          <td>Overrides that break callers</td>
+          <td>Type hierarchies</td>
+          <td>Flat hierarchies with duplicated code</td>
+        </tr>
+        <tr>
+          <td class="name">ISP</td>
+          <td>Depend only on what you call</td>
+          <td>Stubs that raise NotImplemented</td>
+          <td>Interfaces and protocols</td>
+          <td>A swarm of single-method interfaces</td>
+        </tr>
+        <tr>
+          <td class="name">DIP</td>
+          <td>Policy owns the abstraction</td>
+          <td>Domain importing the driver</td>
+          <td>Dependencies between layers</td>
+          <td>Interfaces with exactly one implementation</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">SRP, OCP, LSP, ISP and DIP are the five SOLID principles and pull in the same direction: keep a unit small,
+  keep its promises, and let it depend on ideas rather than on details. KISS and YAGNI are the counterweight that stops
+  the other eight from turning into architecture for its own sake.</p>
+</section>
+
+</main>
+
+<footer>Design principles and the GoF catalogue, in Python.</footer>
+</div>
+
+<script>
+const KW = new Set(["def","class","return","if","elif","else","for","while","in","not","and","or","import","from","as","with","try","except","finally","raise","yield","lambda","pass","None","True","False","self","cls","is","global","nonlocal","assert","break","continue","del","async","await"]);
+const BI = new Set(["print","len","list","dict","set","str","int","float","range","super","isinstance","sum","map","filter","sorted","type","object","abs","max","min","tuple","enumerate","zip","getattr","setattr","hasattr","property","staticmethod","classmethod","Exception","NotImplementedError","ValueError","TypeError","open","all","any","next","iter","round","repr","format","bool","Protocol","copy","sqlite3","typing"]);
+const RX = /(#[^\n]*)|('(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*")|(@[A-Za-z_][\w.]*)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g;
+
+function esc(s){
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function line(src){
+  let out = "", last = 0, prev = "", m;
+  RX.lastIndex = 0;
+  while ((m = RX.exec(src)) !== null){
+    out += esc(src.slice(last, m.index));
+    const t = m[0];
+    if (m[1]) out += '<span class="c">' + esc(t) + "</span>";
+    else if (m[2]) out += '<span class="s">' + esc(t) + "</span>";
+    else if (m[3]) out += '<span class="d">' + esc(t) + "</span>";
+    else if (m[4]) out += '<span class="n">' + t + "</span>";
+    else if (KW.has(t)) { out += '<span class="k">' + t + "</span>"; }
+    else if (prev === "def" || prev === "class") out += '<span class="f">' + t + "</span>";
+    else if (BI.has(t)) out += '<span class="b">' + t + "</span>";
+    else out += t;
+    if (m[5]) prev = t;
+    last = m.index + t.length;
+  }
+  return out + esc(src.slice(last));
+}
+
+document.querySelectorAll("code.py").forEach(function(el){
+  const rows = el.textContent.replace(/\s+$/, "").split("\n");
+  el.innerHTML = rows.map(function(r, i){
+    return '<span class="cl"><i>' + (i + 1) + "</i>" + (line(r) || " ") + "</span>";
+  }).join("");
+});
+
+const tabs = document.getElementById("tabs");
+tabs.addEventListener("click", function(e){
+  const btn = e.target.closest("button[data-tab]");
+  if (!btn) return;
+  tabs.querySelectorAll("button").forEach(function(b){ b.classList.toggle("on", b === btn); });
+  document.querySelectorAll(".panel").forEach(function(p){ p.classList.toggle("on", p.id === btn.dataset.tab); });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+</script>
+</body>
+</html>
