@@ -1,0 +1,21 @@
+tech-notes/design-patterns/design-patterns.html
+  s_cffd665b432e44::t_f08f20f2f7ed84 1-1160
+tech-notes/design-patterns/design-patterns.md
+  s_cffd665b432e44::t_d64f65fd1c2d57 1-934
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "a0747aaa39307f4a2be17e33eacd7b5b9451c479",
+  "prompts": {},
+  "sessions": {
+    "s_cffd665b432e44": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "65b8fa29-ce55-45bb-ba7f-b862e14ce971",
+        "model": "claude-opus-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
