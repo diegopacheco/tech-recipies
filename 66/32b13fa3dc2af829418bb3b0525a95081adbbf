@@ -1,0 +1,14 @@
+tech-notes/ai-transformation/mcp-2.0.md
+  h_8e2c3875396153 1-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "6632b13fa3dc2af829418bb3b0525a95081adbbf",
+  "prompts": {},
+  "humans": {
+    "h_8e2c3875396153": {
+      "author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
