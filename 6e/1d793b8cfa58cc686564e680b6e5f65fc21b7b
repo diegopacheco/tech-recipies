@@ -1,0 +1,20 @@
+tech-notes/ai-transformation/ai-workflow-patterns.md
+  s_a7ef75fc789250::t_9e852af0619afb 331-332
+  s_a7ef75fc789250::t_29473d110b6e7f 1-330,333-434
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6e1d793b8cfa58cc686564e680b6e5f65fc21b7b",
+  "prompts": {},
+  "sessions": {
+    "s_a7ef75fc789250": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ff2de-3673-7193-a13f-a262a45b4c1b",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
