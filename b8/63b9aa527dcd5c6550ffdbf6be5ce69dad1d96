@@ -1,0 +1,19 @@
+tech-notes/index.html
+  s_8cbadfb1dddc02::t_5167591720490a 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b863b9aa527dcd5c6550ffdbf6be5ce69dad1d96",
+  "prompts": {},
+  "sessions": {
+    "s_8cbadfb1dddc02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dd3292e-4e76-47a2-9aac-2270cce21aa6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
