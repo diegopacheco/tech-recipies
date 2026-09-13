@@ -1,0 +1,22 @@
+tech-notes/ai-transformation/sw-factories-loops.md
+  s_969b3e0f4bfd5a::t_c3fea274cd1db7 222-227
+  s_969b3e0f4bfd5a::t_4001c793d081aa 200
+  s_969b3e0f4bfd5a::t_80a71a3cac2267 17
+  s_969b3e0f4bfd5a::t_35ff462c2d1913 1-16,18-199,201-221,228-358
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "77ee82eee15c66ac3d61edd258340a35d493d94c",
+  "prompts": {},
+  "sessions": {
+    "s_969b3e0f4bfd5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d5e8750d-88fe-45e4-b2c2-45cc217b878b",
+        "model": "claude-opus-5"
+      },
+      "human_author": "diegopacheco <diego.pacheco.it@gmail.com>"
+    }
+  }
+}
