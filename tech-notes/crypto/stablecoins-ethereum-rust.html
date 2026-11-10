@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Stablecoins, USDC and Circle, wallets, Solidity, Ethereum, Foundry and Anvil, Rust tooling, and how stablecoin throughput scales.">
+  <title>Stablecoin Field Guide</title>
+  <style>
+    :root {
+      --paper: #f6f2e9;
+      --paper-deep: #ece5d8;
+      --ink: #17303b;
+      --ink-soft: #4d6269;
+      --cyan: #007f84;
+      --cyan-soft: #d7efeb;
+      --amber: #dc8127;
+      --amber-soft: #f7dfbf;
+      --coral: #d34f3f;
+      --coral-soft: #f8dad3;
+      --violet: #67568a;
+      --violet-soft: #e6e0f0;
+      --line: #bdc6c2;
+      --white: #fffdf8;
+      --shadow: 0 18px 50px rgba(24, 48, 59, 0.11);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(23, 48, 59, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 48, 59, 0.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(0, 127, 132, 0.3);
+      outline-offset: 3px;
+    }
+
+    .page-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(23, 48, 59, 0.18);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--ink);
+      text-decoration: none;
+      font-family: Palatino, "Palatino Linotype", serif;
+      font-size: 18px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: var(--amber-soft);
+      box-shadow: 4px 4px 0 var(--ink);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .topbar nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px 20px;
+    }
+
+    .topbar nav a {
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .topbar nav a:hover {
+      color: var(--cyan);
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1, h2, h3 {
+      font-family: Palatino, "Palatino Linotype", "Book Antiqua", serif;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: 60px;
+      padding: 70px 0 60px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 18px;
+      color: var(--cyan);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 28px;
+      height: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    h1 {
+      margin-bottom: 24px;
+      font-size: clamp(48px, 7vw, 92px);
+      font-weight: 500;
+      line-height: 0.92;
+      letter-spacing: -0.05em;
+    }
+
+    h1 em {
+      color: var(--cyan);
+      font-weight: 500;
+    }
+
+    .lead {
+      max-width: 620px;
+      color: var(--ink-soft);
+      font-size: 19px;
+    }
+
+    .toc {
+      display: grid;
+      gap: 10px;
+      padding: 24px;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: 10px 10px 0 var(--ink);
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 6px;
+      border-bottom: 1px dashed var(--line);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .toc a:last-child {
+      border-bottom: 0;
+    }
+
+    .toc a:hover {
+      color: var(--cyan);
+    }
+
+    .toc span {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      background: var(--cyan-soft);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .section {
+      padding: 70px 0;
+      border-top: 1px solid rgba(23, 48, 59, 0.14);
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.6fr);
+      align-items: end;
+      gap: 40px;
+      margin-bottom: 36px;
+    }
+
+    .section-heading h2 {
+      margin-bottom: 0;
+      font-size: clamp(36px, 4.6vw, 60px);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.035em;
+    }
+
+    .section-heading > p {
+      margin-bottom: 4px;
+      color: var(--ink-soft);
+    }
+
+    .answer {
+      margin-bottom: 28px;
+      padding: 22px 26px;
+      border-left: 6px solid var(--amber);
+      border-radius: 0 16px 16px 0;
+      background: var(--amber-soft);
+      font-size: 18px;
+    }
+
+    .answer strong {
+      font-family: Palatino, "Palatino Linotype", serif;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      padding: 24px;
+      border: 1px solid var(--ink);
+      border-radius: 16px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 {
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
+
+    .card p {
+      margin-bottom: 0;
+      color: var(--ink-soft);
+    }
+
+    .card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--ink-soft);
+    }
+
+    .card li + li {
+      margin-top: 6px;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 3px 9px;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      background: var(--cyan-soft);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tag.amber { background: var(--amber-soft); }
+    .tag.coral { background: var(--coral-soft); }
+    .tag.violet { background: var(--violet-soft); }
+
+    code {
+      padding: 1px 6px;
+      border-radius: 5px;
+      background: var(--paper-deep);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 0.86em;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 0;
+      padding: 20px;
+      overflow-x: auto;
+      border: 1px solid var(--ink);
+      border-radius: 14px;
+      color: #e8efe9;
+      background: #17303b;
+      font-family: Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      font-size: inherit;
+    }
+
+    .k { color: #f2b56b; }
+    .s { color: #9fd8c9; }
+    .c { color: #8ea3a8; }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, auto);
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 8px 0 28px;
+      padding: 26px;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .flow-box {
+      min-width: 150px;
+      padding: 16px 18px;
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      background: var(--cyan-soft);
+      text-align: center;
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+
+    .flow-box.amber { background: var(--amber-soft); }
+    .flow-box.coral { background: var(--coral-soft); }
+    .flow-box.violet { background: var(--violet-soft); }
+
+    .flow-box strong {
+      display: block;
+      font-family: Palatino, "Palatino Linotype", serif;
+      font-size: 18px;
+    }
+
+    .flow-box small {
+      color: var(--ink-soft);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .arrow {
+      color: var(--ink-soft);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .arrow b {
+      display: block;
+      color: var(--ink);
+      font-size: 22px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--ink);
+      border-radius: 16px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    th, td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--paper-deep);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .bars {
+      display: grid;
+      gap: 12px;
+      padding: 26px;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 190px 1fr 120px;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+
+    .bar-track {
+      height: 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      width: 0;
+      height: 100%;
+      border-radius: 999px;
+      background: var(--cyan);
+      transition: width 900ms ease;
+    }
+
+    .bar-fill.amber { background: var(--amber); }
+    .bar-fill.coral { background: var(--coral); }
+    .bar-fill.violet { background: var(--violet); }
+
+    .bar-value {
+      font-family: Monaco, Consolas, monospace;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .note {
+      margin-top: 14px;
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .callout {
+      margin-top: 22px;
+      padding: 18px 22px;
+      border: 1px dashed var(--ink);
+      border-radius: 14px;
+      background: var(--violet-soft);
+    }
+
+    footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 30px 0 50px;
+      border-top: 1px solid rgba(23, 48, 59, 0.18);
+      color: var(--ink-soft);
+      font-family: Monaco, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    footer a {
+      color: var(--cyan);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 600ms ease, transform 600ms ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 900px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .topbar nav {
+        justify-content: flex-start;
+      }
+
+      .hero,
+      .section-heading,
+      .split {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .arrow b {
+        transform: rotate(90deg);
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .bar-value {
+        text-align: left;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal,
+      .bar-fill {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-shell topbar">
+    <a class="brand" href="#top" aria-label="Stablecoin Field Guide home">
+      <span class="brand-mark">$1</span>
+      Stablecoin Field Guide
+    </a>
+    <nav aria-label="Page sections">
+      <a href="#essence">Essence</a>
+      <a href="#foundry">Foundry</a>
+      <a href="#rust">Rust</a>
+      <a href="#usdc">USDC</a>
+      <a href="#wallet">Wallet</a>
+      <a href="#solidity">Solidity</a>
+      <a href="#private">Own chain</a>
+      <a href="#tps">TPS</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="page-shell hero">
+      <div>
+        <p class="eyebrow">Stablecoins for engineers</p>
+        <h1>A dollar that lives in <em>a smart contract.</em></h1>
+        <p class="lead">What a stablecoin really is, who issues USDC, what a wallet actually holds, how Solidity relates to Ethereum, the Foundry and Rust toolchain, and why throughput depends on the chain, not the coin.</p>
+      </div>
+      <nav class="toc" aria-label="Questions">
+        <a href="#essence"><span>01</span>What is a stablecoin, in essence?</a>
+        <a href="#foundry"><span>02</span>What are Foundry and Anvil?</a>
+        <a href="#rust"><span>03</span>Rust tools for blockchain and stablecoins</a>
+        <a href="#usdc"><span>04</span>What are USDC and Circle?</a>
+        <a href="#wallet"><span>05</span>What is a wallet? A file? A hash?</a>
+        <a href="#solidity"><span>06</span>What is Solidity and how does it relate to Ethereum?</a>
+        <a href="#private"><span>07</span>Ethereum without the Ethereum network?</a>
+        <a href="#tps"><span>08</span>Stablecoin TPS and how to scale it</a>
+      </nav>
+    </section>
+
+    <section class="page-shell section reveal" id="essence">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">01 · The gist</p>
+          <h2>An IOU for a dollar, written as a token.</h2>
+        </div>
+        <p>A stablecoin is a crypto token designed to keep a steady price, almost always 1 token = 1 US dollar.</p>
+      </div>
+      <div class="answer"><strong>The essence:</strong> a stablecoin is a <strong>ledger entry on a blockchain</strong> plus a <strong>promise of redemption</strong>. Someone holds real dollars in a bank or in Treasury bills, and a smart contract tracks who owns claims on those dollars. Mint when dollars come in, burn when dollars go out. Everything else is detail.</div>
+      <div class="flow" aria-label="Mint and burn cycle">
+        <div class="flow-box amber"><strong>$100 in</strong><small>wire to issuer</small></div>
+        <div class="arrow"><b>→</b>mint()</div>
+        <div class="flow-box"><strong>100 tokens</strong><small>balanceOf[you] += 100</small></div>
+        <div class="arrow"><b>→</b>burn()</div>
+        <div class="flow-box coral"><strong>$100 out</strong><small>redeem to bank</small></div>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">On chain</span>
+          <h3>A token contract</h3>
+          <p>Usually an ERC-20 contract: a map of <code>address → balance</code>, plus <code>transfer</code>, <code>mint</code> and <code>burn</code>. Only the issuer may mint or burn.</p>
+        </article>
+        <article class="card">
+          <span class="tag amber">Off chain</span>
+          <h3>A reserve</h3>
+          <p>Cash and short term government debt held by regulated custodians. The reserve is what makes the token worth a dollar.</p>
+        </article>
+        <article class="card">
+          <span class="tag coral">The peg</span>
+          <h3>Arbitrage</h3>
+          <p>If the token trades at $0.99, traders buy it and redeem it for $1.00. At $1.01 they mint new tokens and sell. Redemption keeps the price near $1.</p>
+        </article>
+        <article class="card">
+          <span class="tag violet">Flavors</span>
+          <h3>Four kinds</h3>
+          <ul>
+            <li><strong>Fiat backed</strong>: USDC, USDT, PYUSD</li>
+            <li><strong>Crypto backed</strong>: DAI / USDS, over collateralized</li>
+            <li><strong>Commodity backed</strong>: PAXG (gold)</li>
+            <li><strong>Algorithmic</strong>: no hard reserve, TerraUSD collapsed in 2022</li>
+          </ul>
+        </article>
+      </div>
+      <div class="split" style="margin-top: 22px">
+        <pre><code><span class="k">contract</span> Stablecoin {
+    <span class="k">mapping</span>(address =&gt; uint256) <span class="k">public</span> balanceOf;
+    address <span class="k">public</span> issuer;
+
+    <span class="k">function</span> mint(address to, uint256 amount) <span class="k">external</span> {
+        <span class="k">require</span>(msg.sender == issuer);
+        balanceOf[to] += amount;
+    }
+
+    <span class="k">function</span> burn(uint256 amount) <span class="k">external</span> {
+        balanceOf[msg.sender] -= amount;
+    }
+
+    <span class="k">function</span> transfer(address to, uint256 amount) <span class="k">external</span> {
+        balanceOf[msg.sender] -= amount;
+        balanceOf[to] += amount;
+    }
+}</code></pre>
+        <div class="card">
+          <h3>Why it matters</h3>
+          <p>It moves at blockchain speed, 24/7, across borders, and any program can hold it or move it. Real stablecoins add blacklisting, pausing, upgradeable proxies, permits (gasless approvals) and role based minters, but this is the core.</p>
+          <p style="margin-top: 12px">The hard part is not the code. It is the bank accounts, audits, licenses and redemption operations behind it.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-shell section reveal" id="foundry">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">02 · Toolchain</p>
+          <h2>Foundry builds it. Anvil runs it locally.</h2>
+        </div>
+        <p>Foundry is a fast, Rust based toolkit for Ethereum smart contract development, started by Paradigm. Tests are written in Solidity itself.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">forge</span>
+          <h3>Build, test, deploy</h3>
+          <p>Compiles Solidity, runs unit and fuzz tests, measures gas, and deploys with scripts. Think <code>cargo</code> for contracts.</p>
+        </article>
+        <article class="card">
+          <span class="tag amber">anvil</span>
+          <h3>Local Ethereum node</h3>
+          <p>A dev chain on <code>localhost:8545</code>, chain id <code>31337</code>, 10 funded accounts, instant blocks. It can fork mainnet so you test against the real USDC contract.</p>
+        </article>
+        <article class="card">
+          <span class="tag coral">cast</span>
+          <h3>Swiss army CLI</h3>
+          <p>Call contracts, send transactions, decode data, convert units, query balances, from the terminal against any RPC.</p>
+        </article>
+        <article class="card">
+          <span class="tag violet">chisel</span>
+          <h3>Solidity REPL</h3>
+          <p>Type Solidity line by line and see results. Useful to explore types and snippets fast.</p>
+        </article>
+      </div>
+      <div class="split" style="margin-top: 22px">
+        <pre><code><span class="c">$ curl -L https://foundry.paradigm.xyz | bash</span>
+<span class="c">$ foundryup</span>
+
+forge init my-stablecoin
+forge build
+forge test -vvv
+
+anvil
+anvil --fork-url https://eth.llamarpc.com
+
+forge create src/Stablecoin.sol:Stablecoin \
+  --rpc-url http://127.0.0.1:8545 \
+  --private-key $ANVIL_KEY --broadcast
+
+cast call $USDC <span class="s">"balanceOf(address)(uint256)"</span> $ME
+cast send $TOKEN <span class="s">"transfer(address,uint256)"</span> $TO 1000000</code></pre>
+        <pre><code><span class="k">import</span> {Test} <span class="k">from</span> <span class="s">"forge-std/Test.sol"</span>;
+
+<span class="k">contract</span> StablecoinTest <span class="k">is</span> Test {
+    Stablecoin coin;
+
+    <span class="k">function</span> setUp() <span class="k">public</span> {
+        coin = <span class="k">new</span> Stablecoin();
+    }
+
+    <span class="k">function</span> test_onlyIssuerMints() <span class="k">public</span> {
+        vm.prank(address(0xBEEF));
+        vm.expectRevert();
+        coin.mint(address(this), 100);
+    }
+
+    <span class="k">function</span> testFuzz_transferKeepsSupply(uint96 amt) <span class="k">public</span> {
+        coin.mint(address(this), amt);
+        coin.transfer(address(1), amt);
+        assertEq(coin.balanceOf(address(1)), amt);
+    }
+}</code></pre>
+      </div>
+      <p class="note">Alternatives: Hardhat (JavaScript / TypeScript) is the other popular toolkit. Foundry wins on speed and on keeping everything in Solidity.</p>
+    </section>
+
+    <section class="page-shell section reveal" id="rust">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">03 · Rust ecosystem</p>
+          <h2>Rust is the language of crypto infrastructure.</h2>
+        </div>
+        <p>Contracts on Ethereum are mostly Solidity, but clients, tooling, and whole chains are increasingly written in Rust. Solana contracts are Rust.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Tool</th><th>What it is</th><th>Use it for</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>alloy</strong></td><td>Rust library to talk to EVM chains: RPC providers, signers, ABI encoding, the <code>sol!</code> macro</td><td>Backends that read balances, send USDC, listen to <code>Transfer</code> events. Successor of the deprecated <code>ethers-rs</code></td></tr>
+            <tr><td><strong>Foundry</strong></td><td>forge, cast, anvil, chisel, all written in Rust</td><td>Building and testing Solidity contracts</td></tr>
+            <tr><td><strong>revm</strong></td><td>The EVM implemented in Rust</td><td>Simulating transactions, embedded EVMs, used inside Foundry and Reth</td></tr>
+            <tr><td><strong>Reth</strong></td><td>Ethereum execution client in Rust, by Paradigm</td><td>Running your own node, or building a custom chain on its SDK</td></tr>
+            <tr><td><strong>Solana + Anchor</strong></td><td>Solana programs are Rust; Anchor is the framework; SPL Token and Token-2022 are the token standards</td><td>USDC on Solana is an SPL token. Token-2022 has transfer hooks and confidential transfers</td></tr>
+            <tr><td><strong>Arbitrum Stylus</strong></td><td>Write EVM compatible contracts in Rust, compiled to WASM</td><td>Rust contracts that interoperate with Solidity ones</td></tr>
+            <tr><td><strong>Polkadot SDK / ink!</strong></td><td>Framework to build blockchains in Rust, plus a Rust smart contract language</td><td>Your own app specific chain</td></tr>
+            <tr><td><strong>CosmWasm</strong></td><td>Rust smart contracts for Cosmos chains</td><td>Contracts on Cosmos based networks</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="split" style="margin-top: 22px">
+        <pre><code><span class="k">use</span> alloy::{primitives::{address, Address, U256}, providers::ProviderBuilder, sol};
+
+sol! {
+    <span class="k">#[sol(rpc)]</span>
+    contract IERC20 {
+        <span class="k">function</span> balanceOf(address owner) external view returns (uint256);
+    }
+}
+
+<span class="k">#[tokio::main]</span>
+<span class="k">async fn</span> main() -&gt; anyhow::Result&lt;()&gt; {
+    <span class="k">let</span> provider = ProviderBuilder::new()
+        .connect_http(<span class="s">"https://eth.llamarpc.com"</span>.parse()?);
+    <span class="k">let</span> usdc = IERC20::new(
+        address!(<span class="s">"A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"</span>), provider);
+    <span class="k">let</span> holder: Address = address!(<span class="s">"0000000000000000000000000000000000000001"</span>);
+    <span class="k">let</span> raw: U256 = usdc.balanceOf(holder).call().<span class="k">await</span>?;
+    println!(<span class="s">"{} USDC (6 decimals)"</span>, raw);
+    Ok(())
+}</code></pre>
+        <div class="card">
+          <h3>A sensible Rust stack</h3>
+          <ul>
+            <li>Contracts in <strong>Solidity</strong>, tested with <strong>forge</strong></li>
+            <li>Local chain with <strong>anvil</strong>, forking mainnet when needed</li>
+            <li>Backend in <strong>Rust + alloy</strong> to mint, transfer and index events</li>
+            <li><strong>revm</strong> to simulate before sending</li>
+            <li>Need Solana? <strong>Anchor</strong> + SPL Token</li>
+          </ul>
+          <p style="margin-top: 12px">Note: USDC uses <strong>6 decimals</strong>, so <code>1000000</code> means 1 USDC. ETH uses 18.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-shell section reveal" id="usdc">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">04 · The issuer</p>
+          <h2>USDC is the token. Circle is the company behind it.</h2>
+        </div>
+        <p>USDC (USD Coin) is a fiat backed stablecoin redeemable 1:1 for US dollars. Circle Internet Group issues it.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">History</span>
+          <h3>From Centre to Circle</h3>
+          <p>Launched in 2018 by the Centre consortium (Circle and Coinbase). Centre wound down in 2023 and Circle took full control. Circle listed on the NYSE in 2025 under <code>CRCL</code>.</p>
+        </article>
+        <article class="card">
+          <span class="tag amber">Reserves</span>
+          <h3>Cash and T-bills</h3>
+          <p>Backed by cash at banks and short dated US Treasuries, much of it in the Circle Reserve Fund managed by BlackRock. Monthly third party attestations are published.</p>
+        </article>
+        <article class="card">
+          <span class="tag coral">Business model</span>
+          <h3>Interest on reserves</h3>
+          <p>Holders get no yield. Circle earns the interest on the reserve assets and shares part of it with distribution partners such as Coinbase.</p>
+        </article>
+        <article class="card">
+          <span class="tag violet">Multi chain</span>
+          <h3>Native on many chains</h3>
+          <p>Ethereum, Solana, Base, Arbitrum, Optimism, Polygon, Avalanche and more. <strong>CCTP</strong> moves USDC across chains by burning on one and minting on the other, no wrapped tokens.</p>
+        </article>
+      </div>
+      <div class="split" style="margin-top: 22px">
+        <div class="card">
+          <h3>On Ethereum</h3>
+          <ul>
+            <li>Address: <code>0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48</code></li>
+            <li>An upgradeable proxy in front of Circle's <code>FiatToken</code> implementation</li>
+            <li>Admin powers: <code>mint</code>, <code>burn</code>, <code>blacklist</code>, <code>pause</code>, set minters</li>
+            <li>Supports <code>permit</code> (EIP-2612) and <code>transferWithAuthorization</code> (EIP-3009) for gasless flows</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>USDC vs USDT</h3>
+          <p><strong>USDT</strong> (Tether) is bigger by supply and dominant on Tron and in emerging markets. <strong>USDC</strong> positions itself as the regulated, transparent option, strong in US and EU (MiCA compliant). The US <strong>GENIUS Act</strong> (2025) created a federal framework for payment stablecoins.</p>
+          <p style="margin-top: 12px">Circle also builds <strong>Arc</strong>, its own L1 chain tuned for stablecoin payments, with USDC as the gas token.</p>
+        </div>
+      </div>
+      <div class="callout"><strong>Centralization trade-off:</strong> USDC is a blockchain token, but it is not decentralized money. Circle can freeze any address and can upgrade the contract. You trust Circle and its banks, the chain just moves the claims.</div>
+    </section>
+
+    <section class="page-shell section reveal" id="wallet">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">05 · Keys, not coins</p>
+          <h2>A wallet holds no money. It holds a key.</h2>
+        </div>
+        <p>Is it a file? Sometimes the key is stored in a file. Is it a link to a hash? The address is derived from a hash, but it is an identifier, not a pointer.</p>
+      </div>
+      <div class="answer"><strong>Short answer:</strong> a wallet is a <strong>private key</strong> (a random 256 bit number) plus software that signs with it. Your balance is not in the wallet. It is a number stored <strong>on chain</strong>, inside the USDC contract's <code>balanceOf</code> map, keyed by your address. Whoever has the private key can move it.</div>
+      <div class="flow" aria-label="Key derivation">
+        <div class="flow-box coral"><strong>Private key</strong><small>32 random bytes · secret</small></div>
+        <div class="arrow"><b>→</b>secp256k1</div>
+        <div class="flow-box violet"><strong>Public key</strong><small>64 bytes · shareable</small></div>
+        <div class="arrow"><b>→</b>keccak256, last 20 bytes</div>
+        <div class="flow-box"><strong>Address</strong><small>0x + 40 hex chars</small></div>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag coral">The secret</span>
+          <h3>Private key</h3>
+          <p>64 hex characters. Signs transactions. Lose it and funds are gone. Leak it and funds are stolen. There is no "forgot password".</p>
+        </article>
+        <article class="card">
+          <span class="tag amber">Human backup</span>
+          <h3>Seed phrase</h3>
+          <p>12 or 24 words (BIP-39). One seed deterministically derives many keys (BIP-32/44, path <code>m/44'/60'/0'/0/0</code> for Ethereum). Back up the words, recover every account.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Where it lives</span>
+          <h3>So, a file?</h3>
+          <p>Software wallets store an encrypted <strong>keystore JSON file</strong> or encrypted seed. Hardware wallets (Ledger, Trezor) keep the key in a chip and never export it. Custodial wallets (an exchange) keep it for you.</p>
+        </article>
+        <article class="card">
+          <span class="tag violet">Next gen</span>
+          <h3>Smart accounts</h3>
+          <p>With account abstraction (ERC-4337, EIP-7702) the account is a contract: multisig, spending limits, social recovery, and paying gas in USDC.</p>
+        </article>
+      </div>
+      <pre style="margin-top: 22px"><code>cast wallet new
+
+cast wallet address --private-key 0x0000000000000000000000000000000000000000000000000000000000000001
+<span class="c">0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf</span>
+
+cast call $USDC <span class="s">"balanceOf(address)(uint256)"</span> 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf</code></pre>
+      <p class="note">That key is the number 1, publicly known and drained. Never use it for real funds.</p>
+    </section>
+
+    <section class="page-shell section reveal" id="solidity">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">06 · The language</p>
+          <h2>Solidity is to the EVM what Java is to the JVM.</h2>
+        </div>
+        <p>Solidity is a statically typed, curly brace language for writing smart contracts. It was proposed by Gavin Wood in 2014 and is developed by a team at the Ethereum Foundation.</p>
+      </div>
+      <div class="flow" aria-label="Solidity compile path">
+        <div class="flow-box amber"><strong>.sol source</strong><small>Solidity</small></div>
+        <div class="arrow"><b>→</b>solc</div>
+        <div class="flow-box violet"><strong>Bytecode + ABI</strong><small>EVM opcodes · JSON interface</small></div>
+        <div class="arrow"><b>→</b>deploy tx</div>
+        <div class="flow-box"><strong>Contract</strong><small>runs on every node's EVM</small></div>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Ethereum</span>
+          <h3>The platform</h3>
+          <p>A network of nodes that agree on state. It ships a virtual machine, the <strong>EVM</strong>, that executes bytecode and charges <strong>gas</strong> for every operation.</p>
+        </article>
+        <article class="card">
+          <span class="tag amber">Solidity</span>
+          <h3>One language for it</h3>
+          <p>The most used language that compiles to EVM bytecode. Ethereum does not run Solidity, it runs bytecode. Alternatives: <strong>Vyper</strong> (Python like) and <strong>Yul</strong> (low level).</p>
+        </article>
+        <article class="card">
+          <span class="tag coral">Portable</span>
+          <h3>Any EVM chain</h3>
+          <p>The same Solidity contract deploys to Base, Arbitrum, Optimism, Polygon, BNB Chain, Avalanche C-Chain, or a private chain. This is why USDC exists on so many networks.</p>
+        </article>
+        <article class="card">
+          <span class="tag violet">Gotchas</span>
+          <h3>Code is law</h3>
+          <p>Deployed code is immutable (unless behind a proxy), public, and holds money. Reentrancy, access control and integer bugs cost real funds. Audit, fuzz, and use OpenZeppelin libraries.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="page-shell section reveal" id="private">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">07 · Your own chain</p>
+          <h2>Yes: Ethereum the software runs anywhere.</h2>
+        </div>
+        <p>"Ethereum" means two things: the open source protocol and software (EVM, clients), and the public mainnet (chain id 1). You can run the first without the second.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Option</th><th>What it is</th><th>Connected to mainnet?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Local dev chain</strong></td><td>Anvil or Hardhat on your laptop, throwaway state</td><td>No (can fork a snapshot of it)</td></tr>
+            <tr><td><strong>Public testnets</strong></td><td>Sepolia, Hoodi: real networks, valueless ETH from faucets</td><td>No, separate chains</td></tr>
+            <tr><td><strong>Private / permissioned</strong></td><td>Hyperledger Besu with QBFT or IBFT 2.0, known validators, enterprise networks</td><td>No, fully yours</td></tr>
+            <tr><td><strong>Layer 2 rollup</strong></td><td>OP Stack, Arbitrum Orbit, ZK stacks: your own EVM chain that posts data and proofs to Ethereum</td><td>Yes, settles to it</td></tr>
+            <tr><td><strong>Other EVM L1s</strong></td><td>BNB Chain, Avalanche, Polygon PoS: independent networks running the EVM</td><td>No, bridged</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout"><strong>The catch:</strong> on your own chain you can deploy a copy of the USDC contract, but those tokens are worth nothing unless a trusted issuer backs them. Value comes from the reserve and the redemption promise, not from the code. Interoperability with real liquidity needs bridges or a rollup that settles to mainnet.</div>
+    </section>
+
+    <section class="page-shell section reveal" id="tps">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">08 · Throughput</p>
+          <h2>A stablecoin has no TPS. Its chain does.</h2>
+        </div>
+        <p>A USDC transfer is just a transaction on whatever chain it lives on. On Ethereum mainnet it competes for block space with everything else.</p>
+      </div>
+      <div class="answer"><strong>Limited by Ethereum?</strong> On L1, yes. Blocks come every 12 seconds with a gas limit. An ERC-20 transfer costs about 35k to 65k gas, so mainnet handles on the order of <strong>tens of transfers per second</strong>, shared with DeFi, NFTs and everything else. To scale you move the stablecoin to where block space is cheap.</div>
+      <div class="bars" id="bars">
+        <div class="bar-row"><span>Ethereum L1</span><div class="bar-track"><div class="bar-fill coral" data-width="3"></div></div><span class="bar-value">~15-30 TPS</span></div>
+        <div class="bar-row"><span>Tron (USDT heavy)</span><div class="bar-track"><div class="bar-fill amber" data-width="10"></div></div><span class="bar-value">~100s TPS</span></div>
+        <div class="bar-row"><span>Base / Arbitrum (L2)</span><div class="bar-track"><div class="bar-fill" data-width="25"></div></div><span class="bar-value">~100s-1000s TPS</span></div>
+        <div class="bar-row"><span>Solana</span><div class="bar-track"><div class="bar-fill violet" data-width="55"></div></div><span class="bar-value">~1000s TPS</span></div>
+        <div class="bar-row"><span>Visa (average load)</span><div class="bar-track"><div class="bar-fill amber" data-width="45"></div></div><span class="bar-value">~1000s TPS</span></div>
+        <div class="bar-row"><span>Exchange internal ledger</span><div class="bar-track"><div class="bar-fill" data-width="100"></div></div><span class="bar-value">off chain</span></div>
+      </div>
+      <p class="note">Bars are relative orders of magnitude for real sustained user transactions, not marketing peak numbers. Figures vary with load, gas limits and transaction type.</p>
+      <div class="grid" style="margin-top: 22px">
+        <article class="card">
+          <span class="tag">1 · Layer 2 rollups</span>
+          <h3>Execute off L1, settle on L1</h3>
+          <p>Base, Arbitrum, Optimism batch thousands of transfers and post compressed data to Ethereum. Blobs (EIP-4844) made this much cheaper. Fees drop to cents or less.</p>
+        </article>
+        <article class="card">
+          <span class="tag amber">2 · Multi chain</span>
+          <h3>Issue natively on fast chains</h3>
+          <p>Circle mints USDC directly on Solana, Base and others, and CCTP moves it between them. Volume spreads across many chains instead of one.</p>
+        </article>
+        <article class="card">
+          <span class="tag coral">3 · Stablecoin chains</span>
+          <h3>Purpose built L1s</h3>
+          <p>Chains optimized for payments: Circle's Arc, Stripe's Tempo, Plasma for USDT. Stablecoin as gas, fast finality, high throughput.</p>
+        </article>
+        <article class="card">
+          <span class="tag violet">4 · Off chain netting</span>
+          <h3>Batch and settle</h3>
+          <p>Exchanges, custodians and payment processors move balances in an internal database and only settle net amounts on chain. Payment channels follow the same idea.</p>
+        </article>
+        <article class="card">
+          <span class="tag">5 · L1 upgrades</span>
+          <h3>Bigger Ethereum blocks</h3>
+          <p>Ethereum keeps raising the gas limit and blob capacity, and parallel execution and faster clients (like Reth) push L1 further. Still, L1 is the settlement layer, not the payments layer.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-shell">
+    <span>Stablecoin Field Guide · Mint → Transfer → Burn</span>
+    <span><a href="index.html">Crypto notes</a> · <a href="blockhain.html">Blockchain Atlas</a> · <a href="stablecoins.md">stablecoins.md</a></span>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        entry.target.classList.add("visible")
+        entry.target.querySelectorAll(".bar-fill").forEach(bar => {
+          bar.style.width = bar.dataset.width + "%"
+        })
+      })
+    }, { threshold: 0.12 })
+
+    document.querySelectorAll(".reveal").forEach(element => observer.observe(element))
+  </script>
+</body>
+</html>
